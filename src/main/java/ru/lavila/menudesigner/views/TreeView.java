@@ -6,9 +6,9 @@ import ru.lavila.menudesigner.presenters.PopularityFormatter;
 import javax.swing.*;
 import javax.swing.tree.TreeModel;
 
-public class ItemsTree extends JTree
+public class TreeView extends JTree
 {
-    public ItemsTree(TreeModel treeModel)
+    public TreeView(TreeModel treeModel)
     {
         super(treeModel);
     }

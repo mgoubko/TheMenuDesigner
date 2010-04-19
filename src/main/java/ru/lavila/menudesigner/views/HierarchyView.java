@@ -1,0 +1,60 @@
+package ru.lavila.menudesigner.views;
+
+import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.presenters.ItemsTablePresenter;
+import ru.lavila.menudesigner.presenters.ItemsTreePresenter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class HierarchyView extends JPanel
+{
+    private final Hierarchy hierarchy;
+    private boolean asTree;
+    private JScrollPane scrollPane;
+    private JButton switchView;
+
+    public HierarchyView(Hierarchy hierarchy, boolean asTree)
+    {
+        super(new BorderLayout());
+        setMinimumSize(new Dimension(200, 100));
+        setPreferredSize(new Dimension(400, 500));
+
+        this.hierarchy = hierarchy;
+        this.asTree = asTree;
+
+        buildGUI();
+    }
+
+    private void buildGUI()
+    {
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        switchView = new JButton();
+        switchView.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                asTree = !asTree;
+                rebuildView();
+            }
+        });
+        toolbar.add(switchView);
+        add(toolbar, BorderLayout.NORTH);
+
+        scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
+
+        rebuildView();
+    }
+
+    private void rebuildView()
+    {
+        scrollPane.setViewportView(asTree ?
+                new TreeView(new ItemsTreePresenter(hierarchy)) :
+                new TableView(new ItemsTablePresenter(hierarchy))
+        );
+        switchView.setText(asTree ? "Table view" : "Tree view");
+    }
+}
