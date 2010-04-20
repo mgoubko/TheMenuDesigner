@@ -2,8 +2,8 @@ package ru.lavila.menudesigner.models;
 
 public class ItemImpl implements Item
 {
-    private final String name;
-    private final double popularity;
+    private String name;
+    private double popularity;
 
     public ItemImpl(String name, double popularity)
     {
@@ -19,5 +19,15 @@ public class ItemImpl implements Item
     public double getPopularity()
     {
         return popularity;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setPopularity(double popularity)
+    {
+        this.popularity = popularity;
     }
 }

@@ -4,7 +4,7 @@ import java.util.*;
 
 public class CategoryImpl implements Category
 {
-    private final String name;
+    private String name;
     private final List<Choice> choices;
 
     public CategoryImpl(String name)
@@ -36,5 +36,10 @@ public class CategoryImpl implements Category
             popularity += choice.getPopularity();
         }
         return popularity;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 }
