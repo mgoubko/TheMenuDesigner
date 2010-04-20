@@ -2,8 +2,8 @@ package ru.lavila.menudesigner.models;
 
 import java.util.List;
 
-public interface Category extends Choice
+public interface Category extends Element
 {
-    public List<Choice> getChoices();
-    public void add(Choice... choices);
+    public List<Element> getElements();
+    public void add(Element... elements);
 }

@@ -2,25 +2,26 @@ package ru.lavila.menudesigner.models;
 
 import java.util.*;
 
-public class CategoryImpl implements Category
+public class CategoryImpl extends ElementImpl implements Category
 {
     private String name;
-    private final List<Choice> choices;
+    private final List<Element> elements;
 
     public CategoryImpl(String name)
     {
         this.name = name;
-        choices = new ArrayList<Choice>();
+        elements = new ArrayList<Element>();
     }
 
-    public List<Choice> getChoices()
+    public List<Element> getElements()
     {
-        return Collections.unmodifiableList(choices);
+        return Collections.unmodifiableList(elements);
     }
 
-    public void add(Choice... newChoices)
+    public void add(Element... newElements)
     {
-        choices.addAll(Arrays.asList(newChoices));
+        elements.addAll(Arrays.asList(newElements));
+        fireElementsAdded(this, newElements);
     }
 
     public String getName()
@@ -31,9 +32,9 @@ public class CategoryImpl implements Category
     public double getPopularity()
     {
         double popularity = 0;
-        for (Choice choice : choices)
+        for (Element element : elements)
         {
-            popularity += choice.getPopularity();
+            popularity += element.getPopularity();
         }
         return popularity;
     }

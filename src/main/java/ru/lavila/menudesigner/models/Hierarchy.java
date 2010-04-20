@@ -20,15 +20,15 @@ public class Hierarchy
     private List<Item> getItems(Category category)
     {
         List<Item> items = new ArrayList<Item>();
-        for (Choice choice : category.getChoices())
+        for (Element element : category.getElements())
         {
-            if (choice instanceof Item)
+            if (element instanceof Item)
             {
-                items.add((Item) choice);
+                items.add((Item) element);
             }
-            else if (choice instanceof Category)
+            else if (element instanceof Category)
             {
-                items.addAll(getItems((Category) choice));
+                items.addAll(getItems((Category) element));
             }
         }
         return items;

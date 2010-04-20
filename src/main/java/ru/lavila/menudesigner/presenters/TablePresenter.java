@@ -7,11 +7,11 @@ import ru.lavila.menudesigner.presenters.PopularityPresenter;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
-public class ItemsTablePresenter extends AbstractTableModel
+public class TablePresenter extends AbstractTableModel
 {
     private final List<Item> items;
 
-    public ItemsTablePresenter(Hierarchy hierarchy)
+    public TablePresenter(Hierarchy hierarchy)
     {
         this.items = hierarchy.getItems();
     }
