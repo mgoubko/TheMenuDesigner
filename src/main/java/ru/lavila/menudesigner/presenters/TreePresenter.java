@@ -71,12 +71,14 @@ public class TreePresenter extends DefaultTreeModel
         public void elementsAdded(Category parent, Element... children)
         {
             if (parent != element) return;
-            
-            for (Element child : children)
+
+            int[] indexes = new int[children.length];
+            for (int i = 0; i < children.length; i++)
             {
-                ElementTreeNode childNode = new ElementTreeNode(child);
-                insertNodeInto(childNode, this, parent.getElements().indexOf(child));
+                indexes[i] = parent.getElements().indexOf(children[i]);
+                this.insert(new ElementTreeNode(children[i]), indexes[i]);
             }
+            nodesWereInserted(this, indexes);
         }
     }
 }
