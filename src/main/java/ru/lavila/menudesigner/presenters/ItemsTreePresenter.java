@@ -1,55 +1,57 @@
 package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.models.Category;
+import ru.lavila.menudesigner.models.Choice;
 import ru.lavila.menudesigner.models.Hierarchy;
 
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 
-public class ItemsTreePresenter implements TreeModel
+public class ItemsTreePresenter extends DefaultTreeModel
 {
-    private final Hierarchy hierarchy;
-
     public ItemsTreePresenter(Hierarchy hierarchy)
     {
-        this.hierarchy = hierarchy;
+        super(getTreeNode(hierarchy.root));
     }
 
-    public Object getRoot()
+    private static MutableTreeNode getTreeNode(Choice choice)
     {
-        return hierarchy.root;
+        if (choice instanceof Category)
+        {
+            DefaultMutableTreeNode node = new ChoiceTreeNode(choice, true);
+            for (Choice child : ((Category) choice).getChoices())
+            {
+                node.add(getTreeNode(child));
+            }
+            return node;
+        }
+        else
+        {
+            return new ChoiceTreeNode(choice, false);
+        }
     }
 
-    public Object getChild(Object parent, int index)
+    private static class ChoiceTreeNode extends DefaultMutableTreeNode
     {
-        return parent instanceof Category ? ((Category) parent).getChoices().get(index) : null;
-    }
+        private final Choice choice;
 
-    public int getChildCount(Object parent)
-    {
-        return parent instanceof Category ? ((Category) parent).getChoices().size() : 0;
-    }
+        private ChoiceTreeNode(Choice choice, boolean allowsChildren)
+        {
+            super(choice.getName(), allowsChildren);
+            this.choice = choice;
+        }
 
-    public boolean isLeaf(Object node)
-    {
-        return !(node instanceof Category);
-    }
+        @Override
+        public void setUserObject(Object userObject)
+        {
+            super.setUserObject(userObject);
+            choice.setName(userObject.toString());
+        }
 
-    public void valueForPathChanged(TreePath path, Object newValue)
-    {
-    }
-
-    public int getIndexOfChild(Object parent, Object child)
-    {
-        return parent instanceof Category ? ((Category) parent).getChoices().indexOf(child) : 0;
-    }
-
-    public void addTreeModelListener(TreeModelListener l)
-    {
-    }
-
-    public void removeTreeModelListener(TreeModelListener l)
-    {
+        @Override
+        public String toString()
+        {
+            return choice.getName();
+        }
     }
 }
