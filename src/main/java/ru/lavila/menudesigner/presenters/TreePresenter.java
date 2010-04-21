@@ -30,39 +30,7 @@ public class TreePresenter extends DefaultTreeModel
         }
     }
 
-    public void addCategory(TreePath parentPath)
-    {
-        ElementTreeNode parentNode = (ElementTreeNode) (parentPath == null ? getRoot() : parentPath.getLastPathComponent());
-        if (parentNode.element instanceof Category)
-        {
-            ((Category) parentNode.element).add(new CategoryImpl("New category"));
-        }
-    }
-
-    public void removeNodes(TreePath[] paths)
-    {
-        if (paths == null) return;
-        Map<Category, Collection<Element>> toRemove = new HashMap<Category, Collection<Element>>();
-        for (TreePath path : paths)
-        {
-            ElementTreeNode childNode = (ElementTreeNode) path.getLastPathComponent();
-            Category parent = (Category) ((ElementTreeNode) childNode.getParent()).element;
-            Collection<Element> parentElements = toRemove.get(parent);
-            if (parentElements == null)
-            {
-                parentElements = new HashSet<Element>();
-                toRemove.put(parent, parentElements);
-            }
-            parentElements.add(childNode.element);
-        }
-        for (Category category : toRemove.keySet())
-        {
-            Collection<Element> elements = toRemove.get(category);
-            category.remove(elements.toArray(new Element[elements.size()]));
-        }
-    }
-
-    private class ElementTreeNode extends DefaultMutableTreeNode implements ElementListener
+    public class ElementTreeNode extends DefaultMutableTreeNode implements ElementListener
     {
         public final Element element;
 

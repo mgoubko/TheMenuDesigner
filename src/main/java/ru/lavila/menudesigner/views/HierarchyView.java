@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.views;
 
+import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -69,7 +70,7 @@ public class HierarchyView extends JPanel
         scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
 
-        treeView = new TreeView(new TreePresenter(hierarchy));
+        treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy));
         tableView = new TableView(new TablePresenter(hierarchy));
 
         rebuildView();
