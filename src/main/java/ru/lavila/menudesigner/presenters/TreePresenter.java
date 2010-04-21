@@ -71,6 +71,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             parentNode.remove(node);
         }
+        Arrays.sort(removedIndexes);
         nodesWereRemoved(parentNode, removedIndexes, removedNodes);
     }
 
