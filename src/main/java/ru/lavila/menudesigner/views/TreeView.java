@@ -18,15 +18,11 @@ public class TreeView extends JTree
     {
         TreePath path = getSelectionPath();
         expandPath(path);
-        ((TreePresenter) getModel()).addCategory(path == null ? null : path.getLastPathComponent());
+        ((TreePresenter) getModel()).addCategory(path);
     }
 
     public void removeSelection()
     {
-        TreePath path = getSelectionPath();
-        if (path != null)
-        {
-            ((TreePresenter) getModel()).removeNode(path.getLastPathComponent());
-        }
+        ((TreePresenter) getModel()).removeNodes(getSelectionPaths());
     }
 }
