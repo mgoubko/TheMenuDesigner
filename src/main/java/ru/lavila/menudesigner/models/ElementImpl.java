@@ -5,7 +5,7 @@ import java.util.List;
 
 public abstract class ElementImpl implements Element
 {
-    private final List<ElementListener> listeners;
+    protected final List<ElementListener> listeners;
 
     public ElementImpl()
     {
@@ -15,13 +15,5 @@ public abstract class ElementImpl implements Element
     public void addModelListener(ElementListener listener)
     {
         listeners.add(listener);
-    }
-
-    protected void fireElementsAdded(Category parent, Element... elements)
-    {
-        for (ElementListener listener : listeners)
-        {
-            listener.elementsAdded(parent, elements);
-        }
     }
 }

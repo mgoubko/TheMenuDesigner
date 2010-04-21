@@ -21,7 +21,13 @@ public class CategoryImpl extends ElementImpl implements Category
     public void add(Element... newElements)
     {
         elements.addAll(Arrays.asList(newElements));
-        fireElementsAdded(this, newElements);
+        fireElementsAdded(newElements);
+    }
+
+    public void remove(Element... elementsToRemove)
+    {
+        elements.removeAll(Arrays.asList(elementsToRemove));
+        fireElementsRemoved(elementsToRemove);
     }
 
     public String getName()
@@ -42,5 +48,22 @@ public class CategoryImpl extends ElementImpl implements Category
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    protected void fireElementsAdded(Element... elements)
+    {
+        for (ElementListener listener : listeners)
+        {
+            listener.elementsAdded(this, elements);
+        }
+    }
+
+
+    protected void fireElementsRemoved(Element... elements)
+    {
+        for (ElementListener listener : listeners)
+        {
+            listener.elementsRemoved(this, elements);
+        }
     }
 }

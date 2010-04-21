@@ -56,6 +56,16 @@ public class HierarchyView extends JPanel
         });
         toolbar.add(newCategory);
 
+        JButton remove = new JButton("Remove");
+        remove.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                treeView.removeSelection();
+            }
+        });
+        toolbar.add(remove);
+
         scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
 

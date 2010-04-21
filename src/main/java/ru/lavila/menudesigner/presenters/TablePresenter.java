@@ -2,7 +2,6 @@ package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
-import ru.lavila.menudesigner.presenters.PopularityPresenter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
