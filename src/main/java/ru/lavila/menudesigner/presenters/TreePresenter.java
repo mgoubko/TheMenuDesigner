@@ -53,26 +53,32 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         nodesWereInserted(node, indexes);
     }
 
-    public void elementsRemoved(Category parent, Element... elements)
+    public void elementsRemoved(Map<Category, Collection<Element>> elementsMap)
     {
-        Collection<Element> elementsList = Arrays.asList(elements);
-        ElementTreeNode parentNode = nodes.get(parent);
-        ElementTreeNode[] removedNodes = new ElementTreeNode[elements.length];
-        int[] removedIndexes = new int[elements.length];
-        int removeIndex = 0;
-        for (Element element : elementsList)
+        for (Category category : elementsMap.keySet())
         {
-            ElementTreeNode node = nodes.get(element);
-            removedNodes[removeIndex] = node;
-            removedIndexes[removeIndex] = parentNode.getIndex(node);
-            removeIndex++;
+            Collection<Element> elementsList = elementsMap.get(category);
+            ElementTreeNode parentNode = nodes.get(category);
+            if (parentNode != null)
+            {
+                ElementTreeNode[] removedNodes = new ElementTreeNode[elementsList.size()];
+                int[] removedIndexes = new int[elementsList.size()];
+                int removeIndex = 0;
+                for (Element element : elementsList)
+                {
+                    ElementTreeNode node = nodes.get(element);
+                    removedNodes[removeIndex] = node;
+                    removedIndexes[removeIndex] = parentNode.getIndex(node);
+                    removeIndex++;
+                }
+                for (ElementTreeNode node : removedNodes)
+                {
+                    parentNode.remove(node);
+                }
+                Arrays.sort(removedIndexes);
+                nodesWereRemoved(parentNode, removedIndexes, removedNodes);
+            }
         }
-        for (ElementTreeNode node : removedNodes)
-        {
-            parentNode.remove(node);
-        }
-        Arrays.sort(removedIndexes);
-        nodesWereRemoved(parentNode, removedIndexes, removedNodes);
     }
 
     public static class ElementTreeNode extends DefaultMutableTreeNode

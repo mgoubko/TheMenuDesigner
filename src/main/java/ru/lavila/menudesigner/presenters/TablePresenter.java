@@ -3,7 +3,9 @@ package ru.lavila.menudesigner.presenters;
 import ru.lavila.menudesigner.models.*;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class TablePresenter extends AbstractTableModel implements HierarchyListener
 {
@@ -93,22 +95,25 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
         if (lastRow != -1) fireTableRowsInserted(firstRow, lastRow);
     }
 
-    public void elementsRemoved(Category parent, Element... elements)
+    public void elementsRemoved(Map<Category, Collection<Element>> elementsMap)
     {
         int firstRow = getRowCount();
         int lastRow = -1;
-        for (Element element : elements)
+        for (Collection<Element> elements : elementsMap.values())
         {
-            if (element instanceof Item)
+            for (Element element : elements)
             {
-                int index = getItems().indexOf(element);
-                if (index < firstRow) firstRow = index;
-                if (index > lastRow) lastRow = index;
+                if (element instanceof Item)
+                {
+                    int index = getItems().indexOf(element);
+                    if (index < firstRow) firstRow = index;
+                    if (index > lastRow) lastRow = index;
+                }
             }
         }
 
         items = null;
-        
+
         //todo: collect separate intervals
         if (lastRow != -1) fireTableRowsDeleted(firstRow, lastRow);
     }

@@ -1,7 +1,6 @@
 package ru.lavila.menudesigner.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Hierarchy implements Category.CategoryListener
 {
@@ -58,8 +57,9 @@ public class Hierarchy implements Category.CategoryListener
         }
     }
 
-    private void stopListeningTo(Element... elements)
+    private void prepareToRemove(Category parent, Collection<Element> elements, Map<Category, Collection<Element>> collector)
     {
+        collector.put(parent, elements);
         for (Element element : elements)
         {
             if (element instanceof Category)
@@ -68,7 +68,7 @@ public class Hierarchy implements Category.CategoryListener
                 category.removeModelListener(this);
                 if (category.elementsCount() > 0)
                 {
-                    stopListeningTo(category.getElements().toArray(new Element[category.elementsCount()]));
+                    prepareToRemove(category, category.getElements(), collector);
                 }
             }
         }
@@ -90,15 +90,16 @@ public class Hierarchy implements Category.CategoryListener
 
     public void elementsRemoved(Category category, Element... elements)
     {
-        stopListeningTo(elements);
-        fireElementsRemoved(category, elements);
+        Map<Category, Collection<Element>> collector = new HashMap<Category, Collection<Element>>();
+        prepareToRemove(category, Arrays.asList(elements), collector);
+        fireElementsRemoved(collector);
     }
 
-    private void fireElementsRemoved(Category category, Element... elements)
+    private void fireElementsRemoved(Map<Category, Collection<Element>> elementsMap)
     {
         for (HierarchyListener listener : listeners)
         {
-            listener.elementsRemoved(category, elements);
+            listener.elementsRemoved(elementsMap);
         }
     }
 
