@@ -43,14 +43,17 @@ public class TreeController
         for (TreePath path : paths)
         {
             TreePresenter.ElementTreeNode childNode = (TreePresenter.ElementTreeNode) path.getLastPathComponent();
-            Category parent = (Category) ((TreePresenter.ElementTreeNode) childNode.getParent()).element;
-            Collection<Element> parentElements = toRemove.get(parent);
-            if (parentElements == null)
+            if (childNode.getParent() != null)
             {
-                parentElements = new HashSet<Element>();
-                toRemove.put(parent, parentElements);
+                Category parent = (Category) ((TreePresenter.ElementTreeNode) childNode.getParent()).element;
+                Collection<Element> parentElements = toRemove.get(parent);
+                if (parentElements == null)
+                {
+                    parentElements = new HashSet<Element>();
+                    toRemove.put(parent, parentElements);
+                }
+                parentElements.add(childNode.element);
             }
-            parentElements.add(childNode.element);
         }
         for (Category category : toRemove.keySet())
         {
