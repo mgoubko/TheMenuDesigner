@@ -1,23 +1,33 @@
 package ru.lavila.menudesigner.presenters;
 
-import ru.lavila.menudesigner.models.Hierarchy;
-import ru.lavila.menudesigner.models.Item;
+import ru.lavila.menudesigner.models.*;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
-public class TablePresenter extends AbstractTableModel
+public class TablePresenter extends AbstractTableModel implements HierarchyListener
 {
-    private final List<Item> items;
+    private final Hierarchy hierarchy;
+    private List<Item> items;
 
     public TablePresenter(Hierarchy hierarchy)
     {
-        this.items = hierarchy.getItems();
+        this.hierarchy = hierarchy;
+        hierarchy.addModelListener(this);
+    }
+
+    private List<Item> getItems()
+    {
+        if (items == null)
+        {
+            items = hierarchy.getItems();
+        }
+        return items;
     }
 
     public int getRowCount()
     {
-        return items.size();
+        return getItems().size();
     }
 
     public int getColumnCount()
@@ -27,14 +37,14 @@ public class TablePresenter extends AbstractTableModel
 
     public Object getValueAt(int rowIndex, int columnIndex)
     {
-        Item item = items.get(rowIndex);
+        Item item = getItems().get(rowIndex);
         return columnIndex == 0 ? item.getName() : new PopularityPresenter(item.getPopularity());
     }
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex)
     {
-        Item item = items.get(rowIndex);
+        Item item = getItems().get(rowIndex);
         if (columnIndex == 0)
         {
             item.setName(value.toString());
@@ -61,5 +71,45 @@ public class TablePresenter extends AbstractTableModel
     public Class<?> getColumnClass(int columnIndex)
     {
         return columnIndex == 0 ? String.class : PopularityPresenter.class;
+    }
+
+    public void elementsAdded(Category parent, Element... elements)
+    {
+        items = null;
+
+        int firstRow = getRowCount();
+        int lastRow = -1;
+        for (Element element : elements)
+        {
+            if (element instanceof Item)
+            {
+                int index = getItems().indexOf(element);
+                if (index < firstRow) firstRow = index;
+                if (index > lastRow) lastRow = index;
+            }
+        }
+
+        //todo: collect separate intervals
+        if (lastRow != -1) fireTableRowsInserted(firstRow, lastRow);
+    }
+
+    public void elementsRemoved(Category parent, Element... elements)
+    {
+        int firstRow = getRowCount();
+        int lastRow = -1;
+        for (Element element : elements)
+        {
+            if (element instanceof Item)
+            {
+                int index = getItems().indexOf(element);
+                if (index < firstRow) firstRow = index;
+                if (index > lastRow) lastRow = index;
+            }
+        }
+
+        items = null;
+        
+        //todo: collect separate intervals
+        if (lastRow != -1) fireTableRowsDeleted(firstRow, lastRow);
     }
 }

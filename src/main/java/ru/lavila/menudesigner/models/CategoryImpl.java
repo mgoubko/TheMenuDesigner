@@ -2,20 +2,27 @@ package ru.lavila.menudesigner.models;
 
 import java.util.*;
 
-public class CategoryImpl extends ElementImpl implements Category
+public class CategoryImpl implements Category
 {
     private String name;
     private final List<Element> elements;
+    private final List<CategoryListener> listeners;
 
     public CategoryImpl(String name)
     {
         this.name = name;
         elements = new ArrayList<Element>();
+        listeners = new ArrayList<CategoryListener>();
     }
 
     public List<Element> getElements()
     {
         return Collections.unmodifiableList(elements);
+    }
+
+    public int elementsCount()
+    {
+        return elements.size();
     }
 
     public void add(Element... newElements)
@@ -50,18 +57,27 @@ public class CategoryImpl extends ElementImpl implements Category
         this.name = name;
     }
 
+    public void addModelListener(CategoryListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void removeModelListener(CategoryListener listener)
+    {
+        listeners.remove(listener);
+    }
+
     protected void fireElementsAdded(Element... elements)
     {
-        for (ElementListener listener : listeners)
+        for (CategoryListener listener : listeners)
         {
             listener.elementsAdded(this, elements);
         }
     }
 
-
     protected void fireElementsRemoved(Element... elements)
     {
-        for (ElementListener listener : listeners)
+        for (CategoryListener listener : listeners)
         {
             listener.elementsRemoved(this, elements);
         }

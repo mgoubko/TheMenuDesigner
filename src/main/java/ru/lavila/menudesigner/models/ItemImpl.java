@@ -1,6 +1,6 @@
 package ru.lavila.menudesigner.models;
 
-public class ItemImpl extends ElementImpl implements Item
+public class ItemImpl implements Item
 {
     private String name;
     private double popularity;

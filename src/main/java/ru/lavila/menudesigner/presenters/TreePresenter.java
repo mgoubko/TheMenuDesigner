@@ -5,19 +5,30 @@ import ru.lavila.menudesigner.models.*;
 import javax.swing.tree.*;
 import java.util.*;
 
-public class TreePresenter extends DefaultTreeModel
+public class TreePresenter extends DefaultTreeModel implements HierarchyListener
 {
+    private final Map<Element, ElementTreeNode> nodes;
+
     public TreePresenter(Hierarchy hierarchy)
     {
         super(null);
+        nodes = new HashMap<Element, ElementTreeNode>();
         setRoot(getTreeNode(hierarchy.root));
+        hierarchy.addModelListener(this);
+    }
+
+    private ElementTreeNode buildNode(Element element)
+    {
+        ElementTreeNode node = new ElementTreeNode(element);
+        nodes.put(element, node);
+        return node;
     }
 
     private MutableTreeNode getTreeNode(Element element)
     {
         if (element instanceof Category)
         {
-            DefaultMutableTreeNode node = new ElementTreeNode(element);
+            DefaultMutableTreeNode node = buildNode(element);
             for (Element child : ((Category) element).getElements())
             {
                 node.add(getTreeNode(child));
@@ -26,11 +37,44 @@ public class TreePresenter extends DefaultTreeModel
         }
         else
         {
-            return new ElementTreeNode(element);
+            return buildNode(element);
         }
     }
 
-    public class ElementTreeNode extends DefaultMutableTreeNode implements ElementListener
+    public void elementsAdded(Category parent, Element... children)
+    {
+        ElementTreeNode node = nodes.get(parent);
+        int[] indexes = new int[children.length];
+        for (int i = 0; i < children.length; i++)
+        {
+            indexes[i] = parent.getElements().indexOf(children[i]);
+            node.insert(buildNode(children[i]), indexes[i]);
+        }
+        nodesWereInserted(node, indexes);
+    }
+
+    public void elementsRemoved(Category parent, Element... elements)
+    {
+        Collection<Element> elementsList = Arrays.asList(elements);
+        ElementTreeNode parentNode = nodes.get(parent);
+        ElementTreeNode[] removedNodes = new ElementTreeNode[elements.length];
+        int[] removedIndexes = new int[elements.length];
+        int removeIndex = 0;
+        for (Element element : elementsList)
+        {
+            ElementTreeNode node = nodes.get(element);
+            removedNodes[removeIndex] = node;
+            removedIndexes[removeIndex] = parentNode.getIndex(node);
+            removeIndex++;
+        }
+        for (ElementTreeNode node : removedNodes)
+        {
+            parentNode.remove(node);
+        }
+        nodesWereRemoved(parentNode, removedIndexes, removedNodes);
+    }
+
+    public static class ElementTreeNode extends DefaultMutableTreeNode
     {
         public final Element element;
 
@@ -38,7 +82,6 @@ public class TreePresenter extends DefaultTreeModel
         {
             super(element.getName(), element instanceof Category);
             this.element = element;
-            element.addModelListener(this);
         }
 
         @Override
@@ -58,44 +101,6 @@ public class TreePresenter extends DefaultTreeModel
         public String toString()
         {
             return element.getName();
-        }
-
-        public void elementsAdded(Category parent, Element... children)
-        {
-            if (parent != element) return;
-
-            int[] indexes = new int[children.length];
-            for (int i = 0; i < children.length; i++)
-            {
-                indexes[i] = parent.getElements().indexOf(children[i]);
-                this.insert(new ElementTreeNode(children[i]), indexes[i]);
-            }
-            nodesWereInserted(this, indexes);
-        }
-
-        public void elementsRemoved(Category parent, Element... elements)
-        {
-            if (parent != element) return;
-
-            Collection<Element> elementsList = Arrays.asList(elements);
-            ElementTreeNode[] removedNodes = new ElementTreeNode[elements.length];
-            int[] removedIndexes = new int[elements.length];
-            int removeIndex = 0;
-            for (int i = 0; i < getChildCount(); i++)
-            {
-                ElementTreeNode childNode = (ElementTreeNode) getChildAt(i);
-                if (elementsList.contains(childNode.element))
-                {
-                    removedNodes[removeIndex] = childNode;
-                    removedIndexes[removeIndex] = i;
-                    removeIndex++;
-                }
-            }
-            for (ElementTreeNode node : removedNodes)
-            {
-                remove(node);
-            }
-            nodesWereRemoved(this, removedIndexes, removedNodes);
         }
     }
 }

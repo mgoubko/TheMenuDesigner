@@ -23,10 +23,14 @@ public class TreeController
 
     public void addCategory(TreePath parentPath)
     {
-        TreePresenter.ElementTreeNode parentNode = (TreePresenter.ElementTreeNode) (parentPath.getLastPathComponent());
-        if (parentNode != null && !(parentNode.element instanceof Category))
+        TreePresenter.ElementTreeNode parentNode = null;
+        if (parentPath != null)
         {
-            parentNode = (TreePresenter.ElementTreeNode) parentNode.getParent();
+            parentNode = (TreePresenter.ElementTreeNode) (parentPath.getLastPathComponent());
+            if (parentNode != null && !(parentNode.element instanceof Category))
+            {
+                parentNode = (TreePresenter.ElementTreeNode) parentNode.getParent();
+            }
         }
         Category parent = parentNode != null ? (Category) parentNode.element : hierarchy.root;
         parent.add(new CategoryImpl("New category"));
