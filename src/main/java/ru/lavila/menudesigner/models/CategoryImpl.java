@@ -2,16 +2,14 @@ package ru.lavila.menudesigner.models;
 
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.ElementListener;
-import ru.lavila.menudesigner.models.events.StructureChangeEvent;
-import ru.lavila.menudesigner.models.events.StructureChangeEventImpl;
 
 import java.util.*;
 
-public class CategoryImpl extends ElementImpl implements Category, ElementListener
+class CategoryImpl extends ElementImpl implements Category, ElementListener
 {
     private final List<Element> elements;
 
-    public CategoryImpl(String name)
+    CategoryImpl(String name)
     {
         super(name);
         elements = new ArrayList<Element>();
@@ -35,7 +33,6 @@ public class CategoryImpl extends ElementImpl implements Category, ElementListen
         {
             element.addModelListener(this);
         }
-        fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_ADDED, newElements);
         firePopularityChanged(-1, getPopularity());
     }
 
@@ -43,17 +40,7 @@ public class CategoryImpl extends ElementImpl implements Category, ElementListen
     {
         List<Element> elements = Arrays.asList(elementsToRemove);
         this.elements.removeAll(elements);
-        fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_REMOVED, elementsToRemove);
         firePopularityChanged(-1, getPopularity());
-    }
-
-    private void fireStructureChanged(StructureChangeEvent.EventType type, Element... elements)
-    {
-        StructureChangeEvent event = new StructureChangeEventImpl(type, this, elements);
-        for (ElementListener listener : listeners)
-        {
-            listener.structureChanged(event);
-        }
     }
 
     public String getName()
@@ -84,9 +71,5 @@ public class CategoryImpl extends ElementImpl implements Category, ElementListen
             // todo: cache category popularity to be able to send old value and for performance issues
             firePopularityChanged(-1, getPopularity());
         }
-    }
-
-    public void structureChanged(StructureChangeEvent event)
-    {
     }
 }

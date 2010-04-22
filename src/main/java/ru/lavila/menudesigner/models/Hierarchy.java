@@ -120,29 +120,46 @@ public class Hierarchy implements ElementListener
         }
     }
 
-    public void structureChanged(StructureChangeEvent event)
+    public Category newCategory(Category parentCategory, String name)
     {
-        Category category = event.getCategorizedElements().getCategories().iterator().next();
-        if (category == null) return;
-        List<Element> elements = event.getCategorizedElements().getElementsFor(category);
+        Category category = new CategoryImpl(name);
+        add(parentCategory, category);
+        return category;
+    }
 
-        switch (event.getType())
+    public Item newItem(Category parentCategory, String name, double popularity)
+    {
+        Item item = new ItemImpl(name, popularity);
+        add(parentCategory, item);
+        return item;
+    }
+
+    public Item newItem(Category parentCategory, Item sourceItem)
+    {
+        ItemAliasImpl item = new ItemAliasImpl(sourceItem);
+        add(parentCategory, item);
+        return item;
+    }
+
+    public void add(Category category, Element... elements)
+    {
+        HashSet<Element> toRemove = new HashSet<Element>();
+        processNewElements(category, Arrays.asList(elements), toRemove);
+        for (Element element : toRemove)
         {
-            case ELEMENTS_ADDED:
-                HashSet<Element> toRemove = new HashSet<Element>();
-                processNewElements(category, elements, toRemove);
-                fireStructureChangeEvent(event);
-                for (Element element : toRemove)
-                {
-                    items.get(element).remove(element);
-                }
-                break;
-            case ELEMENTS_REMOVED:
-                CategorizedElements collector = new CategorizedElements();
-                prepareToRemove(category, elements, collector);
-                fireStructureChangeEvent(new StructureChangeEventImpl(StructureChangeEvent.EventType.ELEMENTS_REMOVED, collector));
-                break;
+            remove(items.get(element), element);
         }
+        ((CategoryImpl) category).add(elements);
+        fireStructureChangeEvent(new StructureChangeEventImpl(StructureChangeEvent.EventType.ELEMENTS_ADDED, category, elements));
+    }
+
+    //todo: support deletion of elements from several categories at once
+    public void remove(Category category, Element... elements)
+    {
+        CategorizedElements collector = new CategorizedElements();
+        prepareToRemove(category, Arrays.asList(elements), collector);
+        ((CategoryImpl) category).remove(elements);
+        fireStructureChangeEvent(new StructureChangeEventImpl(StructureChangeEvent.EventType.ELEMENTS_REMOVED, collector));
     }
 
     private void fireStructureChangeEvent(StructureChangeEvent event)

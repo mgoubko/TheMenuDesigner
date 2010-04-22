@@ -2,13 +2,12 @@ package ru.lavila.menudesigner.models;
 
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.ElementListener;
-import ru.lavila.menudesigner.models.events.StructureChangeEvent;
 
-public class ItemAliasImpl extends ElementImpl implements Item, ElementListener
+class ItemAliasImpl extends ElementImpl implements Item, ElementListener
 {
     public final Item sourceItem;
 
-    public ItemAliasImpl(Item sourceItem)
+    ItemAliasImpl(Item sourceItem)
     {
         this(null, sourceItem);
     }
@@ -47,9 +46,5 @@ public class ItemAliasImpl extends ElementImpl implements Item, ElementListener
                 firePopularityChanged((Double) event.getOldValue(), (Double) event.getNewValue());
                 break;
         }
-    }
-
-    public void structureChanged(StructureChangeEvent event)
-    {
     }
 }

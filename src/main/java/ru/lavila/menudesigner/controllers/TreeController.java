@@ -1,7 +1,6 @@
 package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.models.Category;
-import ru.lavila.menudesigner.models.CategoryImpl;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -20,7 +19,7 @@ public class TreeController
 
     public void addCategory(Category parentCategory)
     {
-        parentCategory.add(new CategoryImpl("New category"));
+        hierarchy.newCategory(parentCategory, "New category");
     }
 
     public void removeNodes(TreePath[] paths)
@@ -45,7 +44,7 @@ public class TreeController
         for (Category category : toRemove.keySet())
         {
             Collection<Element> elements = toRemove.get(category);
-            category.remove(elements.toArray(new Element[elements.size()]));
+            hierarchy.remove(category, elements.toArray(new Element[elements.size()]));
         }
     }
 }

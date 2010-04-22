@@ -1,9 +1,7 @@
 package ru.lavila.menudesigner.stub;
 
 import ru.lavila.menudesigner.models.Category;
-import ru.lavila.menudesigner.models.CategoryImpl;
 import ru.lavila.menudesigner.models.Hierarchy;
-import ru.lavila.menudesigner.models.ItemImpl;
 
 public class SourceHierarchy extends Hierarchy
 {
@@ -14,45 +12,69 @@ public class SourceHierarchy extends Hierarchy
 
     private void populateStub()
     {
-        Category createMessage = new CategoryImpl("Create message");
-        createMessage.add(new ItemImpl("Message", 0.282), new ItemImpl("Voice notes", 0.0282), new ItemImpl("Templates", 0.0113));
-        Category email = new CategoryImpl("Email");
-        email.add(new ItemImpl("Inbox", 0.009), new ItemImpl("Compose", 0.0056), new ItemImpl("Drafts", 0.0023), new ItemImpl("Outbox", 0.0023), new ItemImpl("Sent items", 0.0042), new ItemImpl("Select a service provider", 0.0011));
-        Category instantMessaging = new CategoryImpl("Instant Messaging");
-        instantMessaging.add(new ItemImpl("AIM", 0.0056), new ItemImpl("ICQ", 0.0056), new ItemImpl("Windows Live Messenger", 0.0056), new ItemImpl("Yahoo! Messenger", 0.0056));
-        Category savedItems = new CategoryImpl("Saved items");
-        savedItems.add(new ItemImpl("Saved Messages", 0.0169), new ItemImpl("Templates", 0.0113));
-        Category voiceMail = new CategoryImpl("Voice mail");
-        voiceMail.add(new ItemImpl("Listen to voice mails", 0.0451), new ItemImpl("Voice mailbox no.", 0.0006));
-        Category deleteMessages = new CategoryImpl("Delete messages");
-        deleteMessages.add(new ItemImpl("By message", 0.0113), new ItemImpl("By folder", 0.0113), new ItemImpl("All messages", 0.0113));
-        Category messageSettings = new CategoryImpl("Message settings");
-        Category generalSettings = new CategoryImpl("General settings");
-        generalSettings.add(new ItemImpl("Save sent messages", 0.0017), new ItemImpl("Overwriting in Sent", 0.0011), new ItemImpl("Default destination", 0.0034), new ItemImpl("Font size", 0.0028), new ItemImpl("Graphical smileys", 0.0028));
-        Category textMessages = new CategoryImpl("Text messages");
-        textMessages.add(new ItemImpl("Delivery reports", 0.0017), new ItemImpl("Message centers", 0.0006), new ItemImpl("Msg. center in use", 0.0006), new ItemImpl("Use packet data", 0.0006), new ItemImpl("Character support", 0.0006), new ItemImpl("Reply via same center", 0.0006));
-        Category pictureMessages = new CategoryImpl("Picture messages");
-        pictureMessages.add(new ItemImpl("Request reports", 0.0008), new ItemImpl("Allow read report", 0.0008), new ItemImpl("Image size (pic.msg)", 0.0014), new ItemImpl("Default slide timing", 0.0011), new ItemImpl("MMS reception", 0.0011), new ItemImpl("Allow ads", 0.0011), new ItemImpl("Configuration sett.", 0.0011));
-        Category serviceMessages = new CategoryImpl("Service messages");
-        serviceMessages.add(new ItemImpl("t-zones messages", 0.0008), new ItemImpl("Message filter", 0.0008), new ItemImpl("Autom. connection", 0.0008));
-        messageSettings.add(generalSettings, textMessages, pictureMessages, serviceMessages);
-        Category messageLog = new CategoryImpl("Message log");
-        messageLog.add(new ItemImpl("Sent text messages", 0.0056), new ItemImpl("Sent picture msgs.", 0.0028), new ItemImpl("Received text msgs.", 0.0056), new ItemImpl("Received pic msgs.", 0.0028), new ItemImpl("Clear all counters", 0.0023));
-        root.add(
-                createMessage,
-                new ItemImpl("Inbox", 0.282),
-                email,
-                instantMessaging,
-                new ItemImpl("Drafts", 0.0423),
-                new ItemImpl("Outbox", 0.0282),
-                new ItemImpl("Sent items", 0.0846),
-                savedItems,
-                voiceMail,
-                new ItemImpl("Delivery reports", 0.0338),
-                new ItemImpl("Serv. commands", 0.0071),
-                deleteMessages,
-                messageSettings,
-                messageLog
-        );
+        Category createMessage = newCategory(root, "Create message");
+        newItem(createMessage, "Message", 0.282);
+        newItem(createMessage, "Voice notes", 0.0282);
+        newItem(createMessage, "Templates", 0.0113);
+        Category email = newCategory(root, "Email");
+        newItem(email, "Inbox", 0.009);
+        newItem(email, "Compose", 0.0056);
+        newItem(email, "Drafts", 0.0023);
+        newItem(email, "Outbox", 0.0023);
+        newItem(email, "Sent items", 0.0042);
+        newItem(email, "Select a service provider", 0.0011);
+        newItem(root, "Inbox", 0.282);
+        Category instantMessaging = newCategory(root, "Instant Messaging");
+        newItem(instantMessaging, "AIM", 0.0056);
+        newItem(instantMessaging, "ICQ", 0.0056);
+        newItem(instantMessaging, "Windows Live Messenger", 0.0056);
+        newItem(instantMessaging, "Yahoo! Messenger", 0.0056);
+        newItem(root, "Drafts", 0.0423);
+        newItem(root, "Outbox", 0.0282);
+        newItem(root, "Sent items", 0.0846);
+        Category savedItems = newCategory(root, "Saved items");
+        newItem(savedItems, "Saved Messages", 0.0169);
+        newItem(savedItems, "Templates", 0.0113);
+        Category voiceMail = newCategory(root, "Voice mail");
+        newItem(voiceMail, "Listen to voice mails", 0.0451);
+        newItem(voiceMail, "Voice mailbox no.", 0.0006);
+        newItem(root, "Delivery reports", 0.0338);
+        newItem(root, "Serv. commands", 0.0071);
+        Category deleteMessages = newCategory(root, "Delete messages");
+        newItem(deleteMessages, "By message", 0.0113);
+        newItem(deleteMessages, "By folder", 0.0113);
+        newItem(deleteMessages, "All messages", 0.0113);
+        Category messageSettings = newCategory(root, "Message settings");
+        Category generalSettings = newCategory(messageSettings, "General settings");
+        newItem(generalSettings, "Save sent messages", 0.0017);
+        newItem(generalSettings, "Overwriting in Sent", 0.0011);
+        newItem(generalSettings, "Default destination", 0.0034);
+        newItem(generalSettings, "Font size", 0.0028);
+        newItem(generalSettings, "Graphical smileys", 0.0028);
+        Category textMessages = newCategory(messageSettings, "Text messages");
+        newItem(textMessages, "Delivery reports", 0.0017);
+        newItem(textMessages, "Message centers", 0.0006);
+        newItem(textMessages, "Msg. center in use", 0.0006);
+        newItem(textMessages, "Use packet data", 0.0006);
+        newItem(textMessages, "Character support", 0.0006);
+        newItem(textMessages, "Reply via same center", 0.0006);
+        Category pictureMessages = newCategory(messageSettings, "Picture messages");
+        newItem(pictureMessages, "Request reports", 0.0008);
+        newItem(pictureMessages, "Allow read report", 0.0008);
+        newItem(pictureMessages, "Image size (pic.msg)", 0.0014);
+        newItem(pictureMessages, "Default slide timing", 0.0011);
+        newItem(pictureMessages, "MMS reception", 0.0011);
+        newItem(pictureMessages, "Allow ads", 0.0011);
+        newItem(pictureMessages, "Configuration sett.", 0.0011);
+        Category serviceMessages = newCategory(messageSettings, "Service messages");
+        newItem(serviceMessages, "t-zones messages", 0.0008);
+        newItem(serviceMessages, "Message filter", 0.0008);
+        newItem(serviceMessages, "Autom. connection", 0.0008);
+        Category messageLog = newCategory(root, "Message log");
+        newItem(messageLog, "Sent text messages", 0.0056);
+        newItem(messageLog, "Sent picture msgs.", 0.0028);
+        newItem(messageLog, "Received text msgs.", 0.0056);
+        newItem(messageLog, "Received pic msgs.", 0.0028);
+        newItem(messageLog, "Clear all counters", 0.0023);
     }
 }

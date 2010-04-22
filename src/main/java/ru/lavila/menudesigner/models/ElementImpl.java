@@ -7,7 +7,7 @@ import ru.lavila.menudesigner.models.events.ElementListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ElementImpl implements Element
+abstract class ElementImpl implements Element
 {
     protected String name;
     protected final List<ElementListener> listeners;
