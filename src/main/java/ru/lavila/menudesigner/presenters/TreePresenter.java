@@ -73,6 +73,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
 
     public void modelChanged(ElementChangeEvent event)
     {
+        nodeChanged(nodes.get(event.getElement()));
     }
 
     public void structureChanged(StructureChangeEvent event)

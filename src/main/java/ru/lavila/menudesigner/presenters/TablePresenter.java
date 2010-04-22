@@ -79,7 +79,11 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
 
     public void modelChanged(ElementChangeEvent event)
     {
-        //todo: update view
+        if (event.getElement() instanceof Item)
+        {
+            int row = getItems().indexOf(event.getElement());
+            fireTableRowsUpdated(row, row);
+        }
     }
 
     public void structureChanged(StructureChangeEvent event)

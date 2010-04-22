@@ -109,14 +109,14 @@ public class Hierarchy implements ElementListener
 
     public void modelChanged(ElementChangeEvent event)
     {
-        switch (event.getType())
+        fireModelChangeEvent(event);
+    }
+
+    private void fireModelChangeEvent(ElementChangeEvent event)
+    {
+        for (HierarchyListener listener : listeners)
         {
-            case NAME_CHANGED:
-                //todo: forward event
-                break;
-            case POPULARITY_CHANGED:
-                //todo: forward event
-                break;
+            listener.modelChanged(event);
         }
     }
 
