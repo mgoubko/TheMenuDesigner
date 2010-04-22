@@ -138,10 +138,10 @@ public class Hierarchy implements ElementListener
             switch (event.getType())
             {
                 case NAME_CHANGED:
-                    //todo
+                    //todo: forward event
                     break;
                 case POPULARITY_CHANGED:
-                    //todo
+                    //todo: forward event
                     break;
             }
         }

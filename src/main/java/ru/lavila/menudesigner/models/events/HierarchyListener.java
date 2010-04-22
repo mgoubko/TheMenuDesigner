@@ -8,6 +8,7 @@ import java.util.Map;
 
 public interface HierarchyListener
 {
+    //todo: redesign interface the same way as element listener
     void elementsAdded(Category parent, Element... elements);
     void elementsRemoved(Map<Category, Collection<Element>> elementsMap);
 }

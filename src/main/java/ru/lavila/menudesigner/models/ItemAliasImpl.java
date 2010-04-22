@@ -4,6 +4,8 @@ public class ItemAliasImpl extends ElementImpl implements Item
 {
     public final Item sourceItem;
 
+    //todo: listen to name change and forward unless overridden
+    //todo: listen to popularity change and forward it
     public ItemAliasImpl(Item sourceItem)
     {
         this(null, sourceItem);

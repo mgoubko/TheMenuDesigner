@@ -9,6 +9,7 @@ public class CategoryImpl extends ElementImpl implements Category
 {
     private final List<Element> elements;
 
+    //todo: listen to popularity change and forward event
     public CategoryImpl(String name)
     {
         super(name);
