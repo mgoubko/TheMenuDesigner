@@ -1,13 +1,13 @@
 package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.models.*;
+import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.HierarchyListener;
+import ru.lavila.menudesigner.models.events.StructureChangeEvent;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class TablePresenter extends AbstractTableModel implements HierarchyListener
 {
@@ -77,13 +77,31 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
         return columnIndex == 0 ? String.class : PopularityPresenter.class;
     }
 
-    public void elementsAdded(Category parent, Element... elements)
+    public void modelChanged(ElementChangeEvent event)
+    {
+        //todo: update view
+    }
+
+    public void structureChanged(StructureChangeEvent event)
+    {
+        switch (event.getType())
+        {
+            case ELEMENTS_ADDED:
+                elementsAdded(event.getCategorizedElements());
+                break;
+            case ELEMENTS_REMOVED:
+                elementsRemoved(event.getCategorizedElements());
+                break;
+        }
+    }
+
+    private void elementsAdded(CategorizedElements categorizedElements)
     {
         items = null;
 
         int firstRow = getRowCount();
         int lastRow = -1;
-        for (Element element : elements)
+        for (Element element : categorizedElements.getAllElements())
         {
             if (element instanceof Item)
             {
@@ -97,20 +115,17 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
         if (lastRow != -1) fireTableRowsInserted(firstRow, lastRow);
     }
 
-    public void elementsRemoved(Map<Category, Collection<Element>> elementsMap)
+    private void elementsRemoved(CategorizedElements categorizedElements)
     {
         int firstRow = getRowCount();
         int lastRow = -1;
-        for (Collection<Element> elements : elementsMap.values())
+        for (Element element : categorizedElements.getAllElements())
         {
-            for (Element element : elements)
+            if (element instanceof Item)
             {
-                if (element instanceof Item)
-                {
-                    int index = getItems().indexOf(element);
-                    if (index < firstRow) firstRow = index;
-                    if (index > lastRow) lastRow = index;
-                }
+                int index = getItems().indexOf(element);
+                if (index < firstRow) firstRow = index;
+                if (index > lastRow) lastRow = index;
             }
         }
 

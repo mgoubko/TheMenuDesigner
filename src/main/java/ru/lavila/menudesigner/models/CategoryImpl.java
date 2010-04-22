@@ -1,15 +1,16 @@
 package ru.lavila.menudesigner.models;
 
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
+import ru.lavila.menudesigner.models.events.ElementListener;
+import ru.lavila.menudesigner.models.events.StructureChangeEvent;
 import ru.lavila.menudesigner.models.events.StructureChangeEventImpl;
 
 import java.util.*;
 
-public class CategoryImpl extends ElementImpl implements Category
+public class CategoryImpl extends ElementImpl implements Category, ElementListener
 {
     private final List<Element> elements;
 
-    //todo: listen to popularity change and forward event
     public CategoryImpl(String name)
     {
         super(name);
@@ -30,19 +31,27 @@ public class CategoryImpl extends ElementImpl implements Category
     {
         List<Element> elements = Arrays.asList(newElements);
         this.elements.addAll(elements);
-        fireStructureChanged(ElementChangeEvent.EventType.ELEMENTS_ADDED, elements);
+        for (Element element : elements)
+        {
+            element.addModelListener(this);
+        }
+        fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_ADDED, newElements);
     }
 
     public void remove(Element... elementsToRemove)
     {
         List<Element> elements = Arrays.asList(elementsToRemove);
         this.elements.removeAll(elements);
-        fireStructureChanged(ElementChangeEvent.EventType.ELEMENTS_REMOVED, elements);
+        fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_REMOVED, elementsToRemove);
     }
 
-    private void fireStructureChanged(ElementChangeEvent.EventType type, List<Element> diff)
+    private void fireStructureChanged(StructureChangeEvent.EventType type, Element... elements)
     {
-        fireModelEvent(new StructureChangeEventImpl(this, type, diff));
+        StructureChangeEvent event = new StructureChangeEventImpl(type, this, elements);
+        for (ElementListener listener : listeners)
+        {
+            listener.structureChanged(event);
+        }
     }
 
     public String getName()
@@ -63,5 +72,19 @@ public class CategoryImpl extends ElementImpl implements Category
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void modelChanged(ElementChangeEvent event)
+    {
+        // child popularity changed, so my popularity changes too
+        if (event.getType() == ElementChangeEvent.EventType.POPULARITY_CHANGED)
+        {
+            // todo: cache category popularity to be able to send old value and for performance issues
+            firePopularityChanged(-1, getPopularity());
+        }
+    }
+
+    public void structureChanged(StructureChangeEvent event)
+    {
     }
 }

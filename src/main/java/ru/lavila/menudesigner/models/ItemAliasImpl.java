@@ -1,11 +1,13 @@
 package ru.lavila.menudesigner.models;
 
-public class ItemAliasImpl extends ElementImpl implements Item
+import ru.lavila.menudesigner.models.events.ElementChangeEvent;
+import ru.lavila.menudesigner.models.events.ElementListener;
+import ru.lavila.menudesigner.models.events.StructureChangeEvent;
+
+public class ItemAliasImpl extends ElementImpl implements Item, ElementListener
 {
     public final Item sourceItem;
 
-    //todo: listen to name change and forward unless overridden
-    //todo: listen to popularity change and forward it
     public ItemAliasImpl(Item sourceItem)
     {
         this(null, sourceItem);
@@ -16,6 +18,7 @@ public class ItemAliasImpl extends ElementImpl implements Item
         super(name);
         if (sourceItem == null) throw new IllegalArgumentException("Alias source can't be null");
         this.sourceItem = sourceItem;
+        sourceItem.addModelListener(this);
     }
 
     public void setPopularity(double popularity)
@@ -31,5 +34,22 @@ public class ItemAliasImpl extends ElementImpl implements Item
     public double getPopularity()
     {
         return sourceItem.getPopularity();
+    }
+
+    public void modelChanged(ElementChangeEvent event)
+    {
+        switch (event.getType())
+        {
+            case NAME_CHANGED:
+                if (name == null) fireNameChanged((String) event.getOldValue(), (String) event.getNewValue());
+                break;
+            case POPULARITY_CHANGED:
+                firePopularityChanged((Double) event.getOldValue(), (Double) event.getNewValue());
+                break;
+        }
+    }
+
+    public void structureChanged(StructureChangeEvent event)
+    {
     }
 }

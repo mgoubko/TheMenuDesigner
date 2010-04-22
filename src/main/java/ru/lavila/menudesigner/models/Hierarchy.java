@@ -74,9 +74,9 @@ public class Hierarchy implements ElementListener
         }
     }
 
-    private void prepareToRemove(Category parent, Collection<Element> elements, Map<Category, Collection<Element>> collector)
+    private void prepareToRemove(Category parent, List<Element> elements, CategorizedElements collector)
     {
-        collector.put(parent, elements);
+        collector.add(parent, elements);
         for (Element element : elements)
         {
             element.removeModelListener(this);
@@ -109,57 +109,47 @@ public class Hierarchy implements ElementListener
 
     public void modelChanged(ElementChangeEvent event)
     {
-        if (event instanceof StructureChangeEvent)
+        switch (event.getType())
         {
-            StructureChangeEvent structureEvent = (StructureChangeEvent) event;
-            Category category = structureEvent.getElement();
-            Collection<Element> elements = structureEvent.getDiff();
-
-            switch (event.getType())
-            {
-                case ELEMENTS_ADDED:
-                    HashSet<Element> toRemove = new HashSet<Element>();
-                    processNewElements(category, elements, toRemove);
-                    fireElementsAdded(category, elements.toArray(new Element[elements.size()]));
-                    for (Element element : toRemove)
-                    {
-                        items.get(element).remove(element);
-                    }
-                    break;
-                case ELEMENTS_REMOVED:
-                    Map<Category, Collection<Element>> collector = new HashMap<Category, Collection<Element>>();
-                    prepareToRemove(category, elements, collector);
-                    fireElementsRemoved(collector);
-                    break;
-            }
-        }
-        else
-        {
-            switch (event.getType())
-            {
-                case NAME_CHANGED:
-                    //todo: forward event
-                    break;
-                case POPULARITY_CHANGED:
-                    //todo: forward event
-                    break;
-            }
+            case NAME_CHANGED:
+                //todo: forward event
+                break;
+            case POPULARITY_CHANGED:
+                //todo: forward event
+                break;
         }
     }
 
-    private void fireElementsAdded(Category category, Element... elements)
+    public void structureChanged(StructureChangeEvent event)
     {
-        for (HierarchyListener listener : listeners)
+        Category category = event.getCategorizedElements().getCategories().iterator().next();
+        if (category == null) return;
+        List<Element> elements = event.getCategorizedElements().getElementsFor(category);
+
+        switch (event.getType())
         {
-            listener.elementsAdded(category, elements);
+            case ELEMENTS_ADDED:
+                HashSet<Element> toRemove = new HashSet<Element>();
+                processNewElements(category, elements, toRemove);
+                fireStructureChangeEvent(event);
+                for (Element element : toRemove)
+                {
+                    items.get(element).remove(element);
+                }
+                break;
+            case ELEMENTS_REMOVED:
+                CategorizedElements collector = new CategorizedElements();
+                prepareToRemove(category, elements, collector);
+                fireStructureChangeEvent(new StructureChangeEventImpl(StructureChangeEvent.EventType.ELEMENTS_REMOVED, collector));
+                break;
         }
     }
 
-    private void fireElementsRemoved(Map<Category, Collection<Element>> elementsMap)
+    private void fireStructureChangeEvent(StructureChangeEvent event)
     {
         for (HierarchyListener listener : listeners)
         {
-            listener.elementsRemoved(elementsMap);
+            listener.structureChanged(event);
         }
     }
 

@@ -29,4 +29,9 @@ public class PopularityPresenter
     {
         return numberFormat.format(value);
     }
+
+    public static String toString(double popularity)
+    {
+        return numberFormat.format(popularity);
+    }
 }

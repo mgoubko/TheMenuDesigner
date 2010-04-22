@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.models.events;
 
+import ru.lavila.menudesigner.models.CategorizedElements;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 
@@ -7,25 +8,20 @@ import java.util.List;
 
 public class StructureChangeEventImpl implements StructureChangeEvent
 {
-    private final Category element;
     private final EventType type;
-    private final List<Element> diff;
+    private final CategorizedElements elements;
 
-    public StructureChangeEventImpl(Category category, EventType type, List<Element> diff)
+    public StructureChangeEventImpl(EventType type, CategorizedElements elements)
     {
-        this.element = category;
         this.type = type;
-        this.diff = diff;
+        this.elements = elements;
     }
 
-    public List<Element> getDiff()
+    public StructureChangeEventImpl(EventType type, Category category, Element... children)
     {
-        return diff;
-    }
-
-    public Category getElement()
-    {
-        return element;
+        this.type = type;
+        elements = new CategorizedElements();
+        elements.add(category, children);
     }
 
     public EventType getType()
@@ -33,13 +29,8 @@ public class StructureChangeEventImpl implements StructureChangeEvent
         return type;
     }
 
-    public List<Element> getOldValue()
+    public CategorizedElements getCategorizedElements()
     {
-        return null;
-    }
-
-    public List<Element> getNewValue()
-    {
-        return null;
+        return elements;
     }
 }

@@ -1,12 +1,15 @@
 package ru.lavila.menudesigner.models.events;
 
-import ru.lavila.menudesigner.models.Category;
-import ru.lavila.menudesigner.models.Element;
+import ru.lavila.menudesigner.models.CategorizedElements;
 
-import java.util.List;
-
-public interface StructureChangeEvent extends ElementChangeEvent<List<Element>>
+public interface StructureChangeEvent
 {
-    Category getElement();
-    List<Element> getDiff();
+    public EventType getType();
+    public CategorizedElements getCategorizedElements();
+
+    enum EventType
+    {
+        ELEMENTS_ADDED,
+        ELEMENTS_REMOVED
+    }
 }

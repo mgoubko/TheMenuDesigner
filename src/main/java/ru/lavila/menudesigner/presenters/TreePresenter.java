@@ -1,7 +1,9 @@
 package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.models.*;
+import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.HierarchyListener;
+import ru.lavila.menudesigner.models.events.StructureChangeEvent;
 
 import javax.swing.tree.*;
 import java.util.*;
@@ -69,23 +71,47 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         return categoryNode != null ? (Category) categoryNode.element : hierarchy.root;
     }
 
-    public void elementsAdded(Category parent, Element... children)
+    public void modelChanged(ElementChangeEvent event)
     {
-        ElementTreeNode node = nodes.get(parent);
-        int[] indexes = new int[children.length];
-        for (int i = 0; i < children.length; i++)
-        {
-            indexes[i] = parent.getElements().indexOf(children[i]);
-            node.insert(buildNode(children[i]), indexes[i]);
-        }
-        nodesWereInserted(node, indexes);
     }
 
-    public void elementsRemoved(Map<Category, Collection<Element>> elementsMap)
+    public void structureChanged(StructureChangeEvent event)
     {
-        for (Category category : elementsMap.keySet())
+        switch (event.getType())
         {
-            Collection<Element> elementsList = elementsMap.get(category);
+            case ELEMENTS_ADDED:
+                elementsAdded(event.getCategorizedElements());
+                break;
+            case ELEMENTS_REMOVED:
+                elementsRemoved(event.getCategorizedElements());
+                break;
+        }
+    }
+
+    private void elementsAdded(CategorizedElements categorizedElements)
+    {
+        for (Category category : categorizedElements.getCategories())
+        {
+            Collection<Element> elements = categorizedElements.getElementsFor(category);
+            ElementTreeNode node = nodes.get(category);
+            int[] indexes = new int[elements.size()];
+            int index = 0;
+            for (Element element : elements)
+            {
+                indexes[index] = category.getElements().indexOf(element);
+                node.insert(buildNode(element), indexes[index]);
+                index++;
+            }
+            Arrays.sort(indexes);
+            nodesWereInserted(node, indexes);
+        }
+    }
+
+    public void elementsRemoved(CategorizedElements categorizedElements)
+    {
+        for (Category category : categorizedElements.getCategories())
+        {
+            Collection<Element> elementsList = categorizedElements.getElementsFor(category);
             ElementTreeNode parentNode = nodes.get(category);
             if (parentNode != null)
             {
@@ -135,7 +161,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         @Override
         public String toString()
         {
-            return element.getName();
+            return element.getName() + " (" + PopularityPresenter.toString(element.getPopularity()) + ")";
         }
     }
 }
