@@ -1,31 +1,51 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.TreeController;
+import ru.lavila.menudesigner.models.Category;
+import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 
 import javax.swing.*;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.util.List;
 
 public class TreeView extends JTree
 {
-    private final TreeController treeController;
+    private final TreeController controller;
 
-    public TreeView(TreePresenter treePresenter, TreeController treeController)
+    public TreeView(TreePresenter treePresenter, TreeController controller)
     {
         super(treePresenter);
-        this.treeController = treeController;
+        this.controller = controller;
         setEditable(true);
+    }
+
+    @Override
+    public TreePresenter getModel()
+    {
+        return (TreePresenter) super.getModel();
     }
 
     public void addCategory()
     {
         TreePath path = getSelectionPath();
         expandPath(path);
-        treeController.addCategory(path);
+        controller.addCategory(getModel().getSelectedCategory(path));
     }
 
     public void removeSelection()
     {
-        treeController.removeNodes(getSelectionPaths());
+        controller.removeNodes(getSelectionPaths());
+    }
+
+    public List<Element> getSelectedElements()
+    {
+        return getModel().getSelectedElements(getSelectionPaths());
+    }
+
+    public Category getSelectedCategory()
+    {
+        return getModel().getSelectedCategory(getSelectionPath());
     }
 }

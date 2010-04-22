@@ -7,11 +7,13 @@ import java.util.*;
 
 public class TreePresenter extends DefaultTreeModel implements HierarchyListener
 {
+    private final Hierarchy hierarchy;
     private final Map<Element, ElementTreeNode> nodes;
 
     public TreePresenter(Hierarchy hierarchy)
     {
         super(null);
+        this.hierarchy = hierarchy;
         nodes = new HashMap<Element, ElementTreeNode>();
         setRoot(getTreeNode(hierarchy.root));
         hierarchy.addModelListener(this);
@@ -39,6 +41,31 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             return buildNode(element);
         }
+    }
+
+    public List<Element> getSelectedElements(TreePath[] selectionPaths)
+    {
+        List<Element> selectedElements = new ArrayList<Element>();
+        for (TreePath path : selectionPaths)
+        {
+            TreePresenter.ElementTreeNode childNode = (TreePresenter.ElementTreeNode) path.getLastPathComponent();
+            selectedElements.add(childNode.element);
+        }
+        return selectedElements;
+    }
+
+    public Category getSelectedCategory(TreePath selectionPath)
+    {
+        TreePresenter.ElementTreeNode categoryNode = null;
+        if (selectionPath != null)
+        {
+            categoryNode = (TreePresenter.ElementTreeNode) (selectionPath.getLastPathComponent());
+            if (categoryNode != null && !(categoryNode.element instanceof Category))
+            {
+                categoryNode = (TreePresenter.ElementTreeNode) categoryNode.getParent();
+            }
+        }
+        return categoryNode != null ? (Category) categoryNode.element : hierarchy.root;
     }
 
     public void elementsAdded(Category parent, Element... children)

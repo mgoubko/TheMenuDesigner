@@ -3,6 +3,7 @@ package ru.lavila.menudesigner.presenters;
 import ru.lavila.menudesigner.models.*;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -116,5 +117,15 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
 
         //todo: collect separate intervals
         if (lastRow != -1) fireTableRowsDeleted(firstRow, lastRow);
+    }
+
+    public List<Element> getSelectedItems(int[] selectedRows)
+    {
+        List<Element> selectedElements = new ArrayList<Element>();
+        for (int selectedRow : selectedRows)
+        {
+            selectedElements.add(getItems().get(selectedRow));
+        }
+        return selectedElements;
     }
 }

@@ -1,6 +1,8 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.TreeController;
+import ru.lavila.menudesigner.models.Category;
+import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -12,63 +14,29 @@ import java.awt.event.ActionListener;
 
 public class HierarchyView extends JPanel
 {
+    private final ToolbarBuilder toolbarBuilder;
     private final Hierarchy hierarchy;
     private boolean asTree;
     private JScrollPane scrollPane;
-    private JButton switchView;
     private TreeView treeView;
     private TableView tableView;
 
-    public HierarchyView(Hierarchy hierarchy, boolean asTree)
+    public HierarchyView(Hierarchy hierarchy, boolean asTree, ToolbarConfigurator configurator)
     {
         super(new BorderLayout());
-        setMinimumSize(new Dimension(200, 100));
-        setPreferredSize(new Dimension(400, 500));
 
         this.hierarchy = hierarchy;
         this.asTree = asTree;
 
-        buildGUI();
-    }
+        setMinimumSize(new Dimension(200, 100));
+        setPreferredSize(new Dimension(400, 500));
 
-    private void buildGUI()
-    {
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        this.toolbarBuilder = new ToolbarBuilder(configurator, toolbar);
+        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
         add(toolbar, BorderLayout.NORTH);
-
-        switchView = new JButton();
-        switchView.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                asTree = !asTree;
-                rebuildView();
-            }
-        });
-        toolbar.add(switchView);
-
-        JButton newCategory = new JButton("New category");
-        newCategory.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                treeView.addCategory();
-            }
-        });
-        toolbar.add(newCategory);
-
-        JButton remove = new JButton("Remove");
-        remove.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                treeView.removeSelection();
-            }
-        });
-        toolbar.add(remove);
-
-        scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(scrollPane, BorderLayout.CENTER);
+        add(scrollPane);
 
         treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy));
         tableView = new TableView(new TablePresenter(hierarchy));
@@ -78,7 +46,81 @@ public class HierarchyView extends JPanel
 
     private void rebuildView()
     {
+        toolbarBuilder.rebuild();
         scrollPane.setViewportView(asTree ? treeView : tableView);
-        switchView.setText(asTree ? "Table view" : "Tree view");
+    }
+
+    public java.util.List<Element> getSelectedElements()
+    {
+        return asTree ? treeView.getSelectedElements() : tableView.getSelectedElements();
+    }
+
+    public Category getSelectedCategory()
+    {
+        return asTree ? treeView.getSelectedCategory() : hierarchy.root;
+    }
+
+    private class ToolbarBuilder implements ToolbarConfig
+    {
+        protected final ToolbarConfigurator configurator;
+        protected final JPanel toolbar;
+
+        public ToolbarBuilder(ToolbarConfigurator configurator, JPanel toolbar)
+        {
+            this.configurator = configurator;
+            this.toolbar = toolbar;
+        }
+
+        public JPanel rebuild()
+        {
+            toolbar.removeAll();
+            configurator.fillToolbar(this);
+            if (asTree) addTreeButtons();
+            toolbar.revalidate();
+            toolbar.repaint();
+            return toolbar;
+        }
+
+        protected void addTreeButtons()
+        {
+            JButton newCategory = new JButton("New cat.");
+            newCategory.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    treeView.addCategory();
+                }
+            });
+            toolbar.add(newCategory);
+
+            JButton remove = new JButton("Remove");
+            remove.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    treeView.removeSelection();
+                }
+            });
+            toolbar.add(remove);
+        }
+
+        public void addButton(JButton button)
+        {
+            toolbar.add(button);
+        }
+
+        public void addSwitchViewButton()
+        {
+            JButton switchView = new JButton("Switch");
+            switchView.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    asTree = !asTree;
+                    rebuildView();
+                }
+            });
+            toolbar.add(switchView);
+        }
     }
 }

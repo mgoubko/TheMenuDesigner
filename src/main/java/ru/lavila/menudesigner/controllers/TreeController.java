@@ -7,10 +7,7 @@ import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 
 import javax.swing.tree.TreePath;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class TreeController
 {
@@ -21,19 +18,9 @@ public class TreeController
         this.hierarchy = hierarchy;
     }
 
-    public void addCategory(TreePath parentPath)
+    public void addCategory(Category parentCategory)
     {
-        TreePresenter.ElementTreeNode parentNode = null;
-        if (parentPath != null)
-        {
-            parentNode = (TreePresenter.ElementTreeNode) (parentPath.getLastPathComponent());
-            if (parentNode != null && !(parentNode.element instanceof Category))
-            {
-                parentNode = (TreePresenter.ElementTreeNode) parentNode.getParent();
-            }
-        }
-        Category parent = parentNode != null ? (Category) parentNode.element : hierarchy.root;
-        parent.add(new CategoryImpl("New category"));
+        parentCategory.add(new CategoryImpl("New category"));
     }
 
     public void removeNodes(TreePath[] paths)

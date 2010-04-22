@@ -6,12 +6,16 @@ public class Hierarchy implements Category.CategoryListener
 {
     public final Category root;
     private final List<HierarchyListener> listeners;
+    private final Map<Item, Item> sourceItems;
+    private final Map<Item, Category> items;
 
     public Hierarchy()
     {
         root = new RootCategoryImpl();
-        listenTo(root);
+        root.addModelListener(this);
         listeners = new ArrayList<HierarchyListener>();
+        sourceItems = new HashMap<Item, Item>();
+        items = new HashMap<Item, Category>();
     }
 
     public List<Item> getItems()
@@ -41,7 +45,7 @@ public class Hierarchy implements Category.CategoryListener
         listeners.add(listener);
     }
 
-    private void listenTo(Element... elements)
+    private void processNewElements(Category parent, Collection<Element> elements, Collection<Element> toRemove)
     {
         for (Element element : elements)
         {
@@ -51,8 +55,19 @@ public class Hierarchy implements Category.CategoryListener
                 category.addModelListener(this);
                 if (category.elementsCount() > 0)
                 {
-                    listenTo(category.getElements().toArray(new Element[category.elementsCount()]));
+                    processNewElements(category, category.getElements(), toRemove);
                 }
+            }
+            else if (element instanceof Item)
+            {
+                Item item = (Item) element;
+                Item sourceItem = getSource(item);
+                if (sourceItems.containsKey(sourceItem))
+                {
+                    toRemove.add(sourceItems.get(sourceItem));
+                }
+                items.put(item, parent);
+                sourceItems.put(sourceItem, item);
             }
         }
     }
@@ -71,13 +86,34 @@ public class Hierarchy implements Category.CategoryListener
                     prepareToRemove(category, category.getElements(), collector);
                 }
             }
+            else if (element instanceof Item)
+            {
+                Item item = (Item) element;
+                Item sourceItem = getSource(item);
+                items.remove(item);
+                if (sourceItems.get(sourceItem) == item) sourceItems.remove(getSource(item));
+            }
         }
+    }
+
+    private Item getSource(Item item)
+    {
+        while (item instanceof ItemAliasImpl)
+        {
+            item = ((ItemAliasImpl) item).sourceItem;
+        }
+        return item;
     }
 
     public void elementsAdded(Category category, Element... elements)
     {
-        listenTo(elements);
+        HashSet<Element> toRemove = new HashSet<Element>();
+        processNewElements(category, Arrays.asList(elements), toRemove);
         fireElementsAdded(category, elements);
+        for (Element element : toRemove)
+        {
+            items.get(element).remove(element);
+        }
     }
 
     private void fireElementsAdded(Category category, Element... elements)
