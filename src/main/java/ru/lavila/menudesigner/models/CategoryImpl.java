@@ -36,6 +36,7 @@ public class CategoryImpl extends ElementImpl implements Category, ElementListen
             element.addModelListener(this);
         }
         fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_ADDED, newElements);
+        firePopularityChanged(-1, getPopularity());
     }
 
     public void remove(Element... elementsToRemove)
@@ -43,6 +44,7 @@ public class CategoryImpl extends ElementImpl implements Category, ElementListen
         List<Element> elements = Arrays.asList(elementsToRemove);
         this.elements.removeAll(elements);
         fireStructureChanged(StructureChangeEvent.EventType.ELEMENTS_REMOVED, elementsToRemove);
+        firePopularityChanged(-1, getPopularity());
     }
 
     private void fireStructureChanged(StructureChangeEvent.EventType type, Element... elements)
