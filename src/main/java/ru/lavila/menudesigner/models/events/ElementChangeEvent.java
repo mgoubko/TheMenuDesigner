@@ -12,8 +12,6 @@ public interface ElementChangeEvent<ValueType>
     enum EventType
     {
         NAME_CHANGED,
-        POPULARITY_CHANGED,
-        ELEMENTS_ADDED,
-        ELEMENTS_REMOVED
+        POPULARITY_CHANGED
     }
 }
