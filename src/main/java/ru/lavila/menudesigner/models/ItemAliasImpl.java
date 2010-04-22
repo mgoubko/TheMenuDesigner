@@ -1,9 +1,8 @@
 package ru.lavila.menudesigner.models;
 
-public class ItemAliasImpl implements Item
+public class ItemAliasImpl extends ElementImpl implements Item
 {
     public final Item sourceItem;
-    private String name;
 
     public ItemAliasImpl(Item sourceItem)
     {
@@ -12,9 +11,9 @@ public class ItemAliasImpl implements Item
 
     public ItemAliasImpl(String name, Item sourceItem)
     {
+        super(name);
         if (sourceItem == null) throw new IllegalArgumentException("Alias source can't be null");
         this.sourceItem = sourceItem;
-        this.name = name;
     }
 
     public void setPopularity(double popularity)
@@ -25,11 +24,6 @@ public class ItemAliasImpl implements Item
     public String getName()
     {
         return name != null ? name : sourceItem.getName();
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public double getPopularity()

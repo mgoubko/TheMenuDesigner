@@ -1,8 +1,10 @@
 package ru.lavila.menudesigner.models;
 
+import ru.lavila.menudesigner.models.events.*;
+
 import java.util.*;
 
-public class Hierarchy implements Category.CategoryListener
+public class Hierarchy implements ElementListener
 {
     public final Category root;
     private final List<HierarchyListener> listeners;
@@ -49,10 +51,10 @@ public class Hierarchy implements Category.CategoryListener
     {
         for (Element element : elements)
         {
+            element.addModelListener(this);
             if (element instanceof Category)
             {
                 Category category = (Category) element;
-                category.addModelListener(this);
                 if (category.elementsCount() > 0)
                 {
                     processNewElements(category, category.getElements(), toRemove);
@@ -77,10 +79,10 @@ public class Hierarchy implements Category.CategoryListener
         collector.put(parent, elements);
         for (Element element : elements)
         {
+            element.removeModelListener(this);
             if (element instanceof Category)
             {
                 Category category = (Category) element;
-                category.removeModelListener(this);
                 if (category.elementsCount() > 0)
                 {
                     prepareToRemove(category, category.getElements(), collector);
@@ -105,14 +107,43 @@ public class Hierarchy implements Category.CategoryListener
         return item;
     }
 
-    public void elementsAdded(Category category, Element... elements)
+    public void modelChanged(ElementChangeEvent event)
     {
-        HashSet<Element> toRemove = new HashSet<Element>();
-        processNewElements(category, Arrays.asList(elements), toRemove);
-        fireElementsAdded(category, elements);
-        for (Element element : toRemove)
+        if (event instanceof StructureChangeEvent)
         {
-            items.get(element).remove(element);
+            StructureChangeEvent structureEvent = (StructureChangeEvent) event;
+            Category category = structureEvent.getElement();
+            Collection<Element> elements = structureEvent.getDiff();
+
+            switch (event.getType())
+            {
+                case ELEMENTS_ADDED:
+                    HashSet<Element> toRemove = new HashSet<Element>();
+                    processNewElements(category, elements, toRemove);
+                    fireElementsAdded(category, elements.toArray(new Element[elements.size()]));
+                    for (Element element : toRemove)
+                    {
+                        items.get(element).remove(element);
+                    }
+                    break;
+                case ELEMENTS_REMOVED:
+                    Map<Category, Collection<Element>> collector = new HashMap<Category, Collection<Element>>();
+                    prepareToRemove(category, elements, collector);
+                    fireElementsRemoved(collector);
+                    break;
+            }
+        }
+        else
+        {
+            switch (event.getType())
+            {
+                case NAME_CHANGED:
+                    //todo
+                    break;
+                case POPULARITY_CHANGED:
+                    //todo
+                    break;
+            }
         }
     }
 
@@ -122,13 +153,6 @@ public class Hierarchy implements Category.CategoryListener
         {
             listener.elementsAdded(category, elements);
         }
-    }
-
-    public void elementsRemoved(Category category, Element... elements)
-    {
-        Map<Category, Collection<Element>> collector = new HashMap<Category, Collection<Element>>();
-        prepareToRemove(category, Arrays.asList(elements), collector);
-        fireElementsRemoved(collector);
     }
 
     private void fireElementsRemoved(Map<Category, Collection<Element>> elementsMap)

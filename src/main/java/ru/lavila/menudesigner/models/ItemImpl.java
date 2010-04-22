@@ -1,19 +1,13 @@
 package ru.lavila.menudesigner.models;
 
-public class ItemImpl implements Item
+public class ItemImpl extends ElementImpl implements Item
 {
-    private String name;
     private double popularity;
 
     public ItemImpl(String name, double popularity)
     {
-        this.name = name;
+        super(name);
         this.popularity = popularity;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public double getPopularity()
@@ -21,13 +15,10 @@ public class ItemImpl implements Item
         return popularity;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public void setPopularity(double popularity)
     {
+        double oldPopularity = this.popularity;
         this.popularity = popularity;
+        firePopularityChanged(oldPopularity, popularity);
     }
 }

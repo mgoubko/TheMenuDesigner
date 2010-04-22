@@ -1,18 +1,18 @@
 package ru.lavila.menudesigner.models;
 
+import ru.lavila.menudesigner.models.events.ElementChangeEvent;
+import ru.lavila.menudesigner.models.events.StructureChangeEventImpl;
+
 import java.util.*;
 
-public class CategoryImpl implements Category
+public class CategoryImpl extends ElementImpl implements Category
 {
-    private String name;
     private final List<Element> elements;
-    private final List<CategoryListener> listeners;
 
     public CategoryImpl(String name)
     {
-        this.name = name;
+        super(name);
         elements = new ArrayList<Element>();
-        listeners = new ArrayList<CategoryListener>();
     }
 
     public List<Element> getElements()
@@ -27,14 +27,21 @@ public class CategoryImpl implements Category
 
     public void add(Element... newElements)
     {
-        elements.addAll(Arrays.asList(newElements));
-        fireElementsAdded(newElements);
+        List<Element> elements = Arrays.asList(newElements);
+        this.elements.addAll(elements);
+        fireStructureChanged(ElementChangeEvent.EventType.ELEMENTS_ADDED, elements);
     }
 
     public void remove(Element... elementsToRemove)
     {
-        elements.removeAll(Arrays.asList(elementsToRemove));
-        fireElementsRemoved(elementsToRemove);
+        List<Element> elements = Arrays.asList(elementsToRemove);
+        this.elements.removeAll(elements);
+        fireStructureChanged(ElementChangeEvent.EventType.ELEMENTS_REMOVED, elements);
+    }
+
+    private void fireStructureChanged(ElementChangeEvent.EventType type, List<Element> diff)
+    {
+        fireModelEvent(new StructureChangeEventImpl(this, type, diff));
     }
 
     public String getName()
@@ -55,31 +62,5 @@ public class CategoryImpl implements Category
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public void addModelListener(CategoryListener listener)
-    {
-        listeners.add(listener);
-    }
-
-    public void removeModelListener(CategoryListener listener)
-    {
-        listeners.remove(listener);
-    }
-
-    protected void fireElementsAdded(Element... elements)
-    {
-        for (CategoryListener listener : listeners)
-        {
-            listener.elementsAdded(this, elements);
-        }
-    }
-
-    protected void fireElementsRemoved(Element... elements)
-    {
-        for (CategoryListener listener : listeners)
-        {
-            listener.elementsRemoved(this, elements);
-        }
     }
 }
