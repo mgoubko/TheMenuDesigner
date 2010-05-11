@@ -6,14 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AliasController
+public class ItemsController
 {
-    private final Hierarchy sourceHierarchy;
     private final Hierarchy targetHierarchy;
 
-    public AliasController(Hierarchy sourceHierarchy, Hierarchy targetHierarchy)
+    public ItemsController(Hierarchy targetHierarchy)
     {
-        this.sourceHierarchy = sourceHierarchy;
         this.targetHierarchy = targetHierarchy;
     }
 
@@ -24,7 +22,7 @@ public class AliasController
         {
             if (element instanceof Item)
             {
-                targetHierarchy.newItem(targetCategory, (Item) element);
+                targetHierarchy.add(targetCategory, element);
             }
             else if (element instanceof Category)
             {

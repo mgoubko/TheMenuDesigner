@@ -1,4 +1,6 @@
-package ru.lavila.menudesigner.models;
+package ru.lavila.menudesigner.models.impl;
+
+import ru.lavila.menudesigner.models.Item;
 
 class ItemImpl extends ElementImpl implements Item
 {
@@ -17,8 +19,7 @@ class ItemImpl extends ElementImpl implements Item
 
     public void setPopularity(double popularity)
     {
-        double oldPopularity = this.popularity;
         this.popularity = popularity;
-        firePopularityChanged(oldPopularity, popularity);
+        firePopularityChanged();
     }
 }

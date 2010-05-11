@@ -1,8 +1,9 @@
 package ru.lavila.menudesigner.views;
 
-import ru.lavila.menudesigner.controllers.AliasController;
+import ru.lavila.menudesigner.controllers.ItemsController;
 import ru.lavila.menudesigner.models.Hierarchy;
-import ru.lavila.menudesigner.stub.SourceHierarchy;
+import ru.lavila.menudesigner.models.ItemsList;
+import ru.lavila.menudesigner.stub.Stub;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,18 +12,19 @@ import java.awt.event.ActionListener;
 
 public class MainContentPane extends JPanel
 {
-    private final AliasController controller;
+    private final ItemsController controller;
     private final HierarchyView sourceView;
     private final HierarchyView targetView;
 
     public MainContentPane()
     {
         super(new BorderLayout());
-        Hierarchy sourceHierarchy = new SourceHierarchy();
-        Hierarchy targetHierarchy = new Hierarchy();
-        controller = new AliasController(sourceHierarchy, targetHierarchy);
-        sourceView = new HierarchyView(sourceHierarchy, false, new SourceToolbarConfigurator());
-        targetView = new HierarchyView(targetHierarchy, true, new TargetToolbarConfigurator());
+        ItemsList itemsList = Stub.getSourceData();
+        Hierarchy sourceHierarchy = itemsList.getHierarchies().iterator().next();
+        Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
+        controller = new ItemsController(targetHierarchy);
+        sourceView = new HierarchyView(itemsList, sourceHierarchy, false, new SourceToolbarConfigurator());
+        targetView = new HierarchyView(itemsList, targetHierarchy, true, new TargetToolbarConfigurator());
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourceView, targetView);
         splitPane.setResizeWeight(0.5);
         add(splitPane, BorderLayout.CENTER);

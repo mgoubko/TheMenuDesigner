@@ -1,7 +1,7 @@
-package ru.lavila.menudesigner.models;
+package ru.lavila.menudesigner.models.impl;
 
+import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
-import ru.lavila.menudesigner.models.events.ElementChangeEventImpl;
 import ru.lavila.menudesigner.models.events.ElementListener;
 
 import java.util.ArrayList;
@@ -25,9 +25,8 @@ abstract class ElementImpl implements Element
 
     public void setName(String name)
     {
-        String oldName = this.name;
         this.name = name;
-        fireNameChanged(oldName, name);
+        fireNameChanged();
     }
 
     public void addModelListener(ElementListener listener)
@@ -48,13 +47,35 @@ abstract class ElementImpl implements Element
         }
     }
 
-    protected void fireNameChanged(String oldValue, String newValue)
+    protected void fireNameChanged()
     {
-        fireModelEvent(new ElementChangeEventImpl<String>(this, ElementChangeEvent.EventType.NAME_CHANGED, oldValue, newValue));
+        fireModelEvent(new ElementChangeEventImpl(this, ElementChangeEvent.EventType.NAME_CHANGED));
     }
 
-    protected void firePopularityChanged(double oldValue, double newValue)
+    protected void firePopularityChanged()
     {
-        fireModelEvent(new ElementChangeEventImpl<Double>(this, ElementChangeEvent.EventType.POPULARITY_CHANGED, oldValue, newValue));
+        fireModelEvent(new ElementChangeEventImpl(this, ElementChangeEvent.EventType.POPULARITY_CHANGED));
+    }
+
+    private static class ElementChangeEventImpl implements ElementChangeEvent
+    {
+        private final Element element;
+        private final EventType type;
+
+        public ElementChangeEventImpl(Element element, EventType type)
+        {
+            this.element = element;
+            this.type = type;
+        }
+
+        public Element getElement()
+        {
+            return element;
+        }
+
+        public EventType getType()
+        {
+            return type;
+        }
     }
 }

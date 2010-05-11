@@ -2,36 +2,26 @@ package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.models.*;
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
-import ru.lavila.menudesigner.models.events.HierarchyListener;
-import ru.lavila.menudesigner.models.events.StructureChangeEvent;
+import ru.lavila.menudesigner.models.events.ItemsListChangeEvent;
+import ru.lavila.menudesigner.models.events.ItemsListListener;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TablePresenter extends AbstractTableModel implements HierarchyListener
+public class TablePresenter extends AbstractTableModel implements ItemsListListener
 {
-    private final Hierarchy hierarchy;
-    private List<Item> items;
+    private final ItemsList itemsList;
 
-    public TablePresenter(Hierarchy hierarchy)
+    public TablePresenter(ItemsList itemsList)
     {
-        this.hierarchy = hierarchy;
-        hierarchy.addModelListener(this);
-    }
-
-    private List<Item> getItems()
-    {
-        if (items == null)
-        {
-            items = hierarchy.getItems();
-        }
-        return items;
+        this.itemsList = itemsList;
+        itemsList.addModelListener(this);
     }
 
     public int getRowCount()
     {
-        return getItems().size();
+        return this.itemsList.size();
     }
 
     public int getColumnCount()
@@ -41,14 +31,14 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
 
     public Object getValueAt(int rowIndex, int columnIndex)
     {
-        Item item = getItems().get(rowIndex);
+        Item item = itemsList.get(rowIndex);
         return columnIndex == 0 ? item.getName() : new PopularityPresenter(item.getPopularity());
     }
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex)
     {
-        Item item = getItems().get(rowIndex);
+        Item item = itemsList.get(rowIndex);
         if (columnIndex == 0)
         {
             item.setName(value.toString());
@@ -77,66 +67,38 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
         return columnIndex == 0 ? String.class : PopularityPresenter.class;
     }
 
-    public void modelChanged(ElementChangeEvent event)
+    public void itemChanged(ElementChangeEvent event)
     {
         if (event.getElement() instanceof Item)
         {
-            int row = getItems().indexOf(event.getElement());
+            int row = itemsList.indexOf((Item) event.getElement());
             fireTableRowsUpdated(row, row);
         }
     }
 
-    public void structureChanged(StructureChangeEvent event)
-    {
-        switch (event.getType())
-        {
-            case ELEMENTS_ADDED:
-                elementsAdded(event.getCategorizedElements());
-                break;
-            case ELEMENTS_REMOVED:
-                elementsRemoved(event.getCategorizedElements());
-                break;
-        }
-    }
-
-    private void elementsAdded(CategorizedElements categorizedElements)
-    {
-        items = null;
-
-        int firstRow = getRowCount();
-        int lastRow = -1;
-        for (Element element : categorizedElements.getAllElements())
-        {
-            if (element instanceof Item)
-            {
-                int index = getItems().indexOf(element);
-                if (index < firstRow) firstRow = index;
-                if (index > lastRow) lastRow = index;
-            }
-        }
-
-        //todo: collect separate intervals
-        if (lastRow != -1) fireTableRowsInserted(firstRow, lastRow);
-    }
-
-    private void elementsRemoved(CategorizedElements categorizedElements)
+    public void listChanged(ItemsListChangeEvent event)
     {
         int firstRow = getRowCount();
         int lastRow = -1;
-        for (Element element : categorizedElements.getAllElements())
+        for (int index : event.getIndexes())
         {
-            if (element instanceof Item)
-            {
-                int index = getItems().indexOf(element);
-                if (index < firstRow) firstRow = index;
-                if (index > lastRow) lastRow = index;
-            }
+            if (index < firstRow) firstRow = index;
+            if (index > lastRow) lastRow = index;
         }
 
-        items = null;
-
         //todo: collect separate intervals
-        if (lastRow != -1) fireTableRowsDeleted(firstRow, lastRow);
+        if (lastRow != -1)
+        {
+            switch (event.getType())
+            {
+                case ELEMENTS_ADDED:
+                    fireTableRowsInserted(firstRow, lastRow);
+                    break;
+                case ELEMENTS_REMOVED:
+                    fireTableRowsDeleted(firstRow, lastRow);
+                    break;
+            }
+        }
     }
 
     public List<Element> getSelectedItems(int[] selectedRows)
@@ -144,7 +106,7 @@ public class TablePresenter extends AbstractTableModel implements HierarchyListe
         List<Element> selectedElements = new ArrayList<Element>();
         for (int selectedRow : selectedRows)
         {
-            selectedElements.add(getItems().get(selectedRow));
+            selectedElements.add(itemsList.get(selectedRow));
         }
         return selectedElements;
     }

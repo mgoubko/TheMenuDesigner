@@ -4,6 +4,7 @@ import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 
@@ -15,16 +16,18 @@ import java.awt.event.ActionListener;
 public class HierarchyView extends JPanel
 {
     private final ToolbarBuilder toolbarBuilder;
+    private final ItemsList itemsList;
     private final Hierarchy hierarchy;
     private boolean asTree;
     private JScrollPane scrollPane;
     private TreeView treeView;
     private TableView tableView;
 
-    public HierarchyView(Hierarchy hierarchy, boolean asTree, ToolbarConfigurator configurator)
+    public HierarchyView(ItemsList itemsList, Hierarchy hierarchy, boolean asTree, ToolbarConfigurator configurator)
     {
         super(new BorderLayout());
 
+        this.itemsList = itemsList;
         this.hierarchy = hierarchy;
         this.asTree = asTree;
 
@@ -39,7 +42,7 @@ public class HierarchyView extends JPanel
         add(scrollPane);
 
         treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy));
-        tableView = new TableView(new TablePresenter(hierarchy));
+        tableView = new TableView(new TablePresenter(itemsList));
 
         rebuildView();
     }
@@ -57,7 +60,7 @@ public class HierarchyView extends JPanel
 
     public Category getSelectedCategory()
     {
-        return asTree ? treeView.getSelectedCategory() : hierarchy.root;
+        return asTree ? treeView.getSelectedCategory() : hierarchy.getRoot();
     }
 
     private class ToolbarBuilder implements ToolbarConfig

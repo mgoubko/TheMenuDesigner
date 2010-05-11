@@ -2,12 +2,10 @@ package ru.lavila.menudesigner.models.events;
 
 import ru.lavila.menudesigner.models.Element;
 
-public interface ElementChangeEvent<ValueType>
+public interface ElementChangeEvent
 {
     public Element getElement();
     public EventType getType();
-    public ValueType getOldValue();
-    public ValueType getNewValue();
 
     enum EventType
     {

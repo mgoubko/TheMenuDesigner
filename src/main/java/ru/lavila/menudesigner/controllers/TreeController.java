@@ -6,7 +6,6 @@ import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 
 import javax.swing.tree.TreePath;
-import java.util.*;
 
 public class TreeController
 {
@@ -25,26 +24,11 @@ public class TreeController
     public void removeNodes(TreePath[] paths)
     {
         if (paths == null) return;
-        Map<Category, Collection<Element>> toRemove = new HashMap<Category, Collection<Element>>();
-        for (TreePath path : paths)
+        Element[] toRemove = new Element[paths.length];
+        for (int index = 0; index < paths.length; index++)
         {
-            TreePresenter.ElementTreeNode childNode = (TreePresenter.ElementTreeNode) path.getLastPathComponent();
-            if (childNode.getParent() != null)
-            {
-                Category parent = (Category) ((TreePresenter.ElementTreeNode) childNode.getParent()).element;
-                Collection<Element> parentElements = toRemove.get(parent);
-                if (parentElements == null)
-                {
-                    parentElements = new HashSet<Element>();
-                    toRemove.put(parent, parentElements);
-                }
-                parentElements.add(childNode.element);
-            }
+            toRemove[index] = ((TreePresenter.ElementTreeNode) paths[index].getLastPathComponent()).element;
         }
-        for (Category category : toRemove.keySet())
-        {
-            Collection<Element> elements = toRemove.get(category);
-            hierarchy.remove(category, elements.toArray(new Element[elements.size()]));
-        }
+        hierarchy.remove(toRemove);
     }
 }

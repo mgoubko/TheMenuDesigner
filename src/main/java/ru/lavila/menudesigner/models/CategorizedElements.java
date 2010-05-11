@@ -13,13 +13,12 @@ public class CategorizedElements
 
     public void add(Category category, List<Element> elements)
     {
-        List<Element> categoryElements = data.get(category);
-        if (categoryElements == null)
-        {
-            categoryElements = new ArrayList<Element>();
-            data.put(category, categoryElements);
-        }
-        categoryElements.addAll(elements);
+        getElementsFor(category).addAll(elements);
+    }
+
+    public void remove(Category category, Element element)
+    {
+        getElementsFor(category).remove(element);
     }
 
     public void add(Category category, Element... elements)
@@ -44,6 +43,35 @@ public class CategorizedElements
 
     public List<Element> getElementsFor(Category category)
     {
-        return data.get(category);
+        List<Element> elements = data.get(category);
+        if (elements == null)
+        {
+            elements = new ArrayList<Element>();
+            data.put(category, elements);
+        }
+        return elements;
+    }
+    
+    public boolean containsElement(Element element)
+    {
+        for (Collection<Element> categoryElements : data.values())
+        {
+            if (categoryElements.contains(element)) return true;
+        }
+        return false;
+    }
+
+    public Category getCategoryFor(Element element)
+    {
+        for (Category category : data.keySet())
+        {
+            if (getElementsFor(category).contains(element)) return category;
+        }
+        return null;
+    }
+
+    public boolean isEmpty()
+    {
+        return getAllElements().isEmpty();
     }
 }

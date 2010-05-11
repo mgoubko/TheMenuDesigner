@@ -18,7 +18,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         super(null);
         this.hierarchy = hierarchy;
         nodes = new HashMap<Element, ElementTreeNode>();
-        setRoot(getTreeNode(hierarchy.root));
+        setRoot(getTreeNode(hierarchy.getRoot()));
         hierarchy.addModelListener(this);
     }
 
@@ -68,10 +68,10 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
                 categoryNode = (TreePresenter.ElementTreeNode) categoryNode.getParent();
             }
         }
-        return categoryNode != null ? (Category) categoryNode.element : hierarchy.root;
+        return categoryNode != null ? (Category) categoryNode.element : hierarchy.getRoot();
     }
 
-    public void modelChanged(ElementChangeEvent event)
+    public void elementChanged(ElementChangeEvent event)
     {
         nodeChanged(nodes.get(event.getElement()));
     }
