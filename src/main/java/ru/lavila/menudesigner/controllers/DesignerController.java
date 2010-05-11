@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ItemsController
+public class DesignerController
 {
     private final Hierarchy targetHierarchy;
 
-    public ItemsController(Hierarchy targetHierarchy)
+    public DesignerController(Hierarchy targetHierarchy)
     {
         this.targetHierarchy = targetHierarchy;
     }

@@ -10,7 +10,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.util.List;
 
-public class TreeView extends JTree
+public class TreeView extends JTree implements ItemsView
 {
     private final TreeController controller;
 

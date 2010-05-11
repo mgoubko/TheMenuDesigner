@@ -1,13 +1,12 @@
 package ru.lavila.menudesigner.views;
 
-import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 
 import javax.swing.*;
 import java.util.List;
 
-public class TableView extends JTable
+public class TableView extends JTable implements ItemsView
 {
     public TableView(TablePresenter tablePresenter)
     {

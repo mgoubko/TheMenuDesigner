@@ -1,58 +1,53 @@
 package ru.lavila.menudesigner.views;
 
-import ru.lavila.menudesigner.controllers.ItemsController;
+import ru.lavila.menudesigner.controllers.DesignerController;
+import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
+import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.stub.Stub;
+import ru.lavila.menudesigner.views.toolbars.DesignerToolbar;
+import ru.lavila.menudesigner.views.toolbars.TreeToolBar;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainContentPane extends JPanel
 {
-    private final ItemsController controller;
-    private final HierarchyView sourceView;
-    private final HierarchyView targetView;
-
     public MainContentPane()
     {
         super(new BorderLayout());
         ItemsList itemsList = Stub.getSourceData();
-        Hierarchy sourceHierarchy = itemsList.getHierarchies().iterator().next();
         Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
-        controller = new ItemsController(targetHierarchy);
-        sourceView = new HierarchyView(itemsList, sourceHierarchy, false, new SourceToolbarConfigurator());
-        targetView = new HierarchyView(itemsList, targetHierarchy, true, new TargetToolbarConfigurator());
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourceView, targetView);
+
+        DesignerController controller = new DesignerController(targetHierarchy);
+
+        ItemsSwitchView sourceView = new ItemsSwitchView(itemsList);
+        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy));
+
+        DesignerToolbar sourceToolbar = new DesignerToolbar(sourceView, targetView, controller);
+        JPanel sourcePanel = buildContentPanel(sourceView, sourceToolbar);
+
+        TreeToolBar targetToolbar = new TreeToolBar(targetView);
+        JScrollPane scrollPane = new JScrollPane(targetView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JPanel targetPanel = buildContentPanel(scrollPane, targetToolbar);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourcePanel, targetPanel);
         splitPane.setResizeWeight(0.5);
         add(splitPane, BorderLayout.CENTER);
         add(new JLabel(" "), BorderLayout.SOUTH);
     }
 
-    private class SourceToolbarConfigurator implements ToolbarConfigurator
+    private JPanel buildContentPanel(JComponent view, JToolBar toolbar)
     {
-        public void fillToolbar(ToolbarConfig config)
-        {
-            config.addSwitchViewButton();
+        JPanel panel = new JPanel(new BorderLayout());
 
-            JButton use = new JButton(">>");
-            use.addActionListener(new ActionListener()
-                    {
-                        public void actionPerformed(ActionEvent e)
-                        {
-                            controller.aliasElements(targetView.getSelectedCategory(), sourceView.getSelectedElements());
-                        }
-                    });
-            config.addButton(use);
-        }
-    }
+        panel.setMinimumSize(new Dimension(200, 100));
+        panel.setPreferredSize(new Dimension(400, 500));
 
-    private class TargetToolbarConfigurator implements ToolbarConfigurator
-    {
-        public void fillToolbar(ToolbarConfig config)
-        {
-        }
+        panel.add(toolbar, BorderLayout.NORTH);
+        panel.add(view, BorderLayout.CENTER);
+
+        return panel;
     }
 }
