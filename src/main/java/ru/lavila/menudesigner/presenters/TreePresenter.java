@@ -81,10 +81,14 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         switch (event.getType())
         {
             case ELEMENTS_ADDED:
-                elementsAdded(event.getCategorizedElements());
+                elementsAdded(event.getElementsAdded());
                 break;
             case ELEMENTS_REMOVED:
-                elementsRemoved(event.getCategorizedElements());
+                elementsRemoved(event.getElementsRemoved());
+                break;
+            case ELEMENTS_MOVED:
+                elementsRemoved(event.getElementsRemoved());
+                elementsAdded(event.getElementsAdded());
                 break;
         }
     }

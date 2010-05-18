@@ -48,53 +48,64 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     public void add(Category category, Element... elements)
     {
+        if (elements.length == 0) return;
         CategorizedElements added = new CategorizedElements();
-        CategorizedElements removed = new CategorizedElements();
-        processNewElements(category, Arrays.asList(elements), added, removed);
+        CategorizedElements movedFrom = new CategorizedElements();
+        CategorizedElements movedTo = new CategorizedElements();
+        processNewElements(category, Arrays.asList(elements), true, added, movedFrom, movedTo);
         HashSet<Category> updatedCategories = new HashSet<Category>();
         updatedCategories.addAll(added.getCategories());
-        updatedCategories.addAll(removed.getCategories());
+        updatedCategories.addAll(movedFrom.getCategories());
+        updatedCategories.addAll(movedTo.getCategories());
         if (!updatedCategories.isEmpty())
         {
             categoriesStructureChanged(updatedCategories);
-            if (!removed.isEmpty())
+            if (!movedFrom.isEmpty())
             {
-                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_REMOVED, removed));
+                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_MOVED, movedTo, movedFrom));
             }
             if (!added.isEmpty())
             {
-                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_ADDED, added));
+                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_ADDED, added, null));
             }
         }
     }
 
-    private void processNewElements(Category category, Collection<Element> elements, CategorizedElements added, CategorizedElements removed)
+    void addSilent(Category category, Element... elements)
+    {
+        processNewElements(category, Arrays.asList(elements), false, null, null, null);
+    }
+
+    private void processNewElements(Category category, Collection<Element> elements, boolean moveExisting, CategorizedElements added, CategorizedElements movedFrom, CategorizedElements movedTo)
     {
         for (Element element : elements)
         {
             if (hierarchyElements.containsElement(element))
             {
-                Category oldCategory = hierarchyElements.getCategoryFor(element);
-                if (oldCategory != category)
+                if (moveExisting)
                 {
-                    hierarchyElements.remove(oldCategory, element);
-                    hierarchyElements.add(category, element);
-                    removed.add(oldCategory, element);
-                    added.add(category, element);
+                    Category oldCategory = hierarchyElements.getCategoryFor(element);
+                    if (oldCategory != category)
+                    {
+                        hierarchyElements.remove(oldCategory, element);
+                        hierarchyElements.add(category, element);
+                        if (movedFrom != null) movedFrom.add(oldCategory, element);
+                        if (movedTo != null) movedTo.add(category, element);
+                    }
                 }
             }
             else
             {
                 element.addModelListener(this);
                 hierarchyElements.add(category, element);
-                added.add(category, element);
+                if (added != null) added.add(category, element);
 
                 if (element instanceof Category)
                 {
                     Category subCategory = (Category) element;
                     if (!subCategory.isEmpty())
                     {
-                        processNewElements(subCategory, subCategory.getElements(), added, removed);
+                        processNewElements(subCategory, subCategory.getElements(), moveExisting, added, movedFrom, movedTo);
                     }
                 }
             }
@@ -103,13 +114,22 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     public void remove(Element... elements)
     {
+        remove(false, elements);
+    }
+
+    void removeSilent(Element... elements)
+    {
+        remove(true, elements);
+    }
+
+    private void remove(boolean silent, Element... elements)
+    {
+        if (elements.length == 0) return;
         CategorizedElements removed = new CategorizedElements();
         processRemove(Arrays.asList(elements), removed);
         categoriesStructureChanged(removed.getCategories());
-        if (!removed.isEmpty())
-        {
-            fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_REMOVED, removed));
-        }
+        if (silent || removed.isEmpty()) return;
+        fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_REMOVED, null, removed));
     }
 
     private void processRemove(Collection<Element> elements, CategorizedElements removed)
@@ -216,21 +236,15 @@ class HierarchyImpl implements Hierarchy, ElementListener
     {
         private final Hierarchy source;
         private final EventType type;
-        private final CategorizedElements elements;
+        private final CategorizedElements elementsAdded;
+        private final CategorizedElements elementsRemoved;
 
-        public StructureChangeEventImpl(Hierarchy source, EventType type, CategorizedElements elements)
+        public StructureChangeEventImpl(Hierarchy source, EventType type, CategorizedElements elementsAdded, CategorizedElements elementsRemoved)
         {
             this.source = source;
             this.type = type;
-            this.elements = elements;
-        }
-
-        public StructureChangeEventImpl(Hierarchy source, EventType type, Category category, Element... children)
-        {
-            this.source = source;
-            this.type = type;
-            elements = new CategorizedElements();
-            elements.add(category, children);
+            this.elementsAdded = elementsAdded;
+            this.elementsRemoved = elementsRemoved;
         }
 
         public Hierarchy getSource()
@@ -243,9 +257,14 @@ class HierarchyImpl implements Hierarchy, ElementListener
             return type;
         }
 
-        public CategorizedElements getCategorizedElements()
+        public CategorizedElements getElementsAdded()
         {
-            return elements;
+            return elementsAdded;
+        }
+
+        public CategorizedElements getElementsRemoved()
+        {
+            return elementsRemoved;
         }
     }
 }

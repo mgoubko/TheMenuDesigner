@@ -7,11 +7,13 @@ public interface StructureChangeEvent
 {
     public Hierarchy getSource();
     public EventType getType();
-    public CategorizedElements getCategorizedElements();
+    public CategorizedElements getElementsAdded();
+    public CategorizedElements getElementsRemoved();
 
     enum EventType
     {
         ELEMENTS_ADDED,
-        ELEMENTS_REMOVED
+        ELEMENTS_REMOVED,
+        ELEMENTS_MOVED
     }
 }

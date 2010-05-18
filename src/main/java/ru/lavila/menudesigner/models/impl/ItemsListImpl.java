@@ -8,13 +8,13 @@ import java.util.*;
 public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListener
 {
     private final List<Item> items;
-    private final List<Hierarchy> hierarchies;
+    private final List<HierarchyImpl> hierarchies;
     private final List<ItemsListListener> listeners;
 
     public ItemsListImpl()
     {
         items = new ArrayList<Item>();
-        hierarchies = new ArrayList<Hierarchy>();
+        hierarchies = new ArrayList<HierarchyImpl>();
         listeners = new ArrayList<ItemsListListener>();
     }
 
@@ -41,11 +41,11 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
     public Item newItem(String name, double popularity)
     {
         Item item = new ItemImpl(name, popularity);
-        add(null, item);
+        add(item);
         return item;
     }
 
-    private void add(Hierarchy sourceHierarchy, Item... newItems)
+    private void add(Item... newItems)
     {
         List<Item> added = new ArrayList<Item>();
         List<Integer> indexes = new ArrayList<Integer>();
@@ -65,22 +65,17 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         {
             fireListChanged(new ItemsListChangeEventImpl(ItemsListChangeEvent.EventType.ELEMENTS_ADDED, added, indexes));
 
-            for (Hierarchy hierarchy : hierarchies)
+            for (HierarchyImpl hierarchy : hierarchies)
             {
-                if (hierarchy != sourceHierarchy && hierarchy.isTaxomony())
+                if (hierarchy.isTaxomony())
                 {
-                    hierarchy.add(hierarchy.getRoot(), added.toArray(new Item[added.size()]));
+                    hierarchy.addSilent(hierarchy.getRoot(), added.toArray(new Item[added.size()]));
                 }
             }
         }
     }
 
     public void remove(Item... toRemove)
-    {
-        remove(null, toRemove);
-    }
-
-    private void remove(Hierarchy sourceHierarchy, Item... toRemove)
     {
         List<Item> removed = new ArrayList<Item>();
         List<Integer> indexes = new ArrayList<Integer>();
@@ -100,24 +95,23 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         {
             fireListChanged(new ItemsListChangeEventImpl(ItemsListChangeEvent.EventType.ELEMENTS_REMOVED, removed, indexes));
 
-            for (Hierarchy hierarchy : hierarchies)
+            for (HierarchyImpl hierarchy : hierarchies)
             {
-                if (hierarchy != sourceHierarchy)
-                {
-                    hierarchy.remove(removed.toArray(new Item[removed.size()]));
-                }
+                hierarchy.removeSilent(removed.toArray(new Item[removed.size()]));
             }
         }
     }
 
     public List<Hierarchy> getHierarchies()
     {
-        return Collections.unmodifiableList(hierarchies);
+        List<Hierarchy> result = new ArrayList<Hierarchy>();
+        result.addAll(hierarchies);
+        return result;
     }
 
     public Hierarchy newHierarchy(String name, boolean taxomony)
     {
-        Hierarchy hierarchy = new HierarchyImpl(name, taxomony);
+        HierarchyImpl hierarchy = new HierarchyImpl(name, taxomony);
         hierarchy.addModelListener(this);
         hierarchies.add(hierarchy);
         if (taxomony)
@@ -167,12 +161,12 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         switch (event.getType())
         {
             case ELEMENTS_ADDED:
-                add(event.getSource(), extractItems(event.getCategorizedElements()));
+                add(extractItems(event.getElementsAdded()));
                 break;
             case ELEMENTS_REMOVED:
                 if (event.getSource().isTaxomony())
                 {
-                    remove(event.getSource(), extractItems(event.getCategorizedElements()));
+                    remove(extractItems(event.getElementsRemoved()));
                 }
                 break;
         }
