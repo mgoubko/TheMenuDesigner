@@ -30,7 +30,7 @@ public class DesignerToolbar extends JToolBar
         {
             public void actionPerformed(ActionEvent e)
             {
-                controller.recalculatePopularities();
+                controller.normalizePopularities();
             }
         });
         add(normalize);

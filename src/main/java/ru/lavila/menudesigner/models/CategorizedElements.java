@@ -41,7 +41,12 @@ public class CategorizedElements
         return elements;
     }
 
-    public List<Element> getElementsFor(Category category)
+    public List<Element> getCategoryElements(Category category)
+    {
+        return Collections.unmodifiableList(getElementsFor(category));
+    }
+
+    private List<Element> getElementsFor(Category category)
     {
         List<Element> elements = data.get(category);
         if (elements == null)

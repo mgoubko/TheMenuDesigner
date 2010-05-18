@@ -111,6 +111,7 @@ public class Stub
         type.add(delete,
                 original.newItem(messageLog, "Clear all counters", 16)
         );
+        data.normalizePopularities();
         return data;
     }
 }

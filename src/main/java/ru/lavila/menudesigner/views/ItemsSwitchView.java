@@ -30,7 +30,7 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
             {
                 TreeView treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy));
                 views.add(treeView);
-                addTab(hierarchy.getRoot().getName(), new JScrollPane(treeView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+                addTab(hierarchy.getRoot().getName(), treeView);
             }
         }
     }

@@ -17,18 +17,9 @@ public class DesignerController
         this.targetHierarchy = targetHierarchy;
     }
 
-    public void recalculatePopularities()
+    public void normalizePopularities()
     {
-        Item[] items = itemsList.toArray();
-        double total = 0;
-        for (Item item : items)
-        {
-            total += item.getPopularity();
-        }
-        for (Item item : items)
-        {
-            item.setPopularity(item.getPopularity() / total);
-        }
+        itemsList.normalizePopularities();
     }
 
     public void aliasElements(Category targetCategory, List<Element> sourceElements)

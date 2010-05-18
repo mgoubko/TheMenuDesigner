@@ -12,6 +12,7 @@ public interface ItemsList
     public int size();
     public Item newItem(String name, double popularity);
     public void remove(Item... items);
+    public void normalizePopularities();
 
     public List<Hierarchy> getHierarchies();
     public List<Hierarchy> getTaxonomies();

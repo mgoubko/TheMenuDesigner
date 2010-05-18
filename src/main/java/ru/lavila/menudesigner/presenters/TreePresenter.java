@@ -1,5 +1,7 @@
 package ru.lavila.menudesigner.presenters;
 
+import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.ReadUntilMenuModel;
 import ru.lavila.menudesigner.models.*;
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.HierarchyListener;
@@ -11,12 +13,16 @@ import java.util.*;
 public class TreePresenter extends DefaultTreeModel implements HierarchyListener
 {
     private final Hierarchy hierarchy;
+    private final HierarchyCalculator calculator;
     private final Map<Element, ElementTreeNode> nodes;
+    private final List<CalculationsListener> calculationsListeners;
 
     public TreePresenter(Hierarchy hierarchy)
     {
         super(null);
+        calculationsListeners = new ArrayList<CalculationsListener>();
         this.hierarchy = hierarchy;
+        this.calculator = new HierarchyCalculator(hierarchy);
         nodes = new HashMap<Element, ElementTreeNode>();
         setRoot(getTreeNode(hierarchy.getRoot()));
         hierarchy.addModelListener(this);
@@ -74,6 +80,10 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     public void elementChanged(ElementChangeEvent event)
     {
         nodeChanged(nodes.get(event.getElement()));
+        if (event.getType() == ElementChangeEvent.EventType.POPULARITY_CHANGED)
+        {
+            fireCalculationsChanged();
+        }
     }
 
     public void structureChanged(StructureChangeEvent event)
@@ -91,13 +101,14 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
                 elementsAdded(event.getElementsAdded());
                 break;
         }
+        fireCalculationsChanged();
     }
 
     private void elementsAdded(CategorizedElements categorizedElements)
     {
         for (Category category : categorizedElements.getCategories())
         {
-            Collection<Element> elements = categorizedElements.getElementsFor(category);
+            Collection<Element> elements = categorizedElements.getCategoryElements(category);
             ElementTreeNode node = nodes.get(category);
             int[] indexes = new int[elements.size()];
             int index = 0;
@@ -116,7 +127,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     {
         for (Category category : categorizedElements.getCategories())
         {
-            Collection<Element> elementsList = categorizedElements.getElementsFor(category);
+            Collection<Element> elementsList = categorizedElements.getCategoryElements(category);
             ElementTreeNode parentNode = nodes.get(category);
             if (parentNode != null)
             {
@@ -138,6 +149,32 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
                 nodesWereRemoved(parentNode, removedIndexes, removedNodes);
             }
         }
+    }
+
+    public void addCalculationListener(CalculationsListener listener)
+    {
+        if (!calculationsListeners.contains(listener))
+        {
+            calculationsListeners.add(listener);
+        }
+    }
+
+    public void removeCalculationListener(CalculationsListener listener)
+    {
+        calculationsListeners.remove(listener);
+    }
+
+    private void fireCalculationsChanged()
+    {
+        for (CalculationsListener listener : calculationsListeners)
+        {
+            listener.valuesChanged();
+        }
+    }
+
+    public String getUserSessionTime()
+    {
+        return String.format("%.2f", calculator.getUserSessionTime());
     }
 
     public static class ElementTreeNode extends DefaultMutableTreeNode

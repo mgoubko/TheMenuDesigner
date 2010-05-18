@@ -152,7 +152,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
                     Category category = (Category) element;
                     if (!category.isEmpty())
                     {
-                        processRemove(category.getElements(), removed);
+                        processRemove(new ArrayList<Element>(category.getElements()), removed);
                     }
                 }
             }
@@ -218,7 +218,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
         public List<Element> getElements()
         {
-            return hierarchyElements.getElementsFor(this);
+            return hierarchyElements.getCategoryElements(this);
         }
 
         public boolean isEmpty()

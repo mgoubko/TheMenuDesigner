@@ -29,8 +29,7 @@ public class MainContentPane extends JPanel
         JPanel sourcePanel = buildContentPanel(sourceView, sourceToolbar);
 
         TreeToolBar targetToolbar = new TreeToolBar(targetView);
-        JScrollPane scrollPane = new JScrollPane(targetView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        JPanel targetPanel = buildContentPanel(scrollPane, targetToolbar);
+        JPanel targetPanel = buildContentPanel(targetView, targetToolbar);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourcePanel, targetPanel);
         splitPane.setResizeWeight(0.5);

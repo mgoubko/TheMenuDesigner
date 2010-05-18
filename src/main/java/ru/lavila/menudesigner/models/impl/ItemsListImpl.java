@@ -102,6 +102,19 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         }
     }
 
+    public void normalizePopularities()
+    {
+        double total = 0;
+        for (Item item : items)
+        {
+            total += item.getPopularity();
+        }
+        for (Item item : items)
+        {
+            item.setPopularity(item.getPopularity() / total);
+        }
+    }
+
     public List<Hierarchy> getHierarchies()
     {
         List<Hierarchy> result = new ArrayList<Hierarchy>();
