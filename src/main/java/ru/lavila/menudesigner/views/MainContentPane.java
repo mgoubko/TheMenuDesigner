@@ -20,7 +20,7 @@ public class MainContentPane extends JPanel
         ItemsList itemsList = Stub.getSourceData();
         Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
 
-        DesignerController controller = new DesignerController(targetHierarchy);
+        DesignerController controller = new DesignerController(itemsList, targetHierarchy);
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList);
         TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy));

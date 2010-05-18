@@ -8,11 +8,27 @@ import java.util.Map;
 
 public class DesignerController
 {
+    private final ItemsList itemsList;
     private final Hierarchy targetHierarchy;
 
-    public DesignerController(Hierarchy targetHierarchy)
+    public DesignerController(ItemsList itemsList, Hierarchy targetHierarchy)
     {
+        this.itemsList = itemsList;
         this.targetHierarchy = targetHierarchy;
+    }
+
+    public void recalculatePopularities()
+    {
+        Item[] items = itemsList.toArray();
+        double total = 0;
+        for (Item item : items)
+        {
+            total += item.getPopularity();
+        }
+        for (Item item : items)
+        {
+            item.setPopularity(item.getPopularity() / total);
+        }
     }
 
     public void aliasElements(Category targetCategory, List<Element> sourceElements)

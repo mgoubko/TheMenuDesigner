@@ -25,6 +25,16 @@ public class DesignerToolbar extends JToolBar
 
     private void setupButtons()
     {
+        JButton normalize = new JButton("Normalize");
+        normalize.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                controller.recalculatePopularities();
+            }
+        });
+        add(normalize);
+
         JButton use = new JButton(">>");
         use.addActionListener(new ActionListener()
         {

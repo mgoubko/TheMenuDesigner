@@ -11,7 +11,7 @@ public class PopularityPresenter
 
     static
     {
-        numberFormat.setMaximumFractionDigits(10);
+        numberFormat.setMaximumFractionDigits(5);
     }
 
     public PopularityPresenter(double value)
