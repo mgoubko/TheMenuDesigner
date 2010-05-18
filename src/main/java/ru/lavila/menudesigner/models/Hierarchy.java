@@ -6,6 +6,7 @@ public interface Hierarchy
 {
     public Category getRoot();
     public boolean isTaxomony();
+    public Category getElementCategory(Element element);
     public Item newItem(Category parentCategory, String name, double popularity);
     public Category newCategory(Category parentCategory, String name);
     public void add(Category category, Element... elements);

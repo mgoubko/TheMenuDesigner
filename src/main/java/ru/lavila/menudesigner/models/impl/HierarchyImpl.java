@@ -32,6 +32,11 @@ class HierarchyImpl implements Hierarchy, ElementListener
         return taxomony;
     }
 
+    public Category getElementCategory(Element element)
+    {
+        return hierarchyElements.getCategoryFor(element);
+    }
+
     public Item newItem(Category parentCategory, String name, double popularity)
     {
         Item item = new ItemImpl(name, popularity);

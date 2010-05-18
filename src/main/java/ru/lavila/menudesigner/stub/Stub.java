@@ -10,8 +10,8 @@ public class Stub
     public static ItemsList getSourceData()
     {
         ItemsListImpl data = new ItemsListImpl();
-        Hierarchy original = data.newHierarchy("Original", true);
-        Hierarchy type = data.newHierarchy("Type", true);
+        Hierarchy original = data.newHierarchy("Original Menu", true);
+        Hierarchy type = data.newHierarchy("Action Type", true);
         Category view = type.newCategory(type.getRoot(), "View");
         Category create = type.newCategory(type.getRoot(), "Create");
         Category delete = type.newCategory(type.getRoot(), "Delete");

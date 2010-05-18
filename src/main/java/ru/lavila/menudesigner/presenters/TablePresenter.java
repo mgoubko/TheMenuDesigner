@@ -26,13 +26,24 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
 
     public int getColumnCount()
     {
-        return 2;
+        return 2 + itemsList.getTaxonomies().size();
     }
 
     public Object getValueAt(int rowIndex, int columnIndex)
     {
         Item item = itemsList.get(rowIndex);
-        return columnIndex == 0 ? item.getName() : new PopularityPresenter(item.getPopularity());
+        if (columnIndex == 0)
+        {
+            return item.getName();
+        }
+        else if (columnIndex == 1)
+        {
+            return new PopularityPresenter(item.getPopularity());
+        }
+        else
+        {
+            return getPathToItem(itemsList.getTaxonomies().get(columnIndex - 2), item);
+        }
     }
 
     @Override
@@ -52,19 +63,30 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex)
     {
-        return true;
+        return columnIndex < 2;
     }
 
     @Override
     public String getColumnName(int column)
     {
-        return column == 0 ? "Name" : "Popularity";
+        if (column == 0)
+        {
+            return "Name";
+        }
+        else if (column == 1)
+        {
+            return "Popularity";
+        }
+        else
+        {
+            return itemsList.getTaxonomies().get(column - 2).getRoot().getName();
+        }
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex)
     {
-        return columnIndex == 0 ? String.class : PopularityPresenter.class;
+        return columnIndex == 1 ? PopularityPresenter.class : String.class;
     }
 
     public void itemChanged(ElementChangeEvent event)
@@ -109,5 +131,15 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
             selectedElements.add(itemsList.get(selectedRow));
         }
         return selectedElements;
+    }
+
+    private String getPathToItem(Hierarchy hierarchy, Item item)
+    {
+        String result = "";
+        for (Category current = hierarchy.getElementCategory(item); current != hierarchy.getRoot(); current = hierarchy.getElementCategory(current))
+        {
+            result = " / " + current.getName() + result;
+        }
+        return result.length() == 0 ? result : result.substring(3);
     }
 }

@@ -109,6 +109,16 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         return result;
     }
 
+    public List<Hierarchy> getTaxonomies()
+    {
+        List<Hierarchy> result = new ArrayList<Hierarchy>();
+        for (Hierarchy hierarchy : hierarchies)
+        {
+            if (hierarchy.isTaxomony()) result.add(hierarchy);
+        }
+        return result;
+    }
+
     public Hierarchy newHierarchy(String name, boolean taxomony)
     {
         HierarchyImpl hierarchy = new HierarchyImpl(name, taxomony);
