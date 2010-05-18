@@ -23,30 +23,22 @@ public class MainContentPane extends JPanel
         DesignerController controller = new DesignerController(itemsList, targetHierarchy);
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList);
+        sourceView.setMinimumSize(new Dimension(200, 100));
+        sourceView.setPreferredSize(new Dimension(400, 500));
+
         TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy));
+        targetView.setMinimumSize(new Dimension(200, 100));
+        targetView.setPreferredSize(new Dimension(400, 500));
 
-        DesignerToolbar sourceToolbar = new DesignerToolbar(sourceView, targetView, controller);
-        JPanel sourcePanel = buildContentPanel(sourceView, sourceToolbar);
+        sourceView.addToolBar(new DesignerToolbar(sourceView, targetView, controller));
 
-        TreeToolBar targetToolbar = new TreeToolBar(targetView);
-        JPanel targetPanel = buildContentPanel(targetView, targetToolbar);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Target Menu", targetView);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourcePanel, targetPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sourceView, tabbedPane);
         splitPane.setResizeWeight(0.5);
         add(splitPane, BorderLayout.CENTER);
+        
         add(new JLabel(" "), BorderLayout.SOUTH);
-    }
-
-    private JPanel buildContentPanel(JComponent view, JToolBar toolbar)
-    {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        panel.setMinimumSize(new Dimension(200, 100));
-        panel.setPreferredSize(new Dimension(400, 500));
-
-        panel.add(toolbar, BorderLayout.NORTH);
-        panel.add(view, BorderLayout.CENTER);
-
-        return panel;
     }
 }
