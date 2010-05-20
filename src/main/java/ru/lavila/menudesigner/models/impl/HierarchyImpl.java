@@ -65,7 +65,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
         if (elements.length == 0) return;
         CategorizedElements added = new CategorizedElements();
         CategorizedElements removed = new CategorizedElements();
-        processNewElements(category, Arrays.asList(elements), index, true, added, removed);
+        processNewElements(category, Arrays.asList(elements), index, added, removed);
         HashSet<Category> updatedCategories = new HashSet<Category>();
         updatedCategories.addAll(added.getCategories());
         updatedCategories.addAll(removed.getCategories());
@@ -76,83 +76,61 @@ class HierarchyImpl implements Hierarchy, ElementListener
         }
     }
 
-    void addSilent(Category category, Element... elements)
-    {
-        processNewElements(category, Arrays.asList(elements), -1, false, null, null);
-    }
-
-    private void processNewElements(Category category, Collection<Element> elements, int index, boolean moveExisting, CategorizedElements added, CategorizedElements removed)
+    private void processNewElements(Category category, Collection<Element> elements, int index, CategorizedElements added, CategorizedElements removed)
     {
         for (Element element : elements)
         {
+            Category toProcess = null;
             if (hierarchyElements.containsElement(element))
             {
-                if (moveExisting)
+                Category oldCategory = hierarchyElements.getCategoryFor(element);
+                if (oldCategory.equals(category))
                 {
-                    Category oldCategory = hierarchyElements.getCategoryFor(element);
-                    if (oldCategory.equals(category))
-                    {
-                        if (hierarchyElements.getCategoryElements(category).indexOf(element) <= index) index--;
-                    }
-                    hierarchyElements.remove(oldCategory, element);
-                    if (index < 0)
-                        hierarchyElements.add(category, element);
-                    else
-                        hierarchyElements.add(category, index++, element);
-                    if (removed != null) removed.add(oldCategory, element);
-                    if (added != null) added.add(category, element);
-
-                    if (element instanceof Category)
-                    {
-                        Category subCategory = (Category) element;
-                        if (!subCategory.isEmpty())
-                        {
-                            processNewElements(subCategory, new ArrayList<Element>(subCategory.getElements()), -1, moveExisting, added, removed);
-                        }
-                    }
+                    if (hierarchyElements.getCategoryElements(category).indexOf(element) <= index) index--;
+                }
+                hierarchyElements.remove(oldCategory, element);
+                if (removed != null) removed.add(oldCategory, element);
+                if (element instanceof Category)
+                {
+                    toProcess = (Category) element;
                 }
             }
             else
             {
-                Category toProcess = null;
                 if (element instanceof Category)
                 {
                     toProcess = (Category) element;
                     element = new CategoryImpl(element.getName());
                 }
                 element.addModelListener(this);
-                if (index < 0)
-                    hierarchyElements.add(category, element);
-                else
-                    hierarchyElements.add(category, index++, element);
-                if (added != null) added.add(category, element);
+            }
+            if (index < 0)
+            {
+                hierarchyElements.add(category, element);
+            }
+            else
+            {
+                hierarchyElements.add(category, index++, element);
+            }
+            if (added != null) added.add(category, element);
 
-                if (toProcess != null && !toProcess.isEmpty())
-                {
-                    processNewElements((Category) element, new ArrayList<Element>(toProcess.getElements()), -1, moveExisting, added, removed);
-                }
+            if (toProcess != null && !toProcess.isEmpty())
+            {
+                processNewElements((Category) element, new ArrayList<Element>(toProcess.getElements()), -1, added, removed);
             }
         }
     }
 
     public void remove(Element... elements)
     {
-        remove(false, elements);
-    }
-
-    void removeSilent(Element... elements)
-    {
-        remove(true, elements);
-    }
-
-    private void remove(boolean silent, Element... elements)
-    {
         if (elements.length == 0) return;
         CategorizedElements removed = new CategorizedElements();
         processRemove(Arrays.asList(elements), removed);
         categoriesStructureChanged(removed.getCategories());
-        if (silent || removed.isEmpty()) return;
-        fireStructureChangeEvent(new StructureChangeEventImpl(this, null, removed));
+        if (!removed.isEmpty())
+        {
+            fireStructureChangeEvent(new StructureChangeEventImpl(this, null, removed));
+        }
     }
 
     private void processRemove(Collection<Element> elements, CategorizedElements removed)

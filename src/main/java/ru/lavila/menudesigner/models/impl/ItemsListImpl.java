@@ -10,6 +10,7 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
     private final List<Item> items;
     private final List<HierarchyImpl> hierarchies;
     private final List<ItemsListListener> listeners;
+    private boolean ignoreStructureChange = false;
 
     public ItemsListImpl()
     {
@@ -41,11 +42,11 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
     public Item newItem(String name, double popularity)
     {
         Item item = new ItemImpl(name, popularity);
-        add(item);
+        add(null, item);
         return item;
     }
 
-    private void add(Item... newItems)
+    private void add(Hierarchy source, Item... newItems)
     {
         List<Item> added = new ArrayList<Item>();
         List<Integer> indexes = new ArrayList<Integer>();
@@ -65,13 +66,15 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         {
             fireListChanged(new ItemsListChangeEventImpl(ItemsListChangeEvent.EventType.ELEMENTS_ADDED, added, indexes));
 
+            ignoreStructureChange = true;
             for (HierarchyImpl hierarchy : hierarchies)
             {
-                if (hierarchy.isTaxomony())
+                if (hierarchy != source && hierarchy.isTaxomony())
                 {
-                    hierarchy.addSilent(hierarchy.getRoot(), added.toArray(new Item[added.size()]));
+                    hierarchy.add(hierarchy.getRoot(), added.toArray(new Item[added.size()]));
                 }
             }
+            ignoreStructureChange = false;
         }
     }
 
@@ -95,10 +98,12 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         {
             fireListChanged(new ItemsListChangeEventImpl(ItemsListChangeEvent.EventType.ELEMENTS_REMOVED, removed, indexes));
 
+            ignoreStructureChange = true;
             for (HierarchyImpl hierarchy : hierarchies)
             {
-                hierarchy.removeSilent(removed.toArray(new Item[removed.size()]));
+                hierarchy.remove(removed.toArray(new Item[removed.size()]));
             }
+            ignoreStructureChange = false;
         }
     }
 
@@ -181,26 +186,20 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
 
     public void structureChanged(StructureChangeEvent event)
     {
-        List<Element> added = event.getElementsAdded().getAllElements();
-        added.removeAll(event.getElementsRemoved().getAllElements());
-        for (Element element : added)
-        {
-            if (element instanceof Item) add((Item) element);
-        }
+        if (ignoreStructureChange) return;
+        List<Item> removed = extractItems(event.getElementsRemoved());
+        List<Item> added = extractItems(event.getElementsAdded());
+        add(event.getSource(), added.toArray(new Item[added.size()]));
         if (event.getSource().isTaxomony())
         {
-            List<Element> removed = event.getElementsRemoved().getAllElements();
-            removed.removeAll(event.getElementsAdded().getAllElements());
-            for (Element element : removed)
-            {
-                if (element instanceof Item) remove((Item) element);
-            }
+            removed.removeAll(added);
+            remove(removed.toArray(new Item[removed.size()]));
         }
     }
 
-    private Item[] extractItems(CategorizedElements categorizedElements)
+    private List<Item> extractItems(CategorizedElements categorizedElements)
     {
-        Collection<Item> items = new HashSet<Item>();
+        List<Item> items = new ArrayList<Item>();
         for (Element element : categorizedElements.getAllElements())
         {
             if (element instanceof Item)
@@ -208,7 +207,7 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
                 items.add((Item) element);
             }
         }
-        return items.toArray(new Item[items.size()]);
+        return items;
     }
 
     private static class ItemsListChangeEventImpl implements ItemsListChangeEvent
