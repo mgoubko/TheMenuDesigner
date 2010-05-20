@@ -1,11 +1,13 @@
 package ru.lavila.menudesigner.views;
 
+import ru.lavila.menudesigner.controllers.ItemsController;
 import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
+import ru.lavila.menudesigner.views.toolbars.ItemsToolbar;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -15,11 +17,14 @@ import java.util.List;
 
 public class ItemsSwitchView extends JTabbedPane implements ItemsView
 {
+    private final ItemsController controller;
     private final List<JToolBar> toolBars;
 
     public ItemsSwitchView(ItemsList itemsList)
     {
         super();
+
+        controller = new ItemsController(itemsList);
 
         TableView tableView = new TableView(new TablePresenter(itemsList));
         addTab("List", tableView);
@@ -33,6 +38,7 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
         }
 
         toolBars = new ArrayList<JToolBar>();
+        addToolBar(new ItemsToolbar(controller));
 
         addChangeListener(new ChangeListener()
         {
