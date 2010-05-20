@@ -181,17 +181,20 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
 
     public void structureChanged(StructureChangeEvent event)
     {
-        switch (event.getType())
+        List<Element> added = event.getElementsAdded().getAllElements();
+        added.removeAll(event.getElementsRemoved().getAllElements());
+        for (Element element : added)
         {
-            case ELEMENTS_ADDED:
-                add(extractItems(event.getElementsAdded()));
-                break;
-            case ELEMENTS_REMOVED:
-                if (event.getSource().isTaxomony())
-                {
-                    remove(extractItems(event.getElementsRemoved()));
-                }
-                break;
+            if (element instanceof Item) add((Item) element);
+        }
+        if (event.getSource().isTaxomony())
+        {
+            List<Element> removed = event.getElementsRemoved().getAllElements();
+            removed.removeAll(event.getElementsAdded().getAllElements());
+            for (Element element : removed)
+            {
+                if (element instanceof Item) remove((Item) element);
+            }
         }
     }
 
