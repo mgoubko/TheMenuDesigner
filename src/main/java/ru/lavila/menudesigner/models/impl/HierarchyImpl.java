@@ -47,17 +47,26 @@ class HierarchyImpl implements Hierarchy, ElementListener
     public Category newCategory(Category parentCategory, String name)
     {
         Category category = new CategoryImpl(name);
-        add(parentCategory, category);
+        category.addModelListener(this);
+        hierarchyElements.add(parentCategory, category);
+        CategorizedElements added = new CategorizedElements();
+        added.add(parentCategory, category);
+        fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_ADDED, added, null));
         return category;
     }
 
     public void add(Category category, Element... elements)
     {
+        add(category, -1, elements);
+    }
+
+    public void add(Category category, int index, Element... elements)
+    {
         if (elements.length == 0) return;
         CategorizedElements added = new CategorizedElements();
         CategorizedElements movedFrom = new CategorizedElements();
         CategorizedElements movedTo = new CategorizedElements();
-        processNewElements(category, Arrays.asList(elements), true, added, movedFrom, movedTo);
+        processNewElements(category, Arrays.asList(elements), index, true, added, movedFrom, movedTo);
         HashSet<Category> updatedCategories = new HashSet<Category>();
         updatedCategories.addAll(added.getCategories());
         updatedCategories.addAll(movedFrom.getCategories());
@@ -78,10 +87,10 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     void addSilent(Category category, Element... elements)
     {
-        processNewElements(category, Arrays.asList(elements), false, null, null, null);
+        processNewElements(category, Arrays.asList(elements), -1, false, null, null, null);
     }
 
-    private void processNewElements(Category category, Collection<Element> elements, boolean moveExisting, CategorizedElements added, CategorizedElements movedFrom, CategorizedElements movedTo)
+    private void processNewElements(Category category, Collection<Element> elements, int index, boolean moveExisting, CategorizedElements added, CategorizedElements movedFrom, CategorizedElements movedTo)
     {
         for (Element element : elements)
         {
@@ -90,28 +99,46 @@ class HierarchyImpl implements Hierarchy, ElementListener
                 if (moveExisting)
                 {
                     Category oldCategory = hierarchyElements.getCategoryFor(element);
-                    if (oldCategory != category)
+                    if (oldCategory.equals(category))
                     {
-                        hierarchyElements.remove(oldCategory, element);
+                        if (hierarchyElements.getCategoryElements(category).indexOf(element) <= index) index--;
+                    }
+                    hierarchyElements.remove(oldCategory, element);
+                    if (index < 0)
                         hierarchyElements.add(category, element);
-                        if (movedFrom != null) movedFrom.add(oldCategory, element);
-                        if (movedTo != null) movedTo.add(category, element);
+                    else
+                        hierarchyElements.add(category, index++, element);
+                    if (movedFrom != null) movedFrom.add(oldCategory, element);
+                    if (movedTo != null) movedTo.add(category, element);
+
+                    if (element instanceof Category)
+                    {
+                        Category subCategory = (Category) element;
+                        if (!subCategory.isEmpty())
+                        {
+                            processNewElements(subCategory, new ArrayList<Element>(subCategory.getElements()), -1, moveExisting, added, movedFrom, movedTo);
+                        }
                     }
                 }
             }
             else
             {
-                element.addModelListener(this);
-                hierarchyElements.add(category, element);
-                if (added != null) added.add(category, element);
-
+                Category toProcess = null;
                 if (element instanceof Category)
                 {
-                    Category subCategory = (Category) element;
-                    if (!subCategory.isEmpty())
-                    {
-                        processNewElements(subCategory, subCategory.getElements(), moveExisting, added, movedFrom, movedTo);
-                    }
+                    toProcess = (Category) element;
+                    element = new CategoryImpl(element.getName());
+                }
+                element.addModelListener(this);
+                if (index < 0)
+                    hierarchyElements.add(category, element);
+                else
+                    hierarchyElements.add(category, index++, element);
+                if (added != null) added.add(category, element);
+
+                if (toProcess != null && !toProcess.isEmpty())
+                {
+                    processNewElements((Category) element, new ArrayList<Element>(toProcess.getElements()), -1, moveExisting, added, movedFrom, movedTo);
                 }
             }
         }

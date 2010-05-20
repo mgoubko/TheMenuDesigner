@@ -63,12 +63,12 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         return selectedElements;
     }
 
-    public Category getSelectedCategory(TreePath selectionPath)
+    public Category getCategoryFromPath(TreePath path)
     {
         TreePresenter.ElementTreeNode categoryNode = null;
-        if (selectionPath != null)
+        if (path != null)
         {
-            categoryNode = (TreePresenter.ElementTreeNode) (selectionPath.getLastPathComponent());
+            categoryNode = (TreePresenter.ElementTreeNode) (path.getLastPathComponent());
             if (categoryNode != null && !(categoryNode.element instanceof Category))
             {
                 categoryNode = (TreePresenter.ElementTreeNode) categoryNode.getParent();

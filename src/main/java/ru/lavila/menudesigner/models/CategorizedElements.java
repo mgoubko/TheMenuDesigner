@@ -16,6 +16,11 @@ public class CategorizedElements
         getElementsFor(category).addAll(elements);
     }
 
+    public void add(Category category, int index, List<Element> elements)
+    {
+        getElementsFor(category).addAll(index, elements);
+    }
+
     public void remove(Category category, Element element)
     {
         getElementsFor(category).remove(element);
@@ -24,6 +29,11 @@ public class CategorizedElements
     public void add(Category category, Element... elements)
     {
         add(category, Arrays.asList(elements));
+    }
+
+    public void add(Category category, int index, Element... elements)
+    {
+        add(category, index, Arrays.asList(elements));
     }
 
     public Collection<Category> getCategories()

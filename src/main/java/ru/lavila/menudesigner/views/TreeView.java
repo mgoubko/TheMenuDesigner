@@ -11,6 +11,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 
 public class TreeView extends JPanel implements ItemsView, CalculationsListener
@@ -29,6 +33,9 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
 
         tree = new JTree(presenter);
         tree.setEditable(true);
+        tree.setDragEnabled(true);
+        tree.setDropMode(DropMode.INSERT);
+        tree.setTransferHandler(new TreeTransferHandler());
         add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -57,7 +64,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
     {
         TreePath path = tree.getSelectionPath();
         tree.expandPath(path);
-        controller.addCategory(presenter.getSelectedCategory(path));
+        controller.addCategory(presenter.getCategoryFromPath(path));
     }
 
     public void removeSelection()
@@ -72,11 +79,114 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
 
     public Category getSelectedCategory()
     {
-        return presenter.getSelectedCategory(tree.getSelectionPath());
+        return presenter.getCategoryFromPath(tree.getSelectionPath());
     }
 
     public void valuesChanged()
     {
         userSessionTime.setText(presenter.getUserSessionTime());
+    }
+
+    private class TreeTransferHandler extends TransferHandler
+    {
+        private Category category;
+        private Element[] elements;
+        private int index;
+
+        @Override
+        public boolean canImport(TransferSupport support)
+        {
+            return support.isDataFlavorSupported(ElementsDataFlavor.elementsDataFlavor);
+        }
+
+        @Override
+        protected Transferable createTransferable(JComponent c)
+        {
+            List<Element> elements = getSelectedElements();
+            return new ElementsTransferable(elements.toArray(new Element[elements.size()]));
+        }
+
+        @Override
+        public int getSourceActions(JComponent c)
+        {
+            return TransferHandler.MOVE;
+        }
+
+        @Override
+        public boolean importData(TransferSupport support)
+        {
+            // Do not import data, just store the request. Actual import will be performed on exportDone
+            // as it changes source structure which may break D'n'D
+            JTree.DropLocation dropLocation = (JTree.DropLocation) support.getDropLocation();
+            this.category = presenter.getCategoryFromPath(dropLocation.getPath());
+            this.index = dropLocation.getChildIndex();
+            try
+            {
+                elements = (Element[]) support.getTransferable().getTransferData(ElementsDataFlavor.elementsDataFlavor);
+                return true;
+            }
+            catch (UnsupportedFlavorException e)
+            {
+                return false;
+            }
+            catch (IOException e)
+            {
+                return false;
+            }
+        }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action)
+        {
+            controller.addElements(category, index, elements);
+        }
+    }
+
+    private static class ElementsTransferable implements Transferable
+    {
+        private final Element[] elements;
+
+        public ElementsTransferable(Element[] elements)
+        {
+            this.elements = elements;
+        }
+
+        public DataFlavor[] getTransferDataFlavors()
+        {
+            return new DataFlavor[]{ElementsDataFlavor.elementsDataFlavor};
+        }
+
+        public boolean isDataFlavorSupported(DataFlavor flavor)
+        {
+            return flavor.equals(ElementsDataFlavor.elementsDataFlavor);
+        }
+
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
+        {
+            if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
+            return elements;
+        }
+    }
+
+    private static class ElementsDataFlavor extends DataFlavor
+    {
+        public static DataFlavor elementsDataFlavor = buildElementsDataFlavor();
+
+        private ElementsDataFlavor() throws ClassNotFoundException
+        {
+            super(DataFlavor.javaJVMLocalObjectMimeType + ";class=\"" + Element[].class.getName() + "\"");
+        }
+
+        private static DataFlavor buildElementsDataFlavor()
+        {
+            try
+            {
+                return new ElementsDataFlavor();
+            }
+            catch (ClassNotFoundException e)
+            {
+                return null;
+            }
+        }
     }
 }

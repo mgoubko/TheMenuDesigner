@@ -21,6 +21,11 @@ public class TreeController
         hierarchy.newCategory(parentCategory, "New category");
     }
 
+    public void addElements(Category parentCategory, int index, Element[] elements)
+    {
+        hierarchy.add(parentCategory, index, elements);
+    }
+
     public void removeNodes(TreePath[] paths)
     {
         if (paths == null) return;
