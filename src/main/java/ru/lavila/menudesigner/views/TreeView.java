@@ -4,6 +4,7 @@ import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.presenters.CalculationsListener;
+import ru.lavila.menudesigner.presenters.ElementsTransferable;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.TreeToolBar;
 
@@ -11,7 +12,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -75,11 +75,6 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         return presenter.getSelectedElements(tree.getSelectionPaths());
     }
 
-    public Category getSelectedCategory()
-    {
-        return presenter.getCategoryFromPath(tree.getSelectionPath());
-    }
-
     public void valuesChanged()
     {
         userSessionTime.setText(presenter.getUserSessionTime());
@@ -90,7 +85,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         @Override
         public boolean canImport(TransferSupport support)
         {
-            return support.isDataFlavorSupported(ElementsDataFlavor.elementsDataFlavor);
+            return support.isDataFlavorSupported(ElementsTransferable.dataFlavor);
         }
 
         @Override
@@ -115,7 +110,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
                 JTree.DropLocation dropLocation = (JTree.DropLocation) support.getDropLocation();
                 Category category = presenter.getCategoryFromPath(dropLocation.getPath());
                 int index = dropLocation.getChildIndex();
-                controller.addElements(category, index, (Element[]) support.getTransferable().getTransferData(ElementsDataFlavor.elementsDataFlavor));
+                controller.addElements(category, index, (Element[]) support.getTransferable().getTransferData(ElementsTransferable.dataFlavor));
                 return true;
             }
             catch (UnsupportedFlavorException e)
@@ -132,54 +127,6 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         protected void exportDone(JComponent source, Transferable data, int action)
         {
             presenter.unfreeze();
-        }
-    }
-
-    private static class ElementsTransferable implements Transferable
-    {
-        private final Element[] elements;
-
-        public ElementsTransferable(Element[] elements)
-        {
-            this.elements = elements;
-        }
-
-        public DataFlavor[] getTransferDataFlavors()
-        {
-            return new DataFlavor[]{ElementsDataFlavor.elementsDataFlavor};
-        }
-
-        public boolean isDataFlavorSupported(DataFlavor flavor)
-        {
-            return flavor.equals(ElementsDataFlavor.elementsDataFlavor);
-        }
-
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
-        {
-            if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
-            return elements;
-        }
-    }
-
-    private static class ElementsDataFlavor extends DataFlavor
-    {
-        public static DataFlavor elementsDataFlavor = buildElementsDataFlavor();
-
-        private ElementsDataFlavor() throws ClassNotFoundException
-        {
-            super(DataFlavor.javaJVMLocalObjectMimeType + ";class=\"" + Element[].class.getName() + "\"");
-        }
-
-        private static DataFlavor buildElementsDataFlavor()
-        {
-            try
-            {
-                return new ElementsDataFlavor();
-            }
-            catch (ClassNotFoundException e)
-            {
-                return null;
-            }
         }
     }
 }
