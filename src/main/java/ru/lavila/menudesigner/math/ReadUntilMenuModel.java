@@ -2,10 +2,10 @@ package ru.lavila.menudesigner.math;
 
 public class ReadUntilMenuModel implements MenuModel
 {
-    private final double tResp;
-    private final double tLoad;
-    private final double tRead;
-    private final double tClick;
+    protected final double tResp;
+    protected final double tLoad;
+    protected final double tRead;
+    protected final double tClick;
 
     public ReadUntilMenuModel(double tResp, double tLoad, double tRead, double tClick)
     {
