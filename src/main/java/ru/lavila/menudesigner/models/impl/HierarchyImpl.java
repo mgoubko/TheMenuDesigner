@@ -78,9 +78,10 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     private void processNewElements(Category category, Collection<Element> elements, int index, CategorizedElements added, CategorizedElements removed)
     {
+        CategorizedElements nextLevel = new CategorizedElements();
         for (Element element : elements)
         {
-            Category toProcess = null;
+            if (added.getAllElements().contains(element)) continue;
             if (hierarchyElements.containsElement(element))
             {
                 Category oldCategory = hierarchyElements.getCategoryFor(element);
@@ -89,18 +90,20 @@ class HierarchyImpl implements Hierarchy, ElementListener
                     if (hierarchyElements.getCategoryElements(category).indexOf(element) <= index) index--;
                 }
                 hierarchyElements.remove(oldCategory, element);
-                if (removed != null) removed.add(oldCategory, element);
+                removed.add(oldCategory, element);
                 if (element instanceof Category)
                 {
-                    toProcess = (Category) element;
+                    Category cat = (Category) element;
+                    nextLevel.add(cat, cat.getElements());
                 }
             }
             else
             {
                 if (element instanceof Category)
                 {
-                    toProcess = (Category) element;
+                    Category cat = (Category) element;
                     element = new CategoryImpl(element.getName());
+                    nextLevel.add((Category) element, cat.getElements());
                 }
                 element.addModelListener(this);
             }
@@ -112,12 +115,12 @@ class HierarchyImpl implements Hierarchy, ElementListener
             {
                 hierarchyElements.add(category, index++, element);
             }
-            if (added != null) added.add(category, element);
+            added.add(category, element);
+        }
 
-            if (toProcess != null && !toProcess.isEmpty())
-            {
-                processNewElements((Category) element, new ArrayList<Element>(toProcess.getElements()), -1, added, removed);
-            }
+        for (Category subCategory : nextLevel.getCategories())
+        {
+            processNewElements(subCategory, nextLevel.getCategoryElements(subCategory), -1, added, removed);
         }
     }
 
