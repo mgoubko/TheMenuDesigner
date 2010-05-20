@@ -18,13 +18,13 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     private boolean frozen = false;
     private final List<StructureChangeEvent> eventQueue;
 
-    public TreePresenter(Hierarchy hierarchy)
+    public TreePresenter(Hierarchy hierarchy, HierarchyCalculator calculator)
     {
         super(null);
         calculationsListeners = new ArrayList<CalculationsListener>();
         eventQueue = new ArrayList<StructureChangeEvent>();
         this.hierarchy = hierarchy;
-        this.calculator = new HierarchyCalculator(hierarchy);
+        this.calculator = calculator;
         nodes = new HashMap<Element, ElementTreeNode>();
         setRoot(getTreeNode(hierarchy.getRoot()));
         hierarchy.addModelListener(this);
@@ -188,6 +188,11 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     public String getUserSessionTime()
     {
         return String.format("%.2f", calculator.getUserSessionTime());
+    }
+
+    public String getOptimalUserSessionTime()
+    {
+        return String.format("%.2f", calculator.getOptimalUserSessionTime());
     }
 
     public static class ElementTreeNode extends DefaultMutableTreeNode

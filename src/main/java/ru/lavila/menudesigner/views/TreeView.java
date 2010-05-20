@@ -24,6 +24,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
     private final JTree tree;
     private final JPanel toolBars;
     private final JLabel userSessionTime;
+    private final JLabel optimalSessionTime;
 
     public TreeView(TreePresenter presenter, TreeController controller)
     {
@@ -42,11 +43,15 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         addToolBar(new TreeToolBar(this));
         add(toolBars, BorderLayout.NORTH);
 
-        JPanel calculations = new JPanel(new GridLayout(1, 2));
+        JPanel calculations = new JPanel(new GridLayout(2, 2));
         calculations.setBorder(new EmptyBorder(10, 10, 10, 10));
         calculations.add(new JLabel("User Session Time"));
         userSessionTime = new JLabel();
         calculations.add(userSessionTime);
+        calculations.add(new JLabel("Optimal Time"));
+        optimalSessionTime = new JLabel();
+        calculations.add(optimalSessionTime);
+
         add(calculations, BorderLayout.SOUTH);
 
         valuesChanged();
@@ -78,6 +83,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
     public void valuesChanged()
     {
         userSessionTime.setText(presenter.getUserSessionTime());
+        optimalSessionTime.setText(presenter.getOptimalUserSessionTime());
     }
 
     private class TreeTransferHandler extends TransferHandler

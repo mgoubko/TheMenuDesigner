@@ -19,4 +19,9 @@ public class ReadUntilMenuModel implements MenuModel
     {
         return tResp + tLoad * total + tRead * target + tClick;
     }
+
+    public double[] getOptimalProportion()
+    {
+        return new double[0];
+    }
 }

@@ -1,28 +1,46 @@
 package ru.lavila.menudesigner.math;
 
-import ru.lavila.menudesigner.models.Category;
-import ru.lavila.menudesigner.models.Element;
-import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.models.*;
 
 import java.util.List;
 
 public class HierarchyCalculator
 {
+    private final ItemsList itemsList;
     private final Hierarchy hierarchy;
     private final MenuModel menuModel;
 
-    public HierarchyCalculator(Hierarchy hierarchy)
+    public HierarchyCalculator(ItemsList itemsList, Hierarchy hierarchy)
     {
+        this.itemsList = itemsList;
         this.hierarchy = hierarchy;
         this.menuModel = new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05);
     }
 
     public double getUserSessionTime()
     {
-        return getAverageSearchTime(hierarchy.getRoot());
+        return getAverageSearchTimeWithInherited(hierarchy.getRoot());
     }
 
-    private double getAverageSearchTime(Category category)
+    public double getOptimalUserSessionTime()
+    {
+        double[] proportion = menuModel.getOptimalProportion();
+        double result = getAverageSearchTime(proportion);
+        double sum = 0;
+        for (double popularity : proportion)
+        {
+            sum += popularity * Math.log(popularity);
+        }
+        result /= sum;
+        sum = 0;
+        for (Item item : itemsList.toArray())
+        {
+            sum += item.getPopularity() * Math.log(item.getPopularity());
+        }
+        return result * sum;
+    }
+
+    private double getAverageSearchTimeWithInherited(Category category)
     {
         double result = 0;
         List<Element> elements = category.getElements();
@@ -30,11 +48,21 @@ public class HierarchyCalculator
         for (int index = 0; index < totalElements; index++)
         {
             Element element = elements.get(index);
-            result += menuModel.getTimeToSelect(index, totalElements) * element.getPopularity();
+            result += menuModel.getTimeToSelect(index + 1, totalElements) * element.getPopularity();
             if (element instanceof Category)
             {
-                result += getAverageSearchTime((Category) element);
+                result += getAverageSearchTimeWithInherited((Category) element);
             }
+        }
+        return result;
+    }
+
+    private double getAverageSearchTime(double[] proportion)
+    {
+        double result = 0;
+        for (int index = 0; index < proportion.length; index++)
+        {
+            result += menuModel.getTimeToSelect(index + 1, proportion.length) * proportion[index];
         }
         return result;
     }

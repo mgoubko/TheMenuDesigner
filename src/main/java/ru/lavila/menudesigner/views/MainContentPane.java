@@ -1,6 +1,7 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.TreeController;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -19,7 +20,7 @@ public class MainContentPane extends JPanel
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList);
 
-        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy));
+        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy, new HierarchyCalculator(itemsList, targetHierarchy)), new TreeController(targetHierarchy));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Target Menu", targetView);

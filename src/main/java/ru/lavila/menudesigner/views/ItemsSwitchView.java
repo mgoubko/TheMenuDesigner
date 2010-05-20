@@ -2,6 +2,7 @@ package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.ItemsController;
 import ru.lavila.menudesigner.controllers.TreeController;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
@@ -32,7 +33,7 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
         {
             if (hierarchy.isTaxomony())
             {
-                TreeView treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy));
+                TreeView treeView = new TreeView(new TreePresenter(hierarchy, new HierarchyCalculator(itemsList, hierarchy)), new TreeController(hierarchy));
                 addTab(hierarchy.getRoot().getName(), treeView);
             }
         }

@@ -9,4 +9,6 @@ public interface MenuModel
      * @return average time to select element
      */
     public double getTimeToSelect(int target, int total);
+
+    public double[] getOptimalProportion();
 }
