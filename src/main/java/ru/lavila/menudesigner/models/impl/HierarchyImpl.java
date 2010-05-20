@@ -74,13 +74,13 @@ class HierarchyImpl implements Hierarchy, ElementListener
         if (!updatedCategories.isEmpty())
         {
             categoriesStructureChanged(updatedCategories);
-            if (!movedFrom.isEmpty())
-            {
-                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_MOVED, movedTo, movedFrom));
-            }
             if (!added.isEmpty())
             {
                 fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_ADDED, added, null));
+            }
+            if (!movedFrom.isEmpty())
+            {
+                fireStructureChangeEvent(new StructureChangeEventImpl(this, StructureChangeEvent.EventType.ELEMENTS_MOVED, movedTo, movedFrom));
             }
         }
     }

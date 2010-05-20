@@ -89,10 +89,6 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
 
     private class TreeTransferHandler extends TransferHandler
     {
-        private Category category;
-        private Element[] elements;
-        private int index;
-
         @Override
         public boolean canImport(TransferSupport support)
         {
@@ -102,6 +98,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         @Override
         protected Transferable createTransferable(JComponent c)
         {
+            presenter.freeze();
             List<Element> elements = getSelectedElements();
             return new ElementsTransferable(elements.toArray(new Element[elements.size()]));
         }
@@ -115,14 +112,12 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         @Override
         public boolean importData(TransferSupport support)
         {
-            // Do not import data, just store the request. Actual import will be performed on exportDone
-            // as it changes source structure which may break D'n'D
-            JTree.DropLocation dropLocation = (JTree.DropLocation) support.getDropLocation();
-            this.category = presenter.getCategoryFromPath(dropLocation.getPath());
-            this.index = dropLocation.getChildIndex();
             try
             {
-                elements = (Element[]) support.getTransferable().getTransferData(ElementsDataFlavor.elementsDataFlavor);
+                JTree.DropLocation dropLocation = (JTree.DropLocation) support.getDropLocation();
+                Category category = presenter.getCategoryFromPath(dropLocation.getPath());
+                int index = dropLocation.getChildIndex();
+                controller.addElements(category, index, (Element[]) support.getTransferable().getTransferData(ElementsDataFlavor.elementsDataFlavor));
                 return true;
             }
             catch (UnsupportedFlavorException e)
@@ -138,7 +133,7 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         @Override
         protected void exportDone(JComponent source, Transferable data, int action)
         {
-            controller.addElements(category, index, elements);
+            presenter.unfreeze();
         }
     }
 

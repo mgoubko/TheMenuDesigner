@@ -5,20 +5,30 @@ import java.util.*;
 public class CategorizedElements
 {
     private final Map<Category, List<Element>> data;
+    private final List<Category> categories;
 
     public CategorizedElements()
     {
+        categories = new ArrayList<Category>();
         data = new HashMap<Category, List<Element>>();
     }
 
     public void add(Category category, List<Element> elements)
     {
-        getElementsFor(category).addAll(elements);
+        List<Element> categoryElements = getElementsFor(category);
+        for (Element element : elements)
+        {
+            if (!categoryElements.contains(element)) categoryElements.add(element);
+        }
     }
 
     public void add(Category category, int index, List<Element> elements)
     {
-        getElementsFor(category).addAll(index, elements);
+        List<Element> categoryElements = getElementsFor(category);
+        for (Element element : elements)
+        {
+            if (!categoryElements.contains(element)) categoryElements.add(index++, element);
+        }
     }
 
     public void remove(Category category, Element element)
@@ -38,7 +48,7 @@ public class CategorizedElements
 
     public Collection<Category> getCategories()
     {
-        return data.keySet();
+        return categories;
     }
 
     public List<Element> getAllElements()
@@ -63,6 +73,7 @@ public class CategorizedElements
         {
             elements = new ArrayList<Element>();
             data.put(category, elements);
+            categories.add(category);
         }
         return elements;
     }

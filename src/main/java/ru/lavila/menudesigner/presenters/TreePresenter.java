@@ -1,7 +1,6 @@
 package ru.lavila.menudesigner.presenters;
 
 import ru.lavila.menudesigner.math.HierarchyCalculator;
-import ru.lavila.menudesigner.math.ReadUntilMenuModel;
 import ru.lavila.menudesigner.models.*;
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.HierarchyListener;
@@ -16,11 +15,14 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     private final HierarchyCalculator calculator;
     private final Map<Element, ElementTreeNode> nodes;
     private final List<CalculationsListener> calculationsListeners;
+    private boolean frozen = false;
+    private final List<StructureChangeEvent> eventQueue;
 
     public TreePresenter(Hierarchy hierarchy)
     {
         super(null);
         calculationsListeners = new ArrayList<CalculationsListener>();
+        eventQueue = new ArrayList<StructureChangeEvent>();
         this.hierarchy = hierarchy;
         this.calculator = new HierarchyCalculator(hierarchy);
         nodes = new HashMap<Element, ElementTreeNode>();
@@ -86,22 +88,44 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         }
     }
 
+    public void freeze()
+    {
+        frozen = true;
+    }
+
+    public void unfreeze()
+    {
+        frozen = false;
+        for (StructureChangeEvent event : eventQueue)
+        {
+            structureChanged(event);
+        }
+        eventQueue.clear();
+    }
+
     public void structureChanged(StructureChangeEvent event)
     {
-        switch (event.getType())
+        if (frozen)
         {
-            case ELEMENTS_ADDED:
-                elementsAdded(event.getElementsAdded());
-                break;
-            case ELEMENTS_REMOVED:
-                elementsRemoved(event.getElementsRemoved());
-                break;
-            case ELEMENTS_MOVED:
-                elementsRemoved(event.getElementsRemoved());
-                elementsAdded(event.getElementsAdded());
-                break;
+            eventQueue.add(event);
         }
-        fireCalculationsChanged();
+        else
+        {
+            switch (event.getType())
+            {
+                case ELEMENTS_ADDED:
+                    elementsAdded(event.getElementsAdded());
+                    break;
+                case ELEMENTS_REMOVED:
+                    elementsRemoved(event.getElementsRemoved());
+                    break;
+                case ELEMENTS_MOVED:
+                    elementsRemoved(event.getElementsRemoved());
+                    elementsAdded(event.getElementsAdded());
+                    break;
+            }
+            fireCalculationsChanged();
+        }
     }
 
     private void elementsAdded(CategorizedElements categorizedElements)
@@ -143,7 +167,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
                 }
                 for (ElementTreeNode node : removedNodes)
                 {
-                    parentNode.remove(node);
+                    if (parentNode.isNodeChild(node)) parentNode.remove(node);
                 }
                 Arrays.sort(removedIndexes);
                 nodesWereRemoved(parentNode, removedIndexes, removedNodes);
