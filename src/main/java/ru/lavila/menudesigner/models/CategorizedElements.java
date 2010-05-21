@@ -66,6 +66,23 @@ public class CategorizedElements
         return Collections.unmodifiableList(getElementsFor(category));
     }
 
+    public List<Item> getCategoryGroup(Category category)
+    {
+        List<Item> result = new ArrayList<Item>();
+        for (Element element : getCategoryElements(category))
+        {
+            if (element instanceof Item)
+            {
+                result.add((Item) element);
+            }
+            else
+            {
+                result.addAll(getCategoryGroup((Category) element));
+            }
+        }
+        return result;
+    }
+
     private List<Element> getElementsFor(Category category)
     {
         List<Element> elements = data.get(category);

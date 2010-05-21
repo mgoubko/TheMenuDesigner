@@ -220,6 +220,11 @@ class HierarchyImpl implements Hierarchy, ElementListener
             return hierarchyElements.getCategoryElements(this);
         }
 
+        public List<Item> getGroup()
+        {
+            return hierarchyElements.getCategoryGroup(this);
+        }
+
         public boolean isEmpty()
         {
             return getElements().isEmpty();

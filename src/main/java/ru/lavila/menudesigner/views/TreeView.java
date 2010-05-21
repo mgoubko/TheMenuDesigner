@@ -1,15 +1,16 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.TreeController;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
-import ru.lavila.menudesigner.presenters.CalculationsListener;
 import ru.lavila.menudesigner.presenters.ElementsTransferable;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.TreeToolBar;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
@@ -17,16 +18,15 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 
-public class TreeView extends JPanel implements ItemsView, CalculationsListener
+public class TreeView extends JPanel implements ItemsView
 {
     private final TreeController controller;
     private final TreePresenter presenter;
     private final JTree tree;
     private final JPanel toolBars;
-    private final JLabel userSessionTime;
-    private final JLabel optimalSessionTime;
+    private final CalculationsPanel calculations;
 
-    public TreeView(TreePresenter presenter, TreeController controller)
+    public TreeView(TreePresenter presenter, TreeController controller, HierarchyCalculator calculator)
     {
         super(new BorderLayout());
         this.presenter = presenter;
@@ -37,25 +37,16 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         tree.setDragEnabled(true);
         tree.setDropMode(DropMode.INSERT);
         tree.setTransferHandler(new TreeTransferHandler());
+        tree.addTreeSelectionListener(new HierarchyTreeSelectionListener());
         add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addToolBar(new TreeToolBar(this));
         add(toolBars, BorderLayout.NORTH);
 
-        JPanel calculations = new JPanel(new GridLayout(2, 2));
-        calculations.setBorder(new EmptyBorder(10, 10, 10, 10));
-        calculations.add(new JLabel("User Session Time"));
-        userSessionTime = new JLabel();
-        calculations.add(userSessionTime);
-        calculations.add(new JLabel("Optimal Time"));
-        optimalSessionTime = new JLabel();
-        calculations.add(optimalSessionTime);
-
+        calculations = new CalculationsPanel(calculator);
+        presenter.addCalculationListener(calculations);
         add(calculations, BorderLayout.SOUTH);
-
-        valuesChanged();
-        presenter.addCalculationListener(this);
     }
 
     public void addToolBar(JToolBar toolBar)
@@ -78,12 +69,6 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
     public List<Element> getSelectedElements()
     {
         return presenter.getSelectedElements(tree.getSelectionPaths());
-    }
-
-    public void valuesChanged()
-    {
-        userSessionTime.setText(presenter.getUserSessionTime());
-        optimalSessionTime.setText(presenter.getOptimalUserSessionTime());
     }
 
     private class TreeTransferHandler extends TransferHandler
@@ -133,6 +118,22 @@ public class TreeView extends JPanel implements ItemsView, CalculationsListener
         protected void exportDone(JComponent source, Transferable data, int action)
         {
             presenter.unfreeze();
+        }
+    }
+
+    private class HierarchyTreeSelectionListener implements TreeSelectionListener
+    {
+        public void valueChanged(TreeSelectionEvent e)
+        {
+            List<Element> elements = getSelectedElements();
+            if (elements.size() == 1 && elements.get(0) instanceof Category)
+            {
+                calculations.showFor((Category) elements.get(0));
+            }
+            else
+            {
+                calculations.showFor(null);
+            }
         }
     }
 }

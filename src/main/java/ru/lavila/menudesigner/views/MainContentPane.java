@@ -20,7 +20,7 @@ public class MainContentPane extends JPanel
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList);
 
-        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy, new HierarchyCalculator(itemsList, targetHierarchy)), new TreeController(targetHierarchy));
+        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy), new HierarchyCalculator(itemsList, targetHierarchy));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Target Menu", targetView);

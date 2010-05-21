@@ -1,6 +1,5 @@
 package ru.lavila.menudesigner.presenters;
 
-import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.*;
 import ru.lavila.menudesigner.models.events.ElementChangeEvent;
 import ru.lavila.menudesigner.models.events.HierarchyListener;
@@ -12,19 +11,17 @@ import java.util.*;
 public class TreePresenter extends DefaultTreeModel implements HierarchyListener
 {
     private final Hierarchy hierarchy;
-    private final HierarchyCalculator calculator;
     private final Map<Element, ElementTreeNode> nodes;
     private final List<CalculationsListener> calculationsListeners;
     private boolean frozen = false;
     private final List<StructureChangeEvent> eventQueue;
 
-    public TreePresenter(Hierarchy hierarchy, HierarchyCalculator calculator)
+    public TreePresenter(Hierarchy hierarchy)
     {
         super(null);
         calculationsListeners = new ArrayList<CalculationsListener>();
         eventQueue = new ArrayList<StructureChangeEvent>();
         this.hierarchy = hierarchy;
-        this.calculator = calculator;
         nodes = new HashMap<Element, ElementTreeNode>();
         setRoot(getTreeNode(hierarchy.getRoot()));
         hierarchy.addModelListener(this);
@@ -57,10 +54,13 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     public List<Element> getSelectedElements(TreePath[] selectionPaths)
     {
         List<Element> selectedElements = new ArrayList<Element>();
-        for (TreePath path : selectionPaths)
+        if (selectionPaths != null)
         {
-            TreePresenter.ElementTreeNode childNode = (TreePresenter.ElementTreeNode) path.getLastPathComponent();
-            selectedElements.add(childNode.element);
+            for (TreePath path : selectionPaths)
+            {
+                TreePresenter.ElementTreeNode childNode = (TreePresenter.ElementTreeNode) path.getLastPathComponent();
+                selectedElements.add(childNode.element);
+            }
         }
         return selectedElements;
     }
@@ -183,16 +183,6 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             listener.valuesChanged();
         }
-    }
-
-    public String getUserSessionTime()
-    {
-        return String.format("%.2f", calculator.getUserSessionTime());
-    }
-
-    public String getOptimalUserSessionTime()
-    {
-        return String.format("%.2f", calculator.getOptimalUserSessionTime());
     }
 
     public static class ElementTreeNode extends DefaultMutableTreeNode

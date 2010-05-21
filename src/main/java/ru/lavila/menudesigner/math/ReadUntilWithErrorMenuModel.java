@@ -19,6 +19,6 @@ public class ReadUntilWithErrorMenuModel extends ReadUntilMenuModel
     @Override
     public double[] getOptimalProportion()
     {
-        return new double[]{0.329586, 0.226308, 0.155393, 0.1067, 0.0732647, 0.0503068, 0.0345428, 0.0237186};
+        return new double[]{0.32958626358552495, 0.22630834746066913, 0.15539321200226222, 0.10669977757040802, 0.07326473522800214, 0.050306772424968345, 0.034542830789488506, 0.023718618814810317};
     }
 }

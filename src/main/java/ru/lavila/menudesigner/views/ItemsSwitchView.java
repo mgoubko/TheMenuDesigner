@@ -33,7 +33,7 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
         {
             if (hierarchy.isTaxomony())
             {
-                TreeView treeView = new TreeView(new TreePresenter(hierarchy, new HierarchyCalculator(itemsList, hierarchy)), new TreeController(hierarchy));
+                TreeView treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy), new HierarchyCalculator(itemsList, hierarchy));
                 addTab(hierarchy.getRoot().getName(), treeView);
             }
         }

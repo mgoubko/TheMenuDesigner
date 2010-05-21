@@ -6,4 +6,6 @@ public interface Category extends Element
 {
     public List<Element> getElements();
     public boolean isEmpty();
+
+    List<Item> getGroup();
 }
