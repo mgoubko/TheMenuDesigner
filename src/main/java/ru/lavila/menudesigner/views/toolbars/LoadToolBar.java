@@ -16,7 +16,7 @@ public class LoadToolBar extends JToolBar
 
     public LoadToolBar(MainContentPane contentPane)
     {
-        super("Load Data ToolBar");
+        super("Load Data");
         this.contentPane = contentPane;
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

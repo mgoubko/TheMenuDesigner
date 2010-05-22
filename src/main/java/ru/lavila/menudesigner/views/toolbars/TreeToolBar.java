@@ -12,7 +12,7 @@ public class TreeToolBar extends JToolBar
 
     public TreeToolBar(TreeView treeView)
     {
-        super("Tree Toolbar");
+        super("Tree");
         this.treeView = treeView;
         setupButtons();
     }

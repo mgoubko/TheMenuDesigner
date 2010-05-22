@@ -8,7 +8,7 @@ import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
-import ru.lavila.menudesigner.views.toolbars.ItemsToolbar;
+import ru.lavila.menudesigner.views.toolbars.ItemsToolBar;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -39,7 +39,7 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
         }
 
         toolBars = new ArrayList<JToolBar>();
-        addToolBar(new ItemsToolbar(controller));
+        addToolBar(new ItemsToolBar(controller));
 
         addChangeListener(new ChangeListener()
         {
