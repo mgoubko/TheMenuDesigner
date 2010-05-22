@@ -6,6 +6,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import ru.lavila.menudesigner.models.Category;
+import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.models.Item;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.impl.ItemsListImpl;
 
@@ -13,14 +16,31 @@ import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 public class ItemsListLoader
 {
+    private static final String HIERARCHY_LEVEL_SEPARATOR = ">";
+
     public ItemsList loadItemsList(String filename)
     {
         try
         {
-            return loadItemsListInt(filename);
+            return loadItemsList(new FileInputStream(filename));
+        }
+        catch (FileNotFoundException e)
+        {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+
+    public ItemsList loadItemsList(InputStream inputStream)
+    {
+        try
+        {
+            return loadItemsListInt(inputStream);
         }
         catch (LoaderException e)
         {
@@ -28,41 +48,73 @@ public class ItemsListLoader
             return null;
         }
     }
-
-    private ItemsList loadItemsListInt(String filename) throws LoaderException
+    
+    private ItemsList loadItemsListInt(InputStream inputStream) throws LoaderException
     {
         try
         {
-            FileInputStream inputStream = new FileInputStream(filename);
             Workbook workbook = new HSSFWorkbook(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
 
             ItemsList itemsList = new ItemsListImpl();
+            Row titleRow = sheet.getRow(0);
+            Map<Hierarchy, Map<String, Category>> taxonomies = new LinkedHashMap<Hierarchy, Map<String, Category>>();
+            for (int index = 2; titleRow.getCell(index) != null; index++)
+            {
+                taxonomies.put(itemsList.newHierarchy(titleRow.getCell(index).getStringCellValue(), true), new HashMap<String, Category>());
+            }
             for (Row row : sheet)
             {
                 if (row.getRowNum() == 0) continue;
                 Cell nameCell = row.getCell(0);
                 Cell popularityCell = row.getCell(1);
-                if (nameCell.getCellType() != HSSFCell.CELL_TYPE_STRING)
+                if (nameCell == null || nameCell.getCellType() != HSSFCell.CELL_TYPE_STRING)
                 {
                     throw new LoaderException("Cell in " + getCellIdentifier(nameCell) +" must contain string name");
                 }
-                if (popularityCell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC)
+                if (popularityCell == null || popularityCell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC)
                 {
                     throw new LoaderException("Cell in " + getCellIdentifier(popularityCell) +" must contain numeric popularity");
                 }
-                itemsList.newItem(nameCell.getStringCellValue(), popularityCell.getNumericCellValue());
+                Item item = itemsList.newItem(nameCell.getStringCellValue(), popularityCell.getNumericCellValue());
+                int index = 2;
+                for (Map.Entry<Hierarchy, Map<String, Category>> taxonomy : taxonomies.entrySet())
+                {
+                    Cell categoryCell = row.getCell(index++);
+                    if (categoryCell == null) continue;
+                    if (categoryCell.getCellType() != HSSFCell.CELL_TYPE_STRING)
+                    {
+                        throw new LoaderException("Cell in " + getCellIdentifier(categoryCell) +" must contain string category name");
+                    }
+                    taxonomy.getKey().add(getCategory(taxonomy.getKey(), taxonomy.getValue(), categoryCell.getStringCellValue()), item);
+                }
             }
+            itemsList.normalizePopularities();
             return itemsList;
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new LoaderException("File '" + filename + "' not found", e);
         }
         catch (IOException e)
         {
-            throw new LoaderException("Unexpected error while reading file '" + filename + "'", e);
+            throw new LoaderException("Unexpected error while reading data", e);
         }
+    }
+
+    private Category getCategory(Hierarchy hierarchy, Map<String, Category> categories, String name)
+    {
+        Category category = categories.get(name);
+        if (category == null)
+        {
+            int separatorIndex = name.lastIndexOf(HIERARCHY_LEVEL_SEPARATOR);
+            if (separatorIndex == -1)
+            {
+                category = hierarchy.newCategory(hierarchy.getRoot(), name);
+            }
+            else
+            {
+                category = hierarchy.newCategory(getCategory(hierarchy, categories, name.substring(0, separatorIndex).trim()), name.substring(separatorIndex + 1).trim());
+            }
+            categories.put(name, category);
+        }
+        return category;
     }
 
     private String getCellIdentifier(Cell cell)

@@ -5,8 +5,8 @@ import ru.lavila.menudesigner.io.ItemsListLoader;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
+import ru.lavila.menudesigner.models.impl.ItemsListImpl;
 import ru.lavila.menudesigner.presenters.TreePresenter;
-import ru.lavila.menudesigner.stub.Stub;
 import ru.lavila.menudesigner.views.toolbars.LoadToolBar;
 
 import javax.swing.*;
@@ -26,7 +26,10 @@ public class MainContentPane extends JPanel
         add(new JLabel(" "), BorderLayout.SOUTH);
         toolBar = new LoadToolBar(this);
 
-        setupView(Stub.getSourceData());
+        //todo: Remove autoload of data
+        ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Mobile.xls"));
+        if (itemsList == null) itemsList = new ItemsListImpl();
+        setupView(itemsList);
     }
 
     public void setupView(ItemsList itemsList)
