@@ -63,7 +63,7 @@ public class CalculationsPanel extends JPanel implements CalculationsListener
         {
             texts[0] = category.getName();
             texts[1] = "Time loss";
-            texts[2] = String.format("%.2f", calculator.getCategoryTimeLoss(category));
+            texts[2] = String.format("%.4f", calculator.getCategoryTimeLoss(category));
         }
         for (int index = 0; index < 3; index++)
         {

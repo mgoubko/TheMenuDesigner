@@ -75,7 +75,7 @@ public class HierarchyCalculator
 
     private double getOptimalSearchTime(List<Item> items)
     {
-        double[] proportion = menuModel.getOptimalProportion();
+        double[] proportion = menuModel.getOptimalProportion(items.size());
         double result = getSearchTime(proportion);
         double sum = 0;
         for (double popularity : proportion)
@@ -84,11 +84,14 @@ public class HierarchyCalculator
         }
         result /= sum;
         sum = 0;
+        double totalPopularity = 0;
         for (Item item : items)
         {
-            sum += item.getPopularity() * Math.log(item.getPopularity());
+            double popularity = item.getPopularity();
+            totalPopularity += popularity;
+            sum += popularity * Math.log(popularity);
         }
-        return result * sum;
+        return result * (sum - totalPopularity * Math.log(totalPopularity));
     }
 
 }

@@ -10,5 +10,5 @@ public interface MenuModel
      */
     public double getTimeToSelect(int target, int total);
 
-    public double[] getOptimalProportion();
+    public double[] getOptimalProportion(int itemsSize);
 }
