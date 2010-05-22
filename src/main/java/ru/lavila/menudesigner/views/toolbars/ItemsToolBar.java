@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.views.toolbars;
 
+import ru.lavila.menudesigner.MenuDesigner;
 import ru.lavila.menudesigner.controllers.ItemsController;
 
 import javax.swing.*;
@@ -19,7 +20,8 @@ public class ItemsToolBar extends JToolBar
 
     private void setupButtons()
     {
-        JButton normalize = new JButton("Normalize");
+        JButton normalize = new JButton(MenuDesigner.getIcon("refresh"));
+        normalize.setToolTipText("Normalize items' popularities");
         normalize.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)

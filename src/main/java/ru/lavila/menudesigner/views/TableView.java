@@ -31,7 +31,7 @@ public class TableView extends JPanel implements ItemsView
 
     public void addToolBar(JToolBar toolBar)
     {
-        toolBars.add(toolBar);
+        toolBars.add(toolBar, 0);
     }
 
     public List<Element> getSelectedElements()

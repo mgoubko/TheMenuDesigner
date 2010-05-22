@@ -15,6 +15,11 @@ public class MenuDesigner
         frame.setVisible(true);
     }
 
+    public static Icon getIcon(String name)
+    {
+        return new ImageIcon(MenuDesigner.class.getResource("icons/" + name + ".gif"));
+    }
+
     public static void main(String[] args)
     {
         javax.swing.SwingUtilities.invokeLater(new Runnable()

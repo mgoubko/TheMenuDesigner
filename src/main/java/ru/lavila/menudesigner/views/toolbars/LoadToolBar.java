@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.views.toolbars;
 
+import ru.lavila.menudesigner.MenuDesigner;
 import ru.lavila.menudesigner.io.ItemsListLoader;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.views.MainContentPane;
@@ -26,7 +27,8 @@ public class LoadToolBar extends JToolBar
 
     private void setupButtons()
     {
-        JButton open = new JButton("Open");
+        JButton open = new JButton(MenuDesigner.getIcon("folder"));
+        open.setToolTipText("Open file...");
         open.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)

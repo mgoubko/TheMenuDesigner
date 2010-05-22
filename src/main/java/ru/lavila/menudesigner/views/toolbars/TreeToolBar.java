@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.views.toolbars;
 
+import ru.lavila.menudesigner.MenuDesigner;
 import ru.lavila.menudesigner.views.TreeView;
 
 import javax.swing.*;
@@ -19,7 +20,8 @@ public class TreeToolBar extends JToolBar
 
     private void setupButtons()
     {
-        JButton newCategory = new JButton("New category");
+        JButton newCategory = new JButton(MenuDesigner.getIcon("create"));
+        newCategory.setToolTipText("Create new category");
         newCategory.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -29,7 +31,8 @@ public class TreeToolBar extends JToolBar
         });
         add(newCategory);
 
-        JButton remove = new JButton("Remove");
+        JButton remove = new JButton(MenuDesigner.getIcon("delete"));
+        remove.setToolTipText("Remove selected elements");
         remove.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
