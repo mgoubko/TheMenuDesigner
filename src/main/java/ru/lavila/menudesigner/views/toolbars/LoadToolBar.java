@@ -28,7 +28,7 @@ public class LoadToolBar extends JToolBar
     private void setupButtons()
     {
         JButton open = new JButton(MenuDesigner.getIcon("folder"));
-        open.setToolTipText("Open file...");
+        open.setToolTipText("Import from Excel...");
         open.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
