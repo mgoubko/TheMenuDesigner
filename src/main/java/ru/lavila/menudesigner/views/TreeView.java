@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.views;
 
+import ru.lavila.menudesigner.MenuDesigner;
 import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.math.MenuModelListener;
@@ -169,30 +170,40 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
     {
         private final Border inactiveBorder = BorderFactory.createEmptyBorder();
         private final Border activeBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.black);
+        private final Icon folderGreen = MenuDesigner.getIcon("folder_green");
+        private final Icon folderOrange = MenuDesigner.getIcon("folder_orange");
+        private final Icon folderRed = MenuDesigner.getIcon("folder_red");
 
         private Element element;
 
         @Override
-        public Color getBackgroundNonSelectionColor()
+        public Icon getClosedIcon()
         {
-            if (element instanceof Category)
+            return element instanceof Category ? getColoredIcon() : super.getClosedIcon();
+        }
+
+        @Override
+        public Icon getOpenIcon()
+        {
+            return element instanceof Category ? getColoredIcon() : super.getClosedIcon();
+        }
+
+        private Icon getColoredIcon()
+        {
+            int index = sortedCategories.indexOf(element);
+            int zone = sortedCategories.size() / 3;
+            if (index < zone)
             {
-                int index = sortedCategories.indexOf(element);
-                int zone = sortedCategories.size() / 3;
-                if (index < zone)
-                {
-                    return Color.green;
-                }
-                else if (index < 2 * zone)
-                {
-                    return Color.yellow;
-                }
-                else
-                {
-                    return Color.red;
-                }
+                return folderGreen;
             }
-            return super.getBackgroundNonSelectionColor();
+            else if (index < 2 * zone)
+            {
+                return folderOrange;
+            }
+            else
+            {
+                return folderRed;
+            }
         }
 
         @Override
