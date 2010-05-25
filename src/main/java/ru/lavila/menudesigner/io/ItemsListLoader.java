@@ -70,11 +70,11 @@ public class ItemsListLoader
                 Cell popularityCell = row.getCell(1);
                 if (nameCell == null || nameCell.getCellType() != HSSFCell.CELL_TYPE_STRING)
                 {
-                    throw new LoaderException("Cell in " + getCellIdentifier(nameCell) +" must contain string name");
+                    throw new LoaderException("Cell in " + LoaderException.getCellIdentifier(row.getRowNum(), 0) +" must contain string name");
                 }
                 if (popularityCell == null || popularityCell.getCellType() != HSSFCell.CELL_TYPE_NUMERIC)
                 {
-                    throw new LoaderException("Cell in " + getCellIdentifier(popularityCell) +" must contain numeric popularity");
+                    throw new LoaderException("Cell in " + LoaderException.getCellIdentifier(row.getRowNum(), 1) +" must contain numeric popularity");
                 }
                 Item item = itemsList.newItem(nameCell.getStringCellValue(), popularityCell.getNumericCellValue());
                 int index = 2;
@@ -84,7 +84,7 @@ public class ItemsListLoader
                     if (categoryCell == null) continue;
                     if (categoryCell.getCellType() != HSSFCell.CELL_TYPE_STRING)
                     {
-                        throw new LoaderException("Cell in " + getCellIdentifier(categoryCell) +" must contain string category name");
+                        throw new LoaderException("Cell in " + LoaderException.getCellIdentifier(categoryCell) +" must contain string category name");
                     }
                     taxonomy.getKey().add(getCategory(taxonomy.getKey(), taxonomy.getValue(), categoryCell.getStringCellValue()), item);
                 }
@@ -115,23 +115,5 @@ public class ItemsListLoader
             categories.put(name, category);
         }
         return category;
-    }
-
-    private String getCellIdentifier(Cell cell)
-    {
-        return "row " + (cell.getRowIndex() + 1) + " column " + (cell.getColumnIndex() + 1);
-    }
-
-    private static class LoaderException extends Exception
-    {
-        private LoaderException(String message)
-        {
-            super(message);
-        }
-
-        private LoaderException(String message, Throwable cause)
-        {
-            super(message, cause);
-        }
     }
 }

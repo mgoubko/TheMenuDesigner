@@ -1,5 +1,7 @@
 package ru.lavila.menudesigner.presenters;
 
+import ru.lavila.menudesigner.MenuDesigner;
+import ru.lavila.menudesigner.io.MenuModelsLoader;
 import ru.lavila.menudesigner.math.*;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class MenuModelsPresenter implements MenuModelListener
         this.models = new ArrayList<MenuModel>();
         models.add(new ReadUntilMenuModel(0.5, 0.1, 0.5, 0.5));
         models.add(new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
+        models.addAll(new MenuModelsLoader().loadMenuModels(MenuDesigner.class.getResourceAsStream("/MenuModels.xls")));
         calculator.addModelListener(this);
     }
 
