@@ -46,7 +46,7 @@ public class CategorizedElements
         add(category, index, Arrays.asList(elements));
     }
 
-    public Collection<Category> getCategories()
+    public List<Category> getCategories()
     {
         return categories;
     }
@@ -64,6 +64,11 @@ public class CategorizedElements
     public List<Element> getCategoryElements(Category category)
     {
         return Collections.unmodifiableList(getElementsFor(category));
+    }
+
+    public List<Element> getFirstCategoryElements()
+    {
+        return getCategories().isEmpty() ? Collections.<Element>emptyList() : getCategoryElements(getCategories().get(0));
     }
 
     public List<Item> getCategoryGroup(Category category)

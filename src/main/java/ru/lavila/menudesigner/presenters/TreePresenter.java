@@ -13,6 +13,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     private final Hierarchy hierarchy;
     private final Map<Element, ElementTreeNode> nodes;
     private final List<CalculationsListener> calculationsListeners;
+    private final List<ForceSelectionListener> selectionListeners;
     private boolean frozen = false;
     private final List<StructureChangeEvent> eventQueue;
 
@@ -20,6 +21,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
     {
         super(null);
         calculationsListeners = new ArrayList<CalculationsListener>();
+        selectionListeners = new ArrayList<ForceSelectionListener>();
         eventQueue = new ArrayList<StructureChangeEvent>();
         this.hierarchy = hierarchy;
         nodes = new HashMap<Element, ElementTreeNode>();
@@ -113,6 +115,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             elementsRemoved(event.getElementsRemoved());
             elementsAdded(event.getElementsAdded());
+            fireForceSelection(event.getElementsAdded().getFirstCategoryElements());
             fireCalculationsChanged();
         }
     }
@@ -185,6 +188,33 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         }
     }
 
+    public void addForceSelectionListener(ForceSelectionListener listener)
+    {
+        if (!selectionListeners.contains(listener))
+        {
+            selectionListeners.add(listener);
+        }
+    }
+
+    public void removeForceSelectionListener(ForceSelectionListener listener)
+    {
+        selectionListeners.remove(listener);
+    }
+
+    private void fireForceSelection(List<Element> elements)
+    {
+        if (elements.isEmpty()) return;
+        TreePath[] paths = new TreePath[elements.size()];
+        for (int index = 0; index < elements.size(); index++)
+        {
+            paths[index] = new TreePath(nodes.get(elements.get(index)).getPath());
+        }
+        for (ForceSelectionListener listener : selectionListeners)
+        {
+            listener.setSelection(paths);
+        }
+    }
+
     public static class ElementTreeNode extends DefaultMutableTreeNode
     {
         public final Element element;
@@ -213,5 +243,10 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             return element.getName() + " (" + PopularityPresenter.toString(element.getPopularity()) + ")";
         }
+    }
+
+    public static interface ForceSelectionListener
+    {
+        public void setSelection(TreePath[] paths);
     }
 }

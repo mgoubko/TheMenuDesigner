@@ -18,7 +18,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 
-public class TreeView extends JPanel implements ItemsView
+public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSelectionListener
 {
     private final TreeController controller;
     private final TreePresenter presenter;
@@ -31,6 +31,7 @@ public class TreeView extends JPanel implements ItemsView
         super(new BorderLayout());
         this.presenter = presenter;
         this.controller = controller;
+        presenter.addForceSelectionListener(this);
 
         tree = new JTree(presenter);
         tree.setEditable(true);
@@ -69,6 +70,12 @@ public class TreeView extends JPanel implements ItemsView
     public List<Element> getSelectedElements()
     {
         return presenter.getSelectedElements(tree.getSelectionPaths());
+    }
+
+    public void setSelection(TreePath[] paths)
+    {
+        tree.setSelectionPaths(paths);
+        if (paths.length > 0) tree.scrollPathToVisible(paths[0]);
     }
 
     private class TreeTransferHandler extends TransferHandler
