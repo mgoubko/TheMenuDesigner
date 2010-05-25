@@ -40,7 +40,7 @@ public class CalculationsPanel extends JPanel implements CalculationsListener, M
         add(hierarchyCalculations, BorderLayout.WEST);
 
         panelCalculations = new JPanel(new GridLayout(3, 1, 20, 5));
-        panelCalculations.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Selected Category"), BorderFactory.createEmptyBorder(5, 20, 5, 0)));
+        panelCalculations.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Active Category"), BorderFactory.createEmptyBorder(5, 20, 5, 0)));
         panelCalculations.add(new JLabel());
         panelCalculations.add(new JLabel());
         panelCalculations.add(new JLabel());

@@ -173,8 +173,15 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         private final Icon folderGreen = MenuDesigner.getIcon("folder_green");
         private final Icon folderOrange = MenuDesigner.getIcon("folder_orange");
         private final Icon folderRed = MenuDesigner.getIcon("folder_red");
+        private final Icon item = MenuDesigner.getIcon("item");
 
         private Element element;
+
+        @Override
+        public Icon getLeafIcon()
+        {
+            return item;
+        }
 
         @Override
         public Icon getClosedIcon()
