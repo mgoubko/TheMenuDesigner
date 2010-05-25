@@ -32,6 +32,19 @@ class HierarchyImpl implements Hierarchy, ElementListener
         return taxomony;
     }
 
+    public List<Category> getAllCategories()
+    {
+        List<Category> categories = new ArrayList<Category>();
+        for (Element element : hierarchyElements.getAllElements())
+        {
+            if (element instanceof Category)
+            {
+                categories.add((Category) element);
+            }
+        }
+        return categories;
+    }
+
     public Category getElementCategory(Element element)
     {
         return hierarchyElements.getCategoryFor(element);

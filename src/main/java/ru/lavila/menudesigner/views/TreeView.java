@@ -2,15 +2,19 @@ package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.MenuModelListener;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
+import ru.lavila.menudesigner.presenters.CalculationsListener;
 import ru.lavila.menudesigner.presenters.ElementsTransferable;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.TreeToolBar;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
@@ -18,20 +22,27 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 
-public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSelectionListener
+public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSelectionListener, CalculationsListener, MenuModelListener
 {
     private final TreeController controller;
     private final TreePresenter presenter;
     private final JTree tree;
     private final JPanel toolBars;
+    private final HierarchyCalculator calculator;
     private final CalculationsPanel calculations;
+    private TreePresenter.ElementTreeNode activeNode = null;
+    private List<Category> sortedCategories = null;
 
     public TreeView(TreePresenter presenter, TreeController controller, HierarchyCalculator calculator)
     {
         super(new BorderLayout());
         this.presenter = presenter;
         this.controller = controller;
+        this.calculator = calculator;
+        calculator.addModelListener(this);
+        presenter.addCalculationListener(this);
         presenter.addForceSelectionListener(this);
+        updateCalculations();
 
         tree = new JTree(presenter);
         tree.setEditable(true);
@@ -39,6 +50,7 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         tree.setDropMode(DropMode.INSERT);
         tree.setTransferHandler(new TreeTransferHandler());
         tree.addTreeSelectionListener(new HierarchyTreeSelectionListener());
+        tree.setCellRenderer(new HierarchyTreeCellRenderer());
         add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -48,6 +60,21 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         calculations = new CalculationsPanel(calculator);
         presenter.addCalculationListener(calculations);
         add(calculations, BorderLayout.SOUTH);
+    }
+
+    private void updateCalculations()
+    {
+        this.sortedCategories = calculator.getCategoriesSortedByQuality();
+    }
+
+    public void menuModelChanged()
+    {
+        updateCalculations();
+    }
+
+    public void valuesChanged()
+    {
+        updateCalculations();
     }
 
     public void addToolBar(JToolBar toolBar)
@@ -132,15 +159,49 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
     {
         public void valueChanged(TreeSelectionEvent e)
         {
-            List<Element> elements = getSelectedElements();
-            if (elements.size() == 1 && elements.get(0) instanceof Category)
+            activeNode = presenter.getActiveNode(tree.getSelectionPaths());
+            tree.repaint();
+            calculations.showFor(activeNode == null ? null : (Category) activeNode.element);
+        }
+    }
+
+    private class HierarchyTreeCellRenderer extends DefaultTreeCellRenderer
+    {
+        private final Border inactiveBorder = BorderFactory.createEmptyBorder();
+        private final Border activeBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.black);
+
+        private Element element;
+
+        @Override
+        public Color getBackgroundNonSelectionColor()
+        {
+            if (element instanceof Category)
             {
-                calculations.showFor((Category) elements.get(0));
+                int index = sortedCategories.indexOf(element);
+                int zone = sortedCategories.size() / 3;
+                if (index < zone)
+                {
+                    return Color.green;
+                }
+                else if (index < 2 * zone)
+                {
+                    return Color.yellow;
+                }
+                else
+                {
+                    return Color.red;
+                }
             }
-            else
-            {
-                calculations.showFor(null);
-            }
+            return super.getBackgroundNonSelectionColor();
+        }
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
+        {
+            element = ((TreePresenter.ElementTreeNode) value).element;
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            setBorder(value.equals(activeNode) ? activeBorder : inactiveBorder);
+            return this;
         }
     }
 }

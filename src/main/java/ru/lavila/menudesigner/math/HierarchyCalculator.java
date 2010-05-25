@@ -2,6 +2,8 @@ package ru.lavila.menudesigner.math;
 
 import ru.lavila.menudesigner.models.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class HierarchyCalculator extends MenuModelClient implements MenuModelListener
@@ -37,6 +39,19 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
             }
         }
         return result;
+    }
+
+    public List<Category> getCategoriesSortedByQuality()
+    {
+        List<Category> categories = hierarchy.getAllCategories();
+        Collections.sort(categories, new Comparator<Category>()
+        {
+            public int compare(Category category1, Category category2)
+            {
+                return getCategoryTimeLoss(category1) > getCategoryTimeLoss(category2) ? 1 : -1;
+            }
+        });
+        return categories;
     }
 
     private double getSubHierarchyTimeLoss(Category category)

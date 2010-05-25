@@ -215,6 +215,25 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         }
     }
 
+    public ElementTreeNode getActiveNode(TreePath[] paths)
+    {
+        if (paths == null) return null;
+        ElementTreeNode activeNode = null;
+        for (TreePath path : paths)
+        {
+            ElementTreeNode parent = ((ElementTreeNode) path.getLastPathComponent()).getParent();
+            if (activeNode == null)
+            {
+                activeNode = parent;
+            }
+            else if (!activeNode.equals(parent))
+            {
+                return null;
+            }
+        }
+        return activeNode;
+    }
+
     public static class ElementTreeNode extends DefaultMutableTreeNode
     {
         public final Element element;
@@ -236,6 +255,12 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         {
             super.setUserObject(userObject);
             element.setName(userObject.toString());
+        }
+
+        @Override
+        public ElementTreeNode getParent()
+        {
+            return (ElementTreeNode) super.getParent();
         }
 
         @Override

@@ -2,10 +2,13 @@ package ru.lavila.menudesigner.models;
 
 import ru.lavila.menudesigner.models.events.HierarchyListener;
 
+import java.util.List;
+
 public interface Hierarchy
 {
     public Category getRoot();
     public boolean isTaxomony();
+    public List<Category> getAllCategories();
     public Category getElementCategory(Element element);
     public Item newItem(Category parentCategory, String name, double popularity);
     public Category newCategory(Category parentCategory, String name);
