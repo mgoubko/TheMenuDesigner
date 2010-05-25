@@ -2,20 +2,18 @@ package ru.lavila.menudesigner.math;
 
 import ru.lavila.menudesigner.models.*;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class HierarchyCalculator
+public class HierarchyCalculator extends MenuModelClient implements MenuModelListener
 {
-    private final ItemsList itemsList;
+    private final ItemsListCalculator itemsCalculator;
     private final Hierarchy hierarchy;
-    private final MenuModel menuModel;
 
-    public HierarchyCalculator(ItemsList itemsList, Hierarchy hierarchy)
+    public HierarchyCalculator(ItemsListCalculator itemsCalculator, Hierarchy hierarchy)
     {
-        this.itemsList = itemsList;
+        this.itemsCalculator = itemsCalculator;
+        itemsCalculator.addModelListener(this);
         this.hierarchy = hierarchy;
-        this.menuModel = new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05);
     }
 
     public double getHierarchySearchTime()
@@ -25,7 +23,7 @@ public class HierarchyCalculator
 
     public double getOptimalSearchTime()
     {
-        return getOptimalSearchTime(Arrays.asList(itemsList.toArray()));
+        return itemsCalculator.getOptimalSearchTime();
     }
 
     public double getCategoryTimeLoss(Category category)
@@ -43,7 +41,7 @@ public class HierarchyCalculator
 
     private double getSubHierarchyTimeLoss(Category category)
     {
-        return getSearchTimeWithInherited(category) - getOptimalSearchTime(category.getGroup());
+        return getSearchTimeWithInherited(category) - itemsCalculator.getOptimalSearchTime(category.getGroup());
     }
 
     private double getSearchTimeWithInherited(Category category)
@@ -54,7 +52,7 @@ public class HierarchyCalculator
         for (int index = 0; index < totalElements; index++)
         {
             Element element = elements.get(index);
-            result += menuModel.getTimeToSelect(index + 1, totalElements) * element.getPopularity();
+            result += itemsCalculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
             if (element instanceof Category)
             {
                 result += getSearchTimeWithInherited((Category) element);
@@ -63,35 +61,8 @@ public class HierarchyCalculator
         return result;
     }
 
-    private double getSearchTime(double[] proportion)
+    public void menuModelChanged()
     {
-        double result = 0;
-        for (int index = 0; index < proportion.length; index++)
-        {
-            result += menuModel.getTimeToSelect(index + 1, proportion.length) * proportion[index];
-        }
-        return result;
+        fireModelChanged();
     }
-
-    private double getOptimalSearchTime(List<Item> items)
-    {
-        double[] proportion = menuModel.getOptimalProportion(items.size());
-        double result = getSearchTime(proportion);
-        double sum = 0;
-        for (double popularity : proportion)
-        {
-            sum += popularity * Math.log(popularity);
-        }
-        result /= sum;
-        sum = 0;
-        double totalPopularity = 0;
-        for (Item item : items)
-        {
-            double popularity = item.getPopularity();
-            totalPopularity += popularity;
-            sum += popularity * Math.log(popularity);
-        }
-        return result * (sum - totalPopularity * Math.log(totalPopularity));
-    }
-
 }

@@ -1,11 +1,14 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.controllers.ItemsController;
+import ru.lavila.menudesigner.controllers.MenuModelsController;
 import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.ItemsListCalculator;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
+import ru.lavila.menudesigner.presenters.MenuModelsPresenter;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.ItemsToolBar;
@@ -21,19 +24,19 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
     private final ItemsController controller;
     private final List<JToolBar> toolBars;
 
-    public ItemsSwitchView(ItemsList itemsList)
+    public ItemsSwitchView(ItemsList itemsList, ItemsListCalculator calculator)
     {
         super();
 
         controller = new ItemsController(itemsList);
 
-        TableView tableView = new TableView(new TablePresenter(itemsList));
+        TableView tableView = new TableView(new TablePresenter(itemsList), new MenuModelsPanel(new MenuModelsPresenter(calculator), new MenuModelsController(calculator)));
         addTab("List", tableView);
         for (Hierarchy hierarchy : itemsList.getHierarchies())
         {
             if (hierarchy.isTaxomony())
             {
-                TreeView treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy), new HierarchyCalculator(itemsList, hierarchy));
+                TreeView treeView = new TreeView(new TreePresenter(hierarchy), new TreeController(hierarchy), new HierarchyCalculator(calculator, hierarchy));
                 addTab(hierarchy.getRoot().getName(), treeView);
             }
         }

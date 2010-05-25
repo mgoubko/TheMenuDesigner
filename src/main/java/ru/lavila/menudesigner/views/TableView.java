@@ -15,7 +15,7 @@ public class TableView extends JPanel implements ItemsView
     private final JTable table;
     private final JPanel toolBars;
 
-    public TableView(TablePresenter presenter)
+    public TableView(TablePresenter presenter, JPanel calculations)
     {
         super(new BorderLayout());
         this.presenter = presenter;
@@ -27,6 +27,8 @@ public class TableView extends JPanel implements ItemsView
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
         add(toolBars, BorderLayout.NORTH);
+
+        add(calculations, BorderLayout.SOUTH);
     }
 
     public void addToolBar(JToolBar toolBar)

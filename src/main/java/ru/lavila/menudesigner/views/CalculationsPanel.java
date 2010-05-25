@@ -1,13 +1,14 @@
 package ru.lavila.menudesigner.views;
 
 import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.MenuModelListener;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.presenters.CalculationsListener;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class CalculationsPanel extends JPanel implements CalculationsListener
+public class CalculationsPanel extends JPanel implements CalculationsListener, MenuModelListener
 {
     private final HierarchyCalculator calculator;
     private final JLabel currentSearchTime;
@@ -20,7 +21,9 @@ public class CalculationsPanel extends JPanel implements CalculationsListener
         super(new BorderLayout());
 
         this.calculator = calculator;
+        calculator.addModelListener(this);
 
+        setPreferredSize(new Dimension(500, 120));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel hierarchyCalculations = new JPanel(new GridLayout(3, 2, 20, 5));
@@ -48,6 +51,16 @@ public class CalculationsPanel extends JPanel implements CalculationsListener
     }
 
     public void valuesChanged()
+    {
+        recalculateParameters();
+    }
+
+    public void menuModelChanged()
+    {
+        recalculateParameters();
+    }
+
+    private void recalculateParameters()
     {
         double current = calculator.getHierarchySearchTime();
         currentSearchTime.setText(String.format("%.2f", current));
