@@ -46,7 +46,7 @@ public class MenuModelsPresenter implements MenuModelListener
 
     public String getOptimalSearchTime()
     {
-        return String.format("%.2f", calculator.getOptimalSearchTime());
+        return String.format("%.2fs", calculator.getOptimalSearchTime());
     }
 
     public String getOptimalProportion()

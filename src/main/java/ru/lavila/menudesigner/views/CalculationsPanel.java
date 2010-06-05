@@ -15,6 +15,7 @@ public class CalculationsPanel extends JPanel implements CalculationsListener, M
     private final JLabel optimalSearchTime;
     private final JLabel searchTimeExcess;
     private final JPanel panelCalculations;
+    private Category activeCategory;
 
     public CalculationsPanel(HierarchyCalculator calculator)
     {
@@ -63,24 +64,31 @@ public class CalculationsPanel extends JPanel implements CalculationsListener, M
     private void recalculateParameters()
     {
         double current = calculator.getHierarchySearchTime();
-        currentSearchTime.setText(String.format("%.2f", current));
+        currentSearchTime.setText(String.format("%.2fs", current));
         double optimal = calculator.getOptimalSearchTime();
-        optimalSearchTime.setText(String.format("%.2f", optimal));
+        optimalSearchTime.setText(String.format("%.2fs", optimal));
         searchTimeExcess.setText(String.format("%d%%", Math.round(100 * (current - optimal) / optimal)));
-    }
 
-    public void showFor(Category category)
-    {
         String[] texts = new String[3];
-        if (category != null)
+        if (activeCategory != null)
         {
-            texts[0] = category.getName();
+            texts[0] = activeCategory.getName();
             texts[1] = "Time loss";
-            texts[2] = String.format("%.4f", calculator.getCategoryTimeLoss(category));
+            double timeLoss = calculator.getCategoryTimeLoss(activeCategory);
+            texts[2] = String.format("%.4fs (%d%%)", timeLoss, Math.round(100 * timeLoss / (current - optimal)));
         }
         for (int index = 0; index < 3; index++)
         {
             ((JLabel) panelCalculations.getComponent(index)).setText(texts[index]);
+        }
+    }
+
+    public void showFor(Category category)
+    {
+        if (activeCategory != category)
+        {
+            activeCategory = category;
+            recalculateParameters();
         }
     }
 }
