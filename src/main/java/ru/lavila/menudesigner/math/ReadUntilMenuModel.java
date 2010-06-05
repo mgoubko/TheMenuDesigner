@@ -7,10 +7,13 @@ import org.apache.commons.math.analysis.solvers.UnivariateRealSolverFactory;
 
 public class ReadUntilMenuModel implements MenuModel
 {
+    private final int MAX_SIZE = 100;
+
     protected final double tResp;
     protected final double tLoad;
     protected final double tRead;
     protected final double tClick;
+    protected double[] optimalProportion = null;
 
     public ReadUntilMenuModel(double tResp, double tLoad, double tRead, double tClick)
     {
@@ -35,16 +38,25 @@ public class ReadUntilMenuModel implements MenuModel
         return (tResp + tLoad * total + tClick) / tRead;
     }
 
-    public double[] getOptimalProportion(int itemsSize)
+    public double[] getOptimalProportion()
     {
-        if (itemsSize < 2) return new double[]{1};
+        if (optimalProportion == null)
+        {
+            optimalProportion = calculateOptimalProportion();
+        }
+        return optimalProportion;
+    }
+
+    private double[] calculateOptimalProportion()
+    {
         try
         {
             UnivariateRealSolver solver = UnivariateRealSolverFactory.newInstance().newDefaultSolver();
             ProportionFinderFunction bestFunction = null;
             double bestBase = 0;
             double minResult = 0;
-            for (int size = 2; size <= itemsSize; size++)
+            //todo: make calculations less straightforward
+            for (int size = 2; size <= MAX_SIZE; size++)
             {
                 ProportionFinderFunction function = new ProportionFinderFunction(size, getModelFactor(size));
                 double base = solver.solve(function, 0, 1, 0.1);

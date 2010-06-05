@@ -22,7 +22,7 @@ public class UserDefinedMenuModel implements MenuModel
         return values[total - 1][target - 1];
     }
 
-    public double[] getOptimalProportion(int itemsSize)
+    public double[] getOptimalProportion()
     {
         return new double[]{0.25, 0.25, 0.25, 0.25};
     }

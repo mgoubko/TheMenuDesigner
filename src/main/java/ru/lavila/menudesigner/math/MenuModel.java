@@ -18,8 +18,7 @@ public interface MenuModel
 
     /**
      * Calculates optimal branching factor (size of proportion) and proportion for populartities
-     * @param itemsSize total number of target items
      * @return optimal proportion for popularities
      */
-    public double[] getOptimalProportion(int itemsSize);
+    public double[] getOptimalProportion();
 }
