@@ -57,22 +57,49 @@ public class MenuModelsLoader
                 String name = sheet.getSheetName();
                 if (name.equals("Parameters")) continue;
                 List<double[]> values = new ArrayList<double[]>();
+                double[] proportion = null;
                 for (Row row : sheet)
                 {
-                    int total = row.getRowNum() + 1;
-                    double[] rowValues = new double[total];
-                    for (int index = 0; index < total; index++)
+                    if (row.getRowNum() != sheet.getLastRowNum())
                     {
-                        Cell cell = row.getCell(index);
-                        if (cell == null || (cell.getCellType() != Cell.CELL_TYPE_NUMERIC && cell.getCellType() != Cell.CELL_TYPE_FORMULA))
+                        int total = row.getRowNum() + 1;
+                        double[] rowValues = new double[total];
+                        for (int index = 0; index < total; index++)
                         {
-                            throw new LoaderException("Cell " + LoaderException.getCellIdentifier(row.getRowNum(), index) + " should contain valid number or formula");
+                            Cell cell = row.getCell(index);
+                            if (cell == null || (cell.getCellType() != Cell.CELL_TYPE_NUMERIC && cell.getCellType() != Cell.CELL_TYPE_FORMULA))
+                            {
+                                throw new LoaderException("Cell " + LoaderException.getCellIdentifier(row.getRowNum(), index) + " should contain valid number or formula");
+                            }
+                            rowValues[index] = cell.getNumericCellValue();
                         }
-                        rowValues[index] = cell.getNumericCellValue();
+                        values.add(rowValues);
                     }
-                    values.add(rowValues);
+                    else
+                    {
+                        List<Double> proportionValues = new ArrayList<Double>();
+                        for (Cell cell : row)
+                        {
+                            if (cell.getCellType() != Cell.CELL_TYPE_NUMERIC && cell.getCellType() != Cell.CELL_TYPE_FORMULA)
+                            {
+                                throw new LoaderException("Cell " + LoaderException.getCellIdentifier(cell) + " should contain valid number or formula");
+                            }
+                            proportionValues.add(cell.getNumericCellValue());
+                        }
+                        proportion = new double[proportionValues.size()];
+                        double sum = 0;
+                        for (int index = 0; index < proportionValues.size(); index++)
+                        {
+                            proportion[index] = proportionValues.get(index);
+                            sum += proportion[index];
+                        }
+                        if (Math.abs(sum - 1) > 0.01)
+                        {
+                            throw new LoaderException("Sum of optimal proportion elements should equal to 1");
+                        }
+                    }
                 }
-                models.add(new UserDefinedMenuModel(name, values.toArray(new double[values.size()][])));
+                models.add(new UserDefinedMenuModel(name, values.toArray(new double[values.size()][]), proportion));
             }
             return models;
         }

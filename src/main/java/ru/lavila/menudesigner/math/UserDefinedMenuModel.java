@@ -4,11 +4,13 @@ public class UserDefinedMenuModel implements MenuModel
 {
     private final String name;
     private final double[][] values;
+    private final double[] optimalProportion;
 
-    public UserDefinedMenuModel(String name, double[][] values)
+    public UserDefinedMenuModel(String name, double[][] values, double[] optimalProportion)
     {
         this.name = name;
         this.values = values;
+        this.optimalProportion = optimalProportion;
     }
 
     public String getName()
@@ -24,6 +26,6 @@ public class UserDefinedMenuModel implements MenuModel
 
     public double[] getOptimalProportion()
     {
-        return new double[]{0.25, 0.25, 0.25, 0.25};
+        return optimalProportion;
     }
 }
