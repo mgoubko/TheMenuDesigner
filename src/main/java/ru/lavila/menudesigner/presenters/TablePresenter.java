@@ -38,7 +38,7 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
         }
         else if (columnIndex == 1)
         {
-            return new PopularityPresenter(item.getPopularity());
+            return String.format("%.5f", item.getPopularity());
         }
         else
         {
@@ -56,7 +56,14 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
         }
         else if (columnIndex == 1)
         {
-            item.setPopularity(((PopularityPresenter) value).value);
+            try
+            {
+                item.setPopularity(Double.parseDouble(value.toString()));
+            }
+            catch (NumberFormatException e)
+            {
+                
+            }
         }
     }
 
@@ -86,7 +93,7 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
     @Override
     public Class<?> getColumnClass(int columnIndex)
     {
-        return columnIndex == 1 ? PopularityPresenter.class : String.class;
+        return String.class;
     }
 
     public void itemChanged(ElementChangeEvent event)

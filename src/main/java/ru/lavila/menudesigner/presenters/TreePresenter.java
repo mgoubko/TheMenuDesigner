@@ -75,7 +75,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
             categoryNode = (TreePresenter.ElementTreeNode) (path.getLastPathComponent());
             if (categoryNode != null && !(categoryNode.element instanceof Category))
             {
-                categoryNode = (TreePresenter.ElementTreeNode) categoryNode.getParent();
+                categoryNode = categoryNode.getParent();
             }
         }
         return categoryNode != null ? (Category) categoryNode.element : hierarchy.getRoot();
@@ -266,7 +266,7 @@ public class TreePresenter extends DefaultTreeModel implements HierarchyListener
         @Override
         public String toString()
         {
-            return element.getName() + " (" + PopularityPresenter.toString(element.getPopularity()) + ")";
+            return element.getName() + " (" + String.format("%.5f", element.getPopularity()) + ")";
         }
     }
 
