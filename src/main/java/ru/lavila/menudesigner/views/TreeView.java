@@ -20,6 +20,8 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.List;
 
@@ -61,6 +63,33 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         calculations = new CalculationsPanel(calculator);
         presenter.addCalculationListener(calculations);
         add(calculations, BorderLayout.SOUTH);
+    }
+
+    public void setPopupMenu(final JPopupMenu popupMenu)
+    {
+        //todo: refactor, support several calls
+        tree.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e)
+            {
+                if (e.isPopupTrigger())
+                {
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
     }
 
     private void updateCalculations()

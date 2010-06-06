@@ -22,6 +22,11 @@ class HierarchyImpl implements Hierarchy, ElementListener
         listeners = new ArrayList<HierarchyListener>();
     }
 
+    public String getName()
+    {
+        return root.getName();
+    }
+
     public Category getRoot()
     {
         return root;

@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface Hierarchy
 {
+    String getName();
     public Category getRoot();
     public boolean isTaxomony();
     public List<Category> getAllCategories();

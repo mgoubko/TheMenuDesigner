@@ -182,6 +182,7 @@
     <dictionary name="doz">
       <words>
         <w>configurator</w>
+        <w>popup</w>
       </words>
     </dictionary>
   </component>

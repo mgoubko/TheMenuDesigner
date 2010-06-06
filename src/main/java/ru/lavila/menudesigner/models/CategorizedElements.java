@@ -63,7 +63,7 @@ public class CategorizedElements
 
     public List<Element> getCategoryElements(Category category)
     {
-        return Collections.unmodifiableList(getElementsFor(category));
+        return new ArrayList<Element>(getElementsFor(category));
     }
 
     public List<Element> getFirstCategoryElements()
