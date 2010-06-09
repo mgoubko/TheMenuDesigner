@@ -32,6 +32,7 @@ public class TaxonomyClassifier
         }
         List<TaxonomyElement> taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), group);
         double[] proportion = menuModel.getOptimalProportion();
+        List<Element> split = new ArrayList<Element>();
         for (int index = 0; index < proportion.length - 1; index++)
         {
             if (taxonomyElements.isEmpty()) break;
@@ -42,26 +43,32 @@ public class TaxonomyClassifier
             if (taxonomyElement.element instanceof Category)
             {
                 Category newCategory = targetHierarchy.newCategory(category, taxonomyElement.element.getName());
+                split.add(newCategory);
+                List<Item> items = new ArrayList<Item>();
                 for (TaxonomyElement child : taxonomyElement.children)
                 {
                     if (child.element instanceof Item)
                     {
-                        targetHierarchy.add(newCategory, child.element);
+                        items.add((Item) child.element);
                     }
                 }
+                targetHierarchy.add(newCategory, items.toArray(new Item[items.size()]));
             }
             else
             {
                 targetHierarchy.add(category, taxonomyElement.element);
+                split.add(taxonomyElement.element);
             }
         }
         if (taxonomyElements.size() == 1)
         {
             targetHierarchy.add(category, taxonomyElements.get(0).element);
+            split.add(taxonomyElements.get(0).element);
         }
         else if (taxonomyElements.size() > 1)
         {
             Category newCategory = targetHierarchy.newCategory(category, "...");
+            split.add(newCategory);
             for (TaxonomyElement taxonomyElement : taxonomyElements)
             {
                 if (taxonomyElement.element instanceof Item)
@@ -70,6 +77,7 @@ public class TaxonomyClassifier
                 }
             }
         }
+        targetHierarchy.add(category, split.toArray(new Element[split.size()]));
     }
 
     private TaxonomyElement findClosestTaxonomyElement(List<TaxonomyElement> taxonomyElements, double value)

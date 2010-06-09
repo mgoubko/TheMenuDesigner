@@ -52,9 +52,9 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         tree.setDragEnabled(true);
         tree.setDropMode(DropMode.INSERT);
         tree.setTransferHandler(new TreeTransferHandler());
-        tree.addTreeSelectionListener(new HierarchyTreeSelectionListener());
         tree.setCellRenderer(new HierarchyTreeCellRenderer());
         add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+        addTreeSelectionListener(new HierarchyTreeSelectionListener());
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addToolBar(new TreeToolBar(this));
@@ -63,6 +63,11 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         calculations = new CalculationsPanel(calculator);
         presenter.addCalculationListener(calculations);
         add(calculations, BorderLayout.SOUTH);
+    }
+
+    public void addTreeSelectionListener(TreeSelectionListener listener)
+    {
+        tree.addTreeSelectionListener(listener);
     }
 
     public void setPopupMenu(final JPopupMenu popupMenu)
