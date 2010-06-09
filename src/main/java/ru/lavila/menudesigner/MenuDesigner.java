@@ -17,7 +17,7 @@ public class MenuDesigner
 
     public static Icon getIcon(String name)
     {
-        return new ImageIcon(MenuDesigner.class.getResource("icons/" + name + ".gif"));
+        return new ImageIcon(MenuDesigner.class.getResource("icons/" + name + ".png"));
     }
 
     public static void main(String[] args)

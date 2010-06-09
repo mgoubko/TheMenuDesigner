@@ -20,7 +20,7 @@ public class ItemsToolBar extends JToolBar
 
     private void setupButtons()
     {
-        JButton normalize = new JButton(MenuDesigner.getIcon("refresh"));
+        JButton normalize = new JButton(MenuDesigner.getIcon("normalize"));
         normalize.setToolTipText("Normalize items' popularities");
         normalize.addActionListener(new ActionListener()
         {
