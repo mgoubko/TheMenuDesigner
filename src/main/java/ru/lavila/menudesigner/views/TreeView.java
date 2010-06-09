@@ -54,7 +54,7 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         tree.setTransferHandler(new TreeTransferHandler());
         tree.addTreeSelectionListener(new HierarchyTreeSelectionListener());
         tree.setCellRenderer(new HierarchyTreeCellRenderer());
-        add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+        add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addToolBar(new TreeToolBar(this));
