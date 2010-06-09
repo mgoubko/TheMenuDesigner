@@ -35,6 +35,7 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
     private final CalculationsPanel calculations;
     private TreePresenter.ElementTreeNode activeNode = null;
     private List<Category> sortedCategories = null;
+    private JPopupMenu popupMenu = null;
 
     public TreeView(TreePresenter presenter, TreeController controller, HierarchyCalculator calculator)
     {
@@ -55,6 +56,7 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         tree.setCellRenderer(new HierarchyTreeCellRenderer());
         add(new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
         addTreeSelectionListener(new HierarchyTreeSelectionListener());
+        tree.addMouseListener(new PopupMenuMouseAdapter());
 
         toolBars = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addToolBar(new TreeToolBar(this));
@@ -70,31 +72,9 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
         tree.addTreeSelectionListener(listener);
     }
 
-    public void setPopupMenu(final JPopupMenu popupMenu)
+    public void setPopupMenu(JPopupMenu popupMenu)
     {
-        //todo: refactor, support several calls
-        tree.addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-                maybeShowPopup(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e)
-            {
-                maybeShowPopup(e);
-            }
-
-            private void maybeShowPopup(MouseEvent e)
-            {
-                if (e.isPopupTrigger())
-                {
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
+        this.popupMenu = popupMenu;
     }
 
     private void updateCalculations()
@@ -197,6 +177,29 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
             activeNode = presenter.getActiveNode(tree.getSelectionPaths());
             tree.repaint();
             calculations.showFor(activeNode == null ? null : (Category) activeNode.element);
+        }
+    }
+
+    private class PopupMenuMouseAdapter extends MouseAdapter
+    {
+        @Override
+        public void mousePressed(MouseEvent e)
+        {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e)
+        {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e)
+        {
+            if (popupMenu != null && e.isPopupTrigger())
+            {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
     }
 
