@@ -1,7 +1,7 @@
 package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.math.ItemsListCalculator;
-import ru.lavila.menudesigner.math.MenuModelListener;
+import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
 import ru.lavila.menudesigner.math.TaxonomyClassifier;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;

@@ -4,6 +4,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolver;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolverFactory;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
 public class ReadUntilMenuModel implements MenuModel
 {

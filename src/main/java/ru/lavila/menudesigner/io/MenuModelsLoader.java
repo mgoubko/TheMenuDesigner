@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import ru.lavila.menudesigner.math.MenuModel;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import ru.lavila.menudesigner.math.UserDefinedMenuModel;
 
 import javax.swing.*;

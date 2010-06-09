@@ -39,6 +39,7 @@ public class MainContentPane extends JPanel
     public void setupView(ItemsList itemsList)
     {
         Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
+        //todo: remove hardcoded menu model
         ItemsListCalculator calculator = new ItemsListCalculator(itemsList, new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList, calculator);

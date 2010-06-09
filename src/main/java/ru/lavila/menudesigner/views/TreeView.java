@@ -3,7 +3,7 @@ package ru.lavila.menudesigner.views;
 import ru.lavila.menudesigner.MenuDesigner;
 import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
-import ru.lavila.menudesigner.math.MenuModelListener;
+import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.presenters.CalculationsListener;

@@ -8,6 +8,7 @@ import ru.lavila.menudesigner.math.ItemsListCalculator;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
+import ru.lavila.menudesigner.models.menumodels.MenuModelsLibrary;
 import ru.lavila.menudesigner.presenters.MenuModelsPresenter;
 import ru.lavila.menudesigner.presenters.TablePresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -30,7 +31,11 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
 
         controller = new ItemsController(itemsList);
 
-        TableView tableView = new TableView(new TablePresenter(itemsList), new MenuModelsPanel(new MenuModelsPresenter(calculator), new MenuModelsController(calculator)));
+        MenuModelsLibrary menuModelsLibrary = new MenuModelsLibrary();
+        TableView tableView = new TableView(
+                new TablePresenter(itemsList),
+                new MenuModelsPanel(new MenuModelsPresenter(calculator, menuModelsLibrary), new MenuModelsController(calculator, menuModelsLibrary))
+        );
         addTab("List", tableView);
         for (Hierarchy hierarchy : itemsList.getHierarchies())
         {

@@ -1,5 +1,7 @@
 package ru.lavila.menudesigner.math;
 
+import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
+
 import java.util.ArrayList;
 import java.util.List;
 

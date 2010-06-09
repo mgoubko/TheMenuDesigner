@@ -4,6 +4,7 @@ import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
 import java.util.ArrayList;
 import java.util.Collections;

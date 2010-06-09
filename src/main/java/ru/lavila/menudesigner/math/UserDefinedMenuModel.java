@@ -1,5 +1,7 @@
 package ru.lavila.menudesigner.math;
 
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
+
 public class UserDefinedMenuModel implements MenuModel
 {
     private final String name;
