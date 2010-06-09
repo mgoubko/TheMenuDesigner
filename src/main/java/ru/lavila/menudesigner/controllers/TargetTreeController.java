@@ -1,6 +1,7 @@
 package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.math.ItemsListCalculator;
+import ru.lavila.menudesigner.math.MenuModelListener;
 import ru.lavila.menudesigner.math.TaxonomyClassifier;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
@@ -11,21 +12,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class TargetTreeController
+public class TargetTreeController implements MenuModelListener
 {
-    private final TaxonomyClassifier classifier;
     private final Hierarchy hierarchy;
+    private final ItemsListCalculator calculator;
+    private TaxonomyClassifier classifier = null;
 
     public TargetTreeController(Hierarchy hierarchy, ItemsListCalculator calculator)
     {
-        //todo: listen for menu model change
         this.hierarchy = hierarchy;
-        this.classifier = new TaxonomyClassifier(calculator.getMenuModel(), hierarchy);
+        this.calculator = calculator;
+        calculator.addModelListener(this);
     }
 
     public void classifyByTaxonomy(Hierarchy taxonomy, Category category)
     {
-        classifier.classifyByTaxonomy(taxonomy, category);
+        getClassifier().classifyByTaxonomy(taxonomy, category);
     }
 
     public void sortByPriority(Category category)
@@ -39,5 +41,19 @@ public class TargetTreeController
             }
         });
         hierarchy.add(category, elements.toArray(new Element[elements.size()]));
+    }
+
+    private TaxonomyClassifier getClassifier()
+    {
+        if (classifier == null)
+        {
+            classifier = new TaxonomyClassifier(calculator.getMenuModel(), hierarchy);
+        }
+        return classifier;
+    }
+
+    public void menuModelChanged()
+    {
+        classifier = null;
     }
 }
