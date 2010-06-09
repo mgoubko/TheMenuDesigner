@@ -20,7 +20,7 @@ public class UserDefinedMenuModel implements MenuModel
 
     public double getTimeToSelect(int target, int total)
     {
-        if (total > values.length || target > values[total].length) return Double.MAX_VALUE;
+        if (total >= values.length || target >= values[total].length) return Double.NaN;
         return values[total - 1][target - 1];
     }
 

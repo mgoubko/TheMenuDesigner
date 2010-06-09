@@ -48,7 +48,7 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
         {
             public int compare(Category category1, Category category2)
             {
-                return getCategoryTimeLoss(category1) > getCategoryTimeLoss(category2) ? 1 : -1;
+                return Double.compare(getCategoryTimeLoss(category1), getCategoryTimeLoss(category2));
             }
         });
         return categories;

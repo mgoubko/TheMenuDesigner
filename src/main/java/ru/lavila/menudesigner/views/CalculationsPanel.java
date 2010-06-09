@@ -63,11 +63,19 @@ public class CalculationsPanel extends JPanel implements CalculationsListener, M
 
     private void recalculateParameters()
     {
-        double current = calculator.getHierarchySearchTime();
-        currentSearchTime.setText(String.format("%.2fs", current));
         double optimal = calculator.getOptimalSearchTime();
         optimalSearchTime.setText(String.format("%.2fs", optimal));
-        searchTimeExcess.setText(String.format("%d%%", Math.round(100 * (current - optimal) / optimal)));
+        double current = calculator.getHierarchySearchTime();
+        if (Double.isNaN(current))
+        {
+            currentSearchTime.setText("Unknown");
+            searchTimeExcess.setText("Unknown");
+        }
+        else
+        {
+            currentSearchTime.setText(String.format("%.2fs", current));
+            searchTimeExcess.setText(String.format("%d%%", Math.round(100 * (current - optimal) / optimal)));
+        }
 
         String[] texts = new String[3];
         if (activeCategory != null)
@@ -75,7 +83,11 @@ public class CalculationsPanel extends JPanel implements CalculationsListener, M
             texts[0] = activeCategory.getName();
             texts[1] = "Time loss";
             double timeLoss = calculator.getCategoryTimeLoss(activeCategory);
-            texts[2] = String.format("%.4fs (%d%%)", timeLoss, Math.round(100 * timeLoss / (current - optimal)));
+            texts[2] = Double.isNaN(timeLoss) ? "Unknown" : String.format("%.4fs", timeLoss);
+            if (!Double.isNaN(current) && !Double.isNaN(timeLoss))
+            {
+                texts[2] += String.format(" (%d%%)", Math.round(100 * timeLoss / (current - optimal)));
+            }
         }
         for (int index = 0; index < 3; index++)
         {
