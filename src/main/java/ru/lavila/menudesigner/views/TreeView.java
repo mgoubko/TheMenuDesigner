@@ -205,7 +205,7 @@ public class TreeView extends JPanel implements ItemsView, TreePresenter.ForceSe
 
     private class HierarchyTreeCellRenderer extends DefaultTreeCellRenderer
     {
-        private final Border inactiveBorder = BorderFactory.createEmptyBorder();
+        private final Border inactiveBorder = BorderFactory.createEmptyBorder(0, 0, 1, 0);
         private final Border activeBorder = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.black);
         private final Icon folderGreen = MenuDesigner.getIcon("folder_green");
         private final Icon folderOrange = MenuDesigner.getIcon("folder_orange");

@@ -55,6 +55,7 @@ public class MenuModelsPanel extends JPanel implements MenuModelListener, MenuMo
         menuModels.setSelectedIndex(this.presenter.getCurrentModelIndex());
         menuTypePanel.add(menuModels, BorderLayout.CENTER);
         JButton loadMenuModels = new JButton(MenuDesigner.getIcon("folder"));
+        loadMenuModels.setPreferredSize(new Dimension(32, 32));
         loadMenuModels.setToolTipText("Load menu models...");
         loadMenuModels.addActionListener(new ActionListener()
         {
