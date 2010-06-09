@@ -84,11 +84,11 @@ public class MenuModelsPanel extends JPanel implements MenuModelListener, MenuMo
 
     public void libraryChanged()
     {
+        //todo: restore model selected before update
         menuModels.removeAllItems();
         for (String name : presenter.getModelNames())
         {
             menuModels.addItem(name);
         }
-        menuModels.setSelectedIndex(presenter.getCurrentModelIndex());
     }
 }

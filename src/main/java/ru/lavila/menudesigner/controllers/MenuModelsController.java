@@ -30,6 +30,6 @@ public class MenuModelsController
     {
         List<MenuModel> models = new MenuModelsLoader().loadMenuModels(filename);
         if (models == null || models.isEmpty()) return;
-        library.addMenuModels(models);
+        library.setMenuModels(models);
     }
 }

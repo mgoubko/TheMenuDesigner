@@ -33,8 +33,9 @@ public class MenuModelsLibrary
         fireMenuModelsLibraryChanged();
     }
 
-    public void addMenuModels(List<MenuModel> menuModels)
+    public void setMenuModels(List<MenuModel> menuModels)
     {
+        this.menuModels.clear();
         this.menuModels.addAll(menuModels);
         fireMenuModelsLibraryChanged();
     }
