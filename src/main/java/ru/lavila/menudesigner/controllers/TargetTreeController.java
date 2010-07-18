@@ -1,8 +1,7 @@
 package ru.lavila.menudesigner.controllers;
 
+import ru.lavila.menudesigner.math.CategoryClassifier;
 import ru.lavila.menudesigner.math.ItemsListCalculator;
-import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
-import ru.lavila.menudesigner.math.TaxonomyClassifier;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
@@ -12,27 +11,25 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class TargetTreeController implements MenuModelListener
+public class TargetTreeController
 {
     private final Hierarchy hierarchy;
     private final ItemsListCalculator calculator;
-    private TaxonomyClassifier classifier = null;
 
     public TargetTreeController(Hierarchy hierarchy, ItemsListCalculator calculator)
     {
         this.hierarchy = hierarchy;
         this.calculator = calculator;
-        calculator.addModelListener(this);
     }
 
     public void classifyByTaxonomy(Hierarchy taxonomy, Category category)
     {
-        getClassifier().classifyByTaxonomy(taxonomy, category);
+        new CategoryClassifier(hierarchy, category).classify(taxonomy);
     }
 
     public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
-        getClassifier().optimizeByTaxonomy(taxonomy, category);
+        new CategoryClassifier(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
     }
 
     public void sortByPriority(Category category)
@@ -46,19 +43,5 @@ public class TargetTreeController implements MenuModelListener
             }
         });
         hierarchy.add(category, elements.toArray(new Element[elements.size()]));
-    }
-
-    private TaxonomyClassifier getClassifier()
-    {
-        if (classifier == null)
-        {
-            classifier = new TaxonomyClassifier(calculator.getMenuModel(), hierarchy);
-        }
-        return classifier;
-    }
-
-    public void menuModelChanged()
-    {
-        classifier = null;
     }
 }
