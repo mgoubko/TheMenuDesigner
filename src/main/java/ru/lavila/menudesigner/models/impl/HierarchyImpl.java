@@ -176,6 +176,16 @@ class HierarchyImpl implements Hierarchy, ElementListener
         }
     }
 
+    public String getPathTo(Element element)
+    {
+        String result = "";
+        for (Category current = getElementCategory(element); current != getRoot(); current = getElementCategory(current))
+        {
+            result = " " + LEVEL_SEPARATOR + " " + current.getName() + result;
+        }
+        return result.length() == 0 ? result : result.substring(3);
+    }
+
     public void addModelListener(HierarchyListener listener)
     {
         listeners.add(listener);

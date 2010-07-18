@@ -1,6 +1,7 @@
 package ru.lavila.menudesigner.views.toolbars;
 
 import ru.lavila.menudesigner.MenuDesigner;
+import ru.lavila.menudesigner.io.ExcelWorkbookFilter;
 import ru.lavila.menudesigner.io.ItemsListLoader;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.views.MainContentPane;
@@ -21,6 +22,7 @@ public class LoadToolBar extends JToolBar
         this.contentPane = contentPane;
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.addChoosableFileFilter(new ExcelWorkbookFilter());
         loader = new ItemsListLoader();
         setupButtons();
     }

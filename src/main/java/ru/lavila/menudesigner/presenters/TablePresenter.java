@@ -42,7 +42,7 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
         }
         else
         {
-            return getPathToItem(itemsList.getTaxonomies().get(columnIndex - 2), item);
+            return itemsList.getTaxonomies().get(columnIndex - 2).getPathTo(item);
         }
     }
 
@@ -138,15 +138,5 @@ public class TablePresenter extends AbstractTableModel implements ItemsListListe
             selectedElements.add(itemsList.get(selectedRow));
         }
         return selectedElements;
-    }
-
-    private String getPathToItem(Hierarchy hierarchy, Item item)
-    {
-        String result = "";
-        for (Category current = hierarchy.getElementCategory(item); current != hierarchy.getRoot(); current = hierarchy.getElementCategory(current))
-        {
-            result = " / " + current.getName() + result;
-        }
-        return result.length() == 0 ? result : result.substring(3);
     }
 }

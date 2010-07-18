@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.controllers;
 
+import ru.lavila.menudesigner.io.HierarchySaver;
 import ru.lavila.menudesigner.math.CategoryClassifier;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.math.HierarchyOptimizer;
@@ -18,12 +19,15 @@ public class TargetTreeController
     private final Hierarchy hierarchy;
     private final HierarchyCalculator calculator;
     private final ItemsList itemsList;
+    private final HierarchySaver hierarchySaver;
+
 
     public TargetTreeController(Hierarchy hierarchy, HierarchyCalculator calculator, ItemsList itemsList)
     {
         this.hierarchy = hierarchy;
         this.calculator = calculator;
         this.itemsList = itemsList;
+        this.hierarchySaver = new HierarchySaver();
     }
 
     public void classifyByTaxonomy(Hierarchy taxonomy, Category category)
@@ -52,5 +56,10 @@ public class TargetTreeController
     public void optimize()
     {
         new HierarchyOptimizer(hierarchy, calculator, itemsList).optimize();
+    }
+
+    public void save(String filename)
+    {
+        hierarchySaver.saveHierarchy(filename, hierarchy, itemsList);
     }
 }

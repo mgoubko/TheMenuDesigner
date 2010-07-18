@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface Hierarchy
 {
+    public final String LEVEL_SEPARATOR = ">";
+
     String getName();
     public Category getRoot();
     public boolean isTaxomony();
@@ -16,6 +18,7 @@ public interface Hierarchy
     public void add(Category category, Element... elements);
     public void add(Category category, int index, Element... elements);
     public void remove(Element... elements);
+    public String getPathTo(Element element);
 
     public void addModelListener(HierarchyListener listener);
     public void removeModelListener(HierarchyListener listener);

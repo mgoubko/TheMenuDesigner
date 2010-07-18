@@ -21,8 +21,6 @@ import java.util.*;
 
 public class ItemsListLoader
 {
-    private static final String HIERARCHY_LEVEL_SEPARATOR = ">";
-
     public ItemsList loadItemsList(String filename)
     {
         try
@@ -61,7 +59,10 @@ public class ItemsListLoader
             Map<Hierarchy, Map<String, Category>> taxonomies = new LinkedHashMap<Hierarchy, Map<String, Category>>();
             for (int index = 2; titleRow.getCell(index) != null; index++)
             {
-                taxonomies.put(itemsList.newHierarchy(titleRow.getCell(index).getStringCellValue(), true), new HashMap<String, Category>());
+                Hierarchy taxonomy = itemsList.newHierarchy(titleRow.getCell(index).getStringCellValue(), true);
+                HashMap<String, Category> categories = new HashMap<String, Category>();
+                categories.put("", taxonomy.getRoot());
+                taxonomies.put(taxonomy, categories);
             }
             for (Row row : sheet)
             {
@@ -103,7 +104,7 @@ public class ItemsListLoader
         Category category = categories.get(name);
         if (category == null)
         {
-            int separatorIndex = name.lastIndexOf(HIERARCHY_LEVEL_SEPARATOR);
+            int separatorIndex = name.lastIndexOf(Hierarchy.LEVEL_SEPARATOR);
             if (separatorIndex == -1)
             {
                 category = hierarchy.newCategory(hierarchy.getRoot(), name);
