@@ -6,9 +6,7 @@ import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
 import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class TaxonomyClassifier
 {
@@ -22,6 +20,32 @@ public class TaxonomyClassifier
     }
 
     public void classifyByTaxonomy(Hierarchy taxonomy, Category category)
+    {
+        List<Item> group = category.getGroup();
+        List<Element> children = category.getElements();
+        targetHierarchy.remove(children.toArray(new Element[children.size()]));
+        List<TaxonomyElement> taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), group);
+        Map<Category, Category> categories = new HashMap<Category, Category>();
+        for (TaxonomyElement taxonomyElement : taxonomyElements)
+        {
+            Element element = taxonomyElement.element;
+            Category parentCategory = category;
+            if (!taxonomyElement.parents.isEmpty())
+            {
+                parentCategory = categories.get(taxonomyElement.parents.get(0).element);
+            }
+            if (element instanceof Category)
+            {
+                categories.put((Category) element, targetHierarchy.newCategory(parentCategory, element.getName()));
+            }
+            else
+            {
+                targetHierarchy.add(parentCategory, element);
+            }
+        }
+    }
+
+    public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
         List<Item> group = category.getGroup();
         List<Element> children = category.getElements();

@@ -30,6 +30,11 @@ public class TargetTreeController implements MenuModelListener
         getClassifier().classifyByTaxonomy(taxonomy, category);
     }
 
+    public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
+    {
+        getClassifier().optimizeByTaxonomy(taxonomy, category);
+    }
+
     public void sortByPriority(Category category)
     {
         List<Element> elements = new ArrayList<Element>(category.getElements());

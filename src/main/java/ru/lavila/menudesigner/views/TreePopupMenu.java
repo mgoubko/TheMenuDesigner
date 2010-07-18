@@ -19,7 +19,8 @@ public class TreePopupMenu extends JPopupMenu implements TreeSelectionListener
     private final TargetTreeController controller;
     private final TreeView treeView;
     private JMenuItem sort;
-    private JMenu split;
+    private JMenu classify;
+    private JMenu optimize;
 
     public TreePopupMenu(TreePopupMenuPresenter presenter, TargetTreeController controller, TreeView treeView)
     {
@@ -42,19 +43,31 @@ public class TreePopupMenu extends JPopupMenu implements TreeSelectionListener
             }
         });
         add(sort);
-        split = new JMenu("Split by...");
-        add(split);
+        classify = new JMenu("Classify by...");
+        add(classify);
+        optimize = new JMenu("Optimize by...");
+        add(optimize);
         for (final Hierarchy taxonomy : presenter.getTaxonomies())
         {
-            JMenuItem menuItem = new JMenuItem(taxonomy.getName());
-            menuItem.addActionListener(new ActionListener()
+            JMenuItem classifyItem = new JMenuItem(taxonomy.getName());
+            classifyItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
                 {
                     controller.classifyByTaxonomy(taxonomy, getSelectedCategory());
                 }
             });
-            split.add(menuItem);
+            classify.add(classifyItem);
+
+            JMenuItem optimizeItem = new JMenuItem(taxonomy.getName());
+            optimizeItem.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    controller.optimizeByTaxonomy(taxonomy, getSelectedCategory());
+                }
+            });
+            optimize.add(optimizeItem);
         }
     }
 
@@ -72,6 +85,7 @@ public class TreePopupMenu extends JPopupMenu implements TreeSelectionListener
     {
         boolean enabled = getSelectedCategory() != null;
         sort.setEnabled(enabled);
-        split.setEnabled(enabled);
+        classify.setEnabled(enabled);
+        optimize.setEnabled(enabled);
     }
 }
