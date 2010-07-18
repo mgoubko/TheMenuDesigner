@@ -1,6 +1,7 @@
 package ru.lavila.menudesigner.math;
 
 import ru.lavila.menudesigner.models.*;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
 
 import java.util.Collections;
@@ -75,6 +76,11 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
             }
         }
         return result;
+    }
+
+    public MenuModel getMenuModel()
+    {
+        return itemsCalculator.getMenuModel();
     }
 
     public void menuModelChanged()

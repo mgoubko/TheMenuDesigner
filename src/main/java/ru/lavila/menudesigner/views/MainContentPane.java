@@ -12,6 +12,7 @@ import ru.lavila.menudesigner.models.impl.ItemsListImpl;
 import ru.lavila.menudesigner.presenters.TreePopupMenuPresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.LoadToolBar;
+import ru.lavila.menudesigner.views.toolbars.TargetToolBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +20,6 @@ import java.awt.*;
 public class MainContentPane extends JPanel
 {
     private final JSplitPane splitPane;
-    private final LoadToolBar toolBar;
 
     public MainContentPane()
     {
@@ -28,7 +28,6 @@ public class MainContentPane extends JPanel
         splitPane.setResizeWeight(0.5);
         add(splitPane, BorderLayout.CENTER);
         add(new JLabel(" "), BorderLayout.SOUTH);
-        toolBar = new LoadToolBar(this);
 
         //todo: Remove autoload of data
         ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Simple.xls"));
@@ -43,10 +42,12 @@ public class MainContentPane extends JPanel
         ItemsListCalculator calculator = new ItemsListCalculator(itemsList, new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList, calculator);
-        sourceView.addToolBar(toolBar);
+        sourceView.addToolBar(new LoadToolBar(this));
 
-        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy), new HierarchyCalculator(calculator, targetHierarchy));
-        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, calculator), targetView));
+        HierarchyCalculator targetHierarchyCalculator = new HierarchyCalculator(calculator, targetHierarchy);
+        TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy), targetHierarchyCalculator);
+        targetView.addToolBar(new TargetToolBar(new TargetTreeController(targetHierarchy, targetHierarchyCalculator, itemsList)));
+        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, targetHierarchyCalculator, itemsList), targetView));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Target Menu", targetView);

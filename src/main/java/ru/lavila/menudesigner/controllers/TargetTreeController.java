@@ -1,10 +1,12 @@
 package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.math.CategoryClassifier;
-import ru.lavila.menudesigner.math.ItemsListCalculator;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.HierarchyOptimizer;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.models.ItemsList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +16,14 @@ import java.util.List;
 public class TargetTreeController
 {
     private final Hierarchy hierarchy;
-    private final ItemsListCalculator calculator;
+    private final HierarchyCalculator calculator;
+    private final ItemsList itemsList;
 
-    public TargetTreeController(Hierarchy hierarchy, ItemsListCalculator calculator)
+    public TargetTreeController(Hierarchy hierarchy, HierarchyCalculator calculator, ItemsList itemsList)
     {
         this.hierarchy = hierarchy;
         this.calculator = calculator;
+        this.itemsList = itemsList;
     }
 
     public void classifyByTaxonomy(Hierarchy taxonomy, Category category)
@@ -43,5 +47,10 @@ public class TargetTreeController
             }
         });
         hierarchy.add(category, elements.toArray(new Element[elements.size()]));
+    }
+
+    public void optimize()
+    {
+        new HierarchyOptimizer(hierarchy, calculator, itemsList).optimize();
     }
 }

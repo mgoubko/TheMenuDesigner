@@ -103,6 +103,13 @@ public class CategoryClassifier
         applySplitToCategory();
     }
 
+    public void flatten()
+    {
+        List<Item> items = category.getGroup();
+        cleanupCategory();
+        targetHierarchy.add(category, items.toArray(new Element[items.size()]));
+    }
+
     private void cleanupCategory()
     {
         List<Element> children = category.getElements();
