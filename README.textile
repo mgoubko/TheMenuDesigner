@@ -1,0 +1,14 @@
+h1. The Menu Designer
+
+TheMenuDesigner is the deisgn tool to create and optimize hierarchical menus for computer programs, gadgets, ubicomp devices, voice services, and other applications
+
+Hierarchical index was one of the earliest methods to arrange a large number of items for fast access. Contemporary examples of such hierarchies include complex command menus in GUI, Web catalogues like “Google™ directory”, voice menus of phone-based services, menus of ubicomp devices, and many others. Users spend much time selecting from menus, thus the usability of applications is often determined by the usability of its menu system. This factor is particularly important for mobile devices, with their limited interface capabilities. The design of a hierarchical menu consists of building a hierarchy of taxonomies for the set of items and choosing a menu type or layout for every taxonomy (menu panel). The result must fit the best specific application, user, and hardware conditions. The usability of a menu is typically measured by the items’ average search time. There are usually a number of semantically feasible ways to arrange a given set of items into a hierarchy of categories, so the problem is to find a permissible hierarchy with the lowest average search time. TheMenuDesigner application provides a flexible and convenient human-guided routine for menu structure optimization.
+
+h2. Install
+
+Use Jar files from Downloads section with up-to-date Java Machine.
+
+h2. Authors
+
+Alexander Danilenko 
+Mikhail Goubko
