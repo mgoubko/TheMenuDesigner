@@ -30,9 +30,9 @@ public class MainContentPane extends JPanel
         add(new JLabel(" "), BorderLayout.SOUTH);
 
         //todo: Remove autoload of data
-        ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Simple.xls"));
-        if (itemsList == null) itemsList = new ItemsListImpl();
-        setupView(itemsList);
+        //ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Simple.xls"));
+        //if (itemsList == null) itemsList = new ItemsListImpl();
+        setupView(new ItemsListImpl());
     }
 
     public void setupView(ItemsList itemsList)
