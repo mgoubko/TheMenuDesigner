@@ -8,7 +8,7 @@ public class MenuDesigner
 {
     private static void createAndShowGUI()
     {
-        JFrame frame = new JFrame("Menu Designer");
+        JFrame frame = new JFrame("The Menu Designer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(new MainContentPane());
         frame.setSize(1000, 600);
@@ -22,7 +22,7 @@ public class MenuDesigner
 
     public static void main(String[] args)
     {
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Menu Designer");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "The Menu Designer");
         javax.swing.SwingUtilities.invokeLater(new Runnable()
         {
             public void run()
