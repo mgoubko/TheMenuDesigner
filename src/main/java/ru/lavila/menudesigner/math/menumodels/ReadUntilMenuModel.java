@@ -1,4 +1,4 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.menumodels;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;

@@ -5,7 +5,7 @@ import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.io.ItemsListLoader;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.math.ItemsListCalculator;
-import ru.lavila.menudesigner.math.ReadUntilWithErrorMenuModel;
+import ru.lavila.menudesigner.math.menumodels.ReadUntilWithErrorMenuModel;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.impl.ItemsListImpl;
@@ -29,10 +29,9 @@ public class MainContentPane extends JPanel
         add(splitPane, BorderLayout.CENTER);
         add(new JLabel(" "), BorderLayout.SOUTH);
 
-        //todo: Remove autoload of data
-        //ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Simple.xls"));
-        //if (itemsList == null) itemsList = new ItemsListImpl();
-        setupView(new ItemsListImpl());
+        ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Mobile.xls"));
+        if (itemsList == null) itemsList = new ItemsListImpl();
+        setupView(itemsList);
     }
 
     public void setupView(ItemsList itemsList)

@@ -1,18 +1,14 @@
 package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.io.HierarchySaver;
-import ru.lavila.menudesigner.math.CategoryClassifier;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
-import ru.lavila.menudesigner.math.HierarchyOptimizer;
+import ru.lavila.menudesigner.math.classifiers.CostCategoryEvaluator;
+import ru.lavila.menudesigner.math.classifiers.HierarchyOptimizer;
+import ru.lavila.menudesigner.math.classifiers.CategoryClassifier;
+import ru.lavila.menudesigner.math.classifiers.GreedyCategoryOptimizer;
 import ru.lavila.menudesigner.models.Category;
-import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class TargetTreeController
 {
@@ -37,25 +33,17 @@ public class TargetTreeController
 
     public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
-        new CategoryClassifier(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
+        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
     }
 
     public void sortByPriority(Category category)
     {
-        List<Element> elements = new ArrayList<Element>(category.getElements());
-        Collections.sort(elements, new Comparator<Element>()
-        {
-            public int compare(Element element1, Element element2)
-            {
-                return Double.compare(element2.getPopularity(), element1.getPopularity());
-            }
-        });
-        hierarchy.add(category, elements.toArray(new Element[elements.size()]));
+        new CategoryClassifier(hierarchy, category).sortByPopularity();
     }
 
     public void optimize()
     {
-        new HierarchyOptimizer(hierarchy, calculator, itemsList).optimize();
+        new HierarchyOptimizer(hierarchy, calculator.getMenuModel(), new CostCategoryEvaluator(calculator), itemsList).optimize();
     }
 
     public void save(String filename)

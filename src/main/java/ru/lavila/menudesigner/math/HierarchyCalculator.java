@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.math;
 
+import ru.lavila.menudesigner.math.menumodels.MenuModelClient;
 import ru.lavila.menudesigner.models.*;
 import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
@@ -22,7 +23,7 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
 
     public double getHierarchySearchTime()
     {
-        return getSearchTimeWithInherited(hierarchy.getRoot());
+        return getSearchTime(hierarchy.getRoot(), true);
     }
 
     public double getOptimalSearchTime()
@@ -58,10 +59,15 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
 
     private double getSubHierarchyTimeLoss(Category category)
     {
-        return getSearchTimeWithInherited(category) - itemsCalculator.getOptimalSearchTime(category.getGroup());
+        return getSearchTime(category, true) - itemsCalculator.getOptimalSearchTime(category.getGroup());
     }
 
-    private double getSearchTimeWithInherited(Category category)
+    public double getSearchTimeEvaluation(Category category)
+    {
+        return getSearchTime(category, false);
+    }
+
+    private double getSearchTime(Category category, boolean exactInheritedCalculation)
     {
         double result = 0;
         List<Element> elements = category.getElements();
@@ -72,7 +78,9 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
             result += itemsCalculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
             if (element instanceof Category)
             {
-                result += getSearchTimeWithInherited((Category) element);
+                result += exactInheritedCalculation ?
+                        getSearchTime((Category) element, true) :
+                        itemsCalculator.getOptimalSearchTime(((Category) element).getGroup());
             }
         }
         return result;

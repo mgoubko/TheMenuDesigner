@@ -1,4 +1,4 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.menumodels;
 
 public class ReadUntilWithErrorMenuModel extends ReadUntilMenuModel
 {

@@ -1,4 +1,4 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.classifiers;
 
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Item;

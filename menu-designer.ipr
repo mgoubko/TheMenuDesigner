@@ -23,6 +23,9 @@
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
+  <component name="CopyrightManager" default="">
+    <module2copyright />
+  </component>
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -175,17 +178,6 @@
       </item>
     </group>
   </component>
-  <component name="ProjectDetails">
-    <option name="projectName" value="menu-designer" />
-  </component>
-  <component name="ProjectDictionaryState">
-    <dictionary name="doz">
-      <words>
-        <w>configurator</w>
-        <w>popup</w>
-      </words>
-    </dictionary>
-  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/menu-designer.iml" filepath="$PROJECT_DIR$/menu-designer.iml" />
@@ -198,7 +190,7 @@
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="Git" />
+    <mapping directory="" vcs="" />
   </component>
   <component name="libraryTable">
     <library name="Maven: org.apache.poi:poi:3.6">

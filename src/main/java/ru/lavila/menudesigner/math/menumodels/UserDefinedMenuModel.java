@@ -1,4 +1,4 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.menumodels;
 
 import ru.lavila.menudesigner.models.menumodels.MenuModel;
 

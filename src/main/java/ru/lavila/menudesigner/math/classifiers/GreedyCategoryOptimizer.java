@@ -1,4 +1,4 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.classifiers;
 
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
@@ -6,52 +6,14 @@ import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
 import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CategoryClassifier
+public class GreedyCategoryOptimizer extends AbstractClassifier
 {
-    private final Hierarchy targetHierarchy;
-    private final Category category;
-    private List<TaxonomyElement> taxonomyElements;
-    private List<Element> split;
-    private double groupPopularity = 0;
-
-    public CategoryClassifier(Hierarchy targetHierarchy, Category category)
+    public GreedyCategoryOptimizer(Hierarchy targetHierarchy, Category category)
     {
-        this.targetHierarchy = targetHierarchy;
-        this.category = category;
-    }
-
-    public void classify(Hierarchy taxonomy)
-    {
-        this.taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), category.getGroup(), 0);
-        this.split = new ArrayList<Element>();
-
-        cleanupCategory();
-
-        Map<Category, Category> categories = new HashMap<Category, Category>();
-        for (TaxonomyElement taxonomyElement : taxonomyElements)
-        {
-            Element element = taxonomyElement.element;
-            Category parentCategory = category;
-            if (!taxonomyElement.parents.isEmpty())
-            {
-                parentCategory = categories.get(taxonomyElement.parents.get(0).element);
-            }
-            if (element instanceof Category)
-            {
-                Category newCategory = targetHierarchy.newCategory(parentCategory, element.getName());
-                categories.put((Category) element, newCategory);
-                if (parentCategory == category) split.add(newCategory);
-            }
-            else
-            {
-                targetHierarchy.add(parentCategory, element);
-                if (parentCategory == category) split.add(element);
-            }
-        }
-
-        applySplitToCategory();
+        super(targetHierarchy, category);
     }
 
     public void optimize(Hierarchy taxonomy, MenuModel menuModel)
@@ -101,24 +63,6 @@ public class CategoryClassifier
             }
         }
         applySplitToCategory();
-    }
-
-    public void flatten()
-    {
-        List<Item> items = category.getGroup();
-        cleanupCategory();
-        targetHierarchy.add(category, items.toArray(new Element[items.size()]));
-    }
-
-    private void cleanupCategory()
-    {
-        List<Element> children = category.getElements();
-        targetHierarchy.remove(children.toArray(new Element[children.size()]));
-    }
-
-    private void applySplitToCategory()
-    {
-        targetHierarchy.add(category, split.toArray(new Element[split.size()]));
     }
 
     private void addElementToSplit(TaxonomyElement taxonomyElement)
@@ -176,39 +120,5 @@ public class CategoryClassifier
             sum += taxonomyElement.popularity;
         }
         return sum;
-    }
-
-    private List<TaxonomyElement> collectTaxonomyElements(Category taxonomyCategory, List<Item> targetItems, double ignoreLimit)
-    {
-        List<TaxonomyElement> taxonomyElements = new ArrayList<TaxonomyElement>();
-        for (Element element : taxonomyCategory.getElements())
-        {
-            if (element instanceof Item && targetItems.contains(element))
-            {
-                taxonomyElements.add(new TaxonomyElement(element));
-            }
-            else if (element instanceof Category)
-            {
-                Category category = (Category) element;
-                List<TaxonomyElement> childTaxonomyElements = collectTaxonomyElements(category, targetItems, ignoreLimit);
-                if (!childTaxonomyElements.isEmpty())
-                {
-                    TaxonomyElement categoryTaxonomyElement = new TaxonomyElement(category);
-                    taxonomyElements.add(categoryTaxonomyElement);
-                    for (TaxonomyElement taxonomyElement : childTaxonomyElements)
-                    {
-                        categoryTaxonomyElement.addChild(taxonomyElement);
-                        if (taxonomyElement.popularity >= ignoreLimit)
-                        {
-                            categoryTaxonomyElement.terminal = false;
-                        }
-                        taxonomyElement.addParent(categoryTaxonomyElement);
-                        taxonomyElements.add(taxonomyElement);
-                    }
-                }
-            }
-        }
-        Collections.sort(taxonomyElements);
-        return taxonomyElements;
     }
 }

@@ -1,7 +1,7 @@
 package ru.lavila.menudesigner.models.menumodels;
 
-import ru.lavila.menudesigner.math.ReadUntilMenuModel;
-import ru.lavila.menudesigner.math.ReadUntilWithErrorMenuModel;
+import ru.lavila.menudesigner.math.menumodels.ReadUntilMenuModel;
+import ru.lavila.menudesigner.math.menumodels.ReadUntilWithErrorMenuModel;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.math;
 
+import ru.lavila.menudesigner.math.menumodels.MenuModelClient;
 import ru.lavila.menudesigner.models.Item;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.menumodels.MenuModel;

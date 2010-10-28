@@ -1,11 +1,11 @@
-package ru.lavila.menudesigner.math;
+package ru.lavila.menudesigner.math.menumodels;
 
 import ru.lavila.menudesigner.models.menumodels.MenuModelListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class MenuModelClient
+public abstract class MenuModelClient
 {
     private final List<MenuModelListener> listeners = new ArrayList<MenuModelListener>();
 
