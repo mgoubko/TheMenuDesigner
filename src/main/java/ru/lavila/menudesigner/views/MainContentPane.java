@@ -16,6 +16,7 @@ import ru.lavila.menudesigner.views.toolbars.TargetToolBar;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.InputStream;
 
 public class MainContentPane extends JPanel
 {
@@ -29,8 +30,8 @@ public class MainContentPane extends JPanel
         add(splitPane, BorderLayout.CENTER);
         add(new JLabel(" "), BorderLayout.SOUTH);
 
-        ItemsList itemsList = new ItemsListLoader().loadItemsList(getClass().getResourceAsStream("/Mobile.xls"));
-        if (itemsList == null) itemsList = new ItemsListImpl();
+        InputStream stream = getClass().getResourceAsStream("/Sample.xls");
+        ItemsList itemsList = stream == null ? new ItemsListImpl() : new ItemsListLoader().loadItemsList(stream);
         setupView(itemsList);
     }
 
