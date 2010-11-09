@@ -35,7 +35,7 @@ public class HierarchyOptimizer
         Hierarchy bestTaxonomy = null;
         for (Hierarchy taxonomy : taxonomies)
         {
-            new GreedyCategoryOptimizer(targetHierarchy, category).optimize(taxonomy, menuModel);
+            new LocalSearchCategoryOptimizer(targetHierarchy, category, evaluator).optimize(taxonomy);
             double evaluation = evaluator.evaluate(category);
             if (best == -1 || evaluation < best)
             {
@@ -50,7 +50,7 @@ public class HierarchyOptimizer
         }
         else
         {
-            new GreedyCategoryOptimizer(targetHierarchy, category).optimize(bestTaxonomy, menuModel);
+            new LocalSearchCategoryOptimizer(targetHierarchy, category, evaluator).optimize(bestTaxonomy);
             for (Element element : category.getElements())
             {
                 if (element instanceof Category)

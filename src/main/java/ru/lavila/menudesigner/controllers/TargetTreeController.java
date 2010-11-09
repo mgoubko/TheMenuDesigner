@@ -2,10 +2,7 @@ package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.io.HierarchySaver;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
-import ru.lavila.menudesigner.math.classifiers.CostCategoryEvaluator;
-import ru.lavila.menudesigner.math.classifiers.HierarchyOptimizer;
-import ru.lavila.menudesigner.math.classifiers.CategoryClassifier;
-import ru.lavila.menudesigner.math.classifiers.GreedyCategoryOptimizer;
+import ru.lavila.menudesigner.math.classifiers.*;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
@@ -33,7 +30,8 @@ public class TargetTreeController
 
     public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
-        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
+//        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
+        new LocalSearchCategoryOptimizer(hierarchy, category, new CostCategoryEvaluator(calculator)).optimize(taxonomy);
     }
 
     public void sortByPriority(Category category)

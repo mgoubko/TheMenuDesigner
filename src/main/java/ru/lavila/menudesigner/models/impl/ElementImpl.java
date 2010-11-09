@@ -78,4 +78,9 @@ abstract class ElementImpl implements Element
             return type;
         }
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

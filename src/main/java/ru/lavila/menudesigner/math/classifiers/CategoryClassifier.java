@@ -24,13 +24,7 @@ public class CategoryClassifier extends AbstractClassifier
     public void sortByPopularity()
     {
         List<Element> elements = new ArrayList<Element>(category.getElements());
-        Collections.sort(elements, new Comparator<Element>()
-        {
-            public int compare(Element element1, Element element2)
-            {
-                return Double.compare(element2.getPopularity(), element1.getPopularity());
-            }
-        });
+        Collections.sort(elements, new ElementsPopularityComparator());
         targetHierarchy.add(category, elements.toArray(new Element[elements.size()]));
     }
 
