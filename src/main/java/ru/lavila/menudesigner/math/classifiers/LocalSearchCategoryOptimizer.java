@@ -18,31 +18,30 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
 
     public void optimize(Hierarchy taxonomy) {
         group = category.getGroup();
-        List<Element> taxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
-        splitByElements(taxonomyElements);
-        int index = 0;
+        List<Element> nextTaxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
+        splitByElements(nextTaxonomyElements);
         double evaluation = evaluator.evaluate(category);
-        while (index < taxonomyElements.size()) {
-            Element element = taxonomyElements.get(index);
-            if (element instanceof Category) {
-                List<Element> newTaxonomyElements = new ArrayList<Element>(taxonomyElements);
-                newTaxonomyElements.remove(index);
-                newTaxonomyElements.addAll(((Category) element).getElements());
-                newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
-                splitByElements(newTaxonomyElements);
-                double newEvaluation = evaluator.evaluate(category);
-                if (newEvaluation < evaluation) {
-                    taxonomyElements = newTaxonomyElements;
-                    evaluation = newEvaluation;
-                    index = 0;
-                } else {
-                    index++;
+        List<Element> currentTaxonomyElements;
+
+        do {
+            currentTaxonomyElements = nextTaxonomyElements;
+            nextTaxonomyElements = null;
+            for (Element element : currentTaxonomyElements) {
+                if (element instanceof Category) {
+                    List<Element> newTaxonomyElements = new ArrayList<Element>(currentTaxonomyElements);
+                    newTaxonomyElements.remove(element);
+                    newTaxonomyElements.addAll(((Category) element).getElements());
+                    newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
+                    splitByElements(newTaxonomyElements);
+                    double newEvaluation = evaluator.evaluate(category);
+                    if (newEvaluation < evaluation) {
+                        nextTaxonomyElements = newTaxonomyElements;
+                        evaluation = newEvaluation;
+                    }
                 }
-            } else {
-                index++;
             }
-        }
-        splitByElements(taxonomyElements);
+        } while (nextTaxonomyElements != null);
+        splitByElements(currentTaxonomyElements);
     }
 
     private List<Element> normalizeTaxonomyElements(List<Element> elements) {
@@ -65,7 +64,7 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
             public int compare(Element element1, Element element2) {
                 return Double.compare(getPopularity(element2), getPopularity(element1));
             }
-            
+
             private double getPopularity(Element element) {
                 if (element instanceof Item && group.contains(element)) {
                     return element.getPopularity();
@@ -83,7 +82,7 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
         });
         return normalized;
     }
-    
+
     private List<Element> getChildElements(Element element) {
         List<Element> childElements = new ArrayList<Element>();
         if (element instanceof Category) {
