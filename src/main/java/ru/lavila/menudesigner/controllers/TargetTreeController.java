@@ -2,6 +2,7 @@ package ru.lavila.menudesigner.controllers;
 
 import ru.lavila.menudesigner.io.HierarchySaver;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
+import ru.lavila.menudesigner.math.ItemsListCalculator;
 import ru.lavila.menudesigner.math.classifiers.*;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Hierarchy;
@@ -10,16 +11,17 @@ import ru.lavila.menudesigner.models.ItemsList;
 public class TargetTreeController
 {
     private final Hierarchy hierarchy;
-    private final HierarchyCalculator calculator;
     private final ItemsList itemsList;
     private final HierarchySaver hierarchySaver;
+    private final ItemsListCalculator calculator;
+    private final HierarchyCalculator hierarchyCalculator;
 
-
-    public TargetTreeController(Hierarchy hierarchy, HierarchyCalculator calculator, ItemsList itemsList)
+    public TargetTreeController(Hierarchy hierarchy, ItemsList itemsList, ItemsListCalculator calculator, HierarchyCalculator hierarchyCalculator)
     {
         this.hierarchy = hierarchy;
-        this.calculator = calculator;
         this.itemsList = itemsList;
+        this.calculator = calculator;
+        this.hierarchyCalculator = hierarchyCalculator;
         this.hierarchySaver = new HierarchySaver();
     }
 
@@ -31,7 +33,8 @@ public class TargetTreeController
     public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
 //        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
-        new LocalSearchCategoryOptimizer(hierarchy, category, new CostCategoryEvaluator(calculator)).optimize(taxonomy);
+//        new LocalSearchCategoryOptimizer(hierarchy, category, new CostCategoryEvaluator(calculator)).optimize(taxonomy);
+        new LocalSearchCategoryOptimizer(hierarchy, category, new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator)).optimize(taxonomy);
     }
 
     public void sortByPriority(Category category)
@@ -41,7 +44,7 @@ public class TargetTreeController
 
     public void optimize()
     {
-        new HierarchyOptimizer(hierarchy, calculator.getMenuModel(), new CostCategoryEvaluator(calculator), itemsList).optimize();
+        new HierarchyOptimizer(hierarchy, calculator.getMenuModel(), new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator), itemsList).optimize();
     }
 
     public void save(String filename)

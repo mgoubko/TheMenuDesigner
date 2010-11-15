@@ -23,7 +23,7 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
 
     public double getHierarchySearchTime()
     {
-        return getSearchTime(hierarchy.getRoot(), true);
+        return getSearchTime(hierarchy.getRoot());
     }
 
     public double getOptimalSearchTime()
@@ -59,15 +59,10 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
 
     private double getSubHierarchyTimeLoss(Category category)
     {
-        return getSearchTime(category, true) - itemsCalculator.getOptimalSearchTime(category.getGroup());
+        return getSearchTime(category) - itemsCalculator.getOptimalSearchTime(category.getGroup());
     }
 
-    public double getSearchTimeEvaluation(Category category)
-    {
-        return getSearchTime(category, false);
-    }
-
-    private double getSearchTime(Category category, boolean exactInheritedCalculation)
+    public double getSearchTime(Category category)
     {
         double result = 0;
         List<Element> elements = category.getElements();
@@ -76,12 +71,7 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
         {
             Element element = elements.get(index);
             result += itemsCalculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
-            if (element instanceof Category)
-            {
-                result += exactInheritedCalculation ?
-                        getSearchTime((Category) element, true) :
-                        itemsCalculator.getOptimalSearchTime(((Category) element).getGroup());
-            }
+            if (element instanceof Category) result += getSearchTime((Category) element);
         }
         return result;
     }

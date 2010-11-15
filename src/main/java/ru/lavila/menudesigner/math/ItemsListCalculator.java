@@ -40,7 +40,7 @@ public class ItemsListCalculator extends MenuModelClient
         return menuModel.getOptimalProportion();
     }
 
-    double getOptimalSearchTime(List<Item> items)
+    public double getOptimalSearchTime(List<Item> items)
     {
         if (items.isEmpty()) return 0;
         double[] proportion = menuModel.getOptimalProportion();

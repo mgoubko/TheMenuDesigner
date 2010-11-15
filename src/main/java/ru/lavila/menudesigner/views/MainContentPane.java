@@ -46,8 +46,8 @@ public class MainContentPane extends JPanel
 
         HierarchyCalculator targetHierarchyCalculator = new HierarchyCalculator(calculator, targetHierarchy);
         TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy), targetHierarchyCalculator);
-        targetView.addToolBar(new TargetToolBar(this, new TargetTreeController(targetHierarchy, targetHierarchyCalculator, itemsList)));
-        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, targetHierarchyCalculator, itemsList), targetView));
+        targetView.addToolBar(new TargetToolBar(this, new TargetTreeController(targetHierarchy, itemsList, calculator, targetHierarchyCalculator)));
+        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, itemsList, calculator, targetHierarchyCalculator), targetView));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Target Menu", targetView);
