@@ -18,6 +18,39 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
 
     public void optimize(Hierarchy taxonomy) {
         group = category.getGroup();
+        optimizeBottomUp(taxonomy);
+    }
+
+    private void optimizeBottomUp(Hierarchy taxonomy) {
+        List<Element> nextTaxonomyElements = new ArrayList<Element>(group);
+        splitByElements(nextTaxonomyElements);
+        double evaluation = evaluator.evaluate(category);
+        List<Element> currentTaxonomyElements;
+        do {
+            currentTaxonomyElements = nextTaxonomyElements;
+            nextTaxonomyElements = null;
+            Collection<Category> parents = new HashSet<Category>();
+            for (Element element : currentTaxonomyElements) {
+                parents.add(taxonomy.getElementCategory(element));
+            }
+            parents.remove(null);
+            for (Category parent : parents) {
+                List<Element> newTaxonomyElements = new ArrayList<Element>(currentTaxonomyElements);
+                newTaxonomyElements.removeAll(parent.getElements());
+                newTaxonomyElements.add(parent);
+                newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
+                splitByElements(newTaxonomyElements);
+                double newEvaluation = evaluator.evaluate(category);
+                if (newEvaluation < evaluation) {
+                    nextTaxonomyElements = newTaxonomyElements;
+                    evaluation = newEvaluation;
+                }
+            }
+        } while (nextTaxonomyElements != null);
+        splitByElements(currentTaxonomyElements);
+    }
+
+    private void optimizeTopDown(Hierarchy taxonomy) {
         List<Element> nextTaxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
         splitByElements(nextTaxonomyElements);
         double evaluation = evaluator.evaluate(category);
@@ -42,6 +75,34 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
             }
         } while (nextTaxonomyElements != null);
         splitByElements(currentTaxonomyElements);
+    }
+
+    private void optimizeTopDownSinglePath(Hierarchy taxonomy) {
+        List<Element> taxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
+        splitByElements(taxonomyElements);
+        int index = 0;
+        double evaluation = evaluator.evaluate(category);
+        while (index < taxonomyElements.size()) {
+            Element element = taxonomyElements.get(index);
+            if (element instanceof Category) {
+                List<Element> newTaxonomyElements = new ArrayList<Element>(taxonomyElements);
+                newTaxonomyElements.remove(index);
+                newTaxonomyElements.addAll(((Category) element).getElements());
+                newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
+                splitByElements(newTaxonomyElements);
+                double newEvaluation = evaluator.evaluate(category);
+                if (newEvaluation < evaluation) {
+                    taxonomyElements = newTaxonomyElements;
+                    evaluation = newEvaluation;
+                    index = 0;
+                } else {
+                    index++;
+                }
+            } else {
+                index++;
+            }
+        }
+        splitByElements(taxonomyElements);
     }
 
     private List<Element> normalizeTaxonomyElements(List<Element> elements) {
