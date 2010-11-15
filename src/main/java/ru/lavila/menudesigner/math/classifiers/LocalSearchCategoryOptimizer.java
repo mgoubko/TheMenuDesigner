@@ -22,7 +22,7 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
     }
 
     private void optimizeBottomUp(Hierarchy taxonomy) {
-        List<Element> nextTaxonomyElements = new ArrayList<Element>(group);
+        List<Element> nextTaxonomyElements = normalizeTaxonomyElements(new ArrayList<Element>(group));
         splitByElements(nextTaxonomyElements);
         double evaluation = evaluator.evaluate(category);
         List<Element> currentTaxonomyElements;
@@ -35,6 +35,14 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
             }
             parents.remove(null);
             for (Category parent : parents) {
+                boolean valid = true;
+                for (Element child : parent.getElements()) {
+                    if (parents.contains(child)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (!valid) continue;
                 List<Element> newTaxonomyElements = new ArrayList<Element>(currentTaxonomyElements);
                 newTaxonomyElements.removeAll(parent.getElements());
                 newTaxonomyElements.add(parent);
