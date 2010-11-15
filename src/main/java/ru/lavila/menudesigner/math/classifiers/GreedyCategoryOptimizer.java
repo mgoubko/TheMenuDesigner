@@ -9,8 +9,11 @@ import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GreedyCategoryOptimizer extends AbstractClassifier
+public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
 {
+    private List<TaxonomyElement> taxonomyElements;
+    private List<Element> split;
+
     public GreedyCategoryOptimizer(Hierarchy targetHierarchy, Category category)
     {
         super(targetHierarchy, category);
@@ -19,6 +22,7 @@ public class GreedyCategoryOptimizer extends AbstractClassifier
     public void optimize(Hierarchy taxonomy, MenuModel menuModel)
     {
         double[] proportion = menuModel.getOptimalProportion();
+        double groupPopularity = 0;
         this.taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), category.getGroup(), proportion[proportion.length - 1]);
         this.split = new ArrayList<Element>();
 
@@ -62,7 +66,7 @@ public class GreedyCategoryOptimizer extends AbstractClassifier
                 }
             }
         }
-        applySplitToCategory();
+        applySplitToCategory(split);
     }
 
     private void addElementToSplit(TaxonomyElement taxonomyElement)

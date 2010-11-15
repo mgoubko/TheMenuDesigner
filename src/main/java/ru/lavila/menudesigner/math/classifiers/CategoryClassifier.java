@@ -7,7 +7,7 @@ import ru.lavila.menudesigner.models.Item;
 
 import java.util.*;
 
-public class CategoryClassifier extends AbstractClassifier
+public class CategoryClassifier extends AbstractTaxonomyElementsClassifier
 {
     public CategoryClassifier(Hierarchy targetHierarchy, Category category)
     {
@@ -30,8 +30,8 @@ public class CategoryClassifier extends AbstractClassifier
 
     public void classify(Hierarchy taxonomy)
     {
-        this.taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), category.getGroup(), 0);
-        this.split = new ArrayList<Element>();
+        List<TaxonomyElement> taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), category.getGroup(), 0);
+        List<Element> split = new ArrayList<Element>();
 
         cleanupCategory();
 
@@ -57,6 +57,6 @@ public class CategoryClassifier extends AbstractClassifier
             }
         }
 
-        applySplitToCategory();
+        applySplitToCategory(split);
     }
 }

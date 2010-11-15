@@ -170,7 +170,7 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
 
     protected void splitByElements(List<Element> elements) {
         cleanupCategory();
-        split = new ArrayList<Element>();
+        List<Element> split = new ArrayList<Element>();
         for (Element element : elements) {
             if (element instanceof Item) {
                 split.add(element);
@@ -182,6 +182,6 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
                 targetHierarchy.add(newCategory, categoryGroup.toArray(new Item[categoryGroup.size()]));
             }
         }
-        applySplitToCategory();
+        applySplitToCategory(split);
     }
 }
