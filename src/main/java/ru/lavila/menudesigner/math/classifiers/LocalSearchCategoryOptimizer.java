@@ -3,34 +3,33 @@ package ru.lavila.menudesigner.math.classifiers;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
-import ru.lavila.menudesigner.models.Item;
+import ru.lavila.menudesigner.utils.TheLogger;
 
 import java.util.*;
 
-public class LocalSearchCategoryOptimizer extends AbstractClassifier {
-    protected final CategoryEvaluator evaluator;
-    protected List<Item> group;
+public class LocalSearchCategoryOptimizer {
+    private final CategoryManipulator manipulator;
 
-    public LocalSearchCategoryOptimizer(Hierarchy targetHierarchy, Category category, CategoryEvaluator evaluator) {
-        super(targetHierarchy, category);
-        this.evaluator = evaluator;
+    public LocalSearchCategoryOptimizer(CategoryManipulator manipulator) {
+        this.manipulator = manipulator;
     }
 
-    public void optimize(Hierarchy taxonomy) {
-        group = category.getGroup();
-        optimizeBottomUp(taxonomy);
+    public CategoryManipulator.Split optimize(Hierarchy taxonomy) {
+        CategoryManipulator.Split topDownSplit = optimizeTopDown(taxonomy);
+        CategoryManipulator.Split bottomUpSplit = optimizeBottomUp(taxonomy);
+        TheLogger.log("Category '" + manipulator.category.getName() + "', Taxonomy '" + taxonomy.getName() + "':");
+        TheLogger.log("  Top-Down:  " + topDownSplit.evaluation);
+        TheLogger.log("  Bottom-Up: " + bottomUpSplit.evaluation);
+        return bottomUpSplit.evaluation < topDownSplit.evaluation ? bottomUpSplit : topDownSplit;
     }
 
-    private void optimizeBottomUp(Hierarchy taxonomy) {
-        List<Element> nextTaxonomyElements = normalizeTaxonomyElements(new ArrayList<Element>(group));
-        splitByElements(nextTaxonomyElements);
-        double evaluation = evaluator.evaluate(category);
-        List<Element> currentTaxonomyElements;
+    private CategoryManipulator.Split optimizeBottomUp(Hierarchy taxonomy) {
+        CategoryManipulator.Split nextSplit = manipulator.groupSplit();
+        CategoryManipulator.Split currentSplit;
         do {
-            currentTaxonomyElements = nextTaxonomyElements;
-            nextTaxonomyElements = null;
+            currentSplit = nextSplit;
             Collection<Category> parents = new HashSet<Category>();
-            for (Element element : currentTaxonomyElements) {
+            for (Element element : currentSplit.elements) {
                 parents.add(taxonomy.getElementCategory(element));
             }
             parents.remove(null);
@@ -43,65 +42,46 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
                     }
                 }
                 if (!valid) continue;
-                List<Element> newTaxonomyElements = new ArrayList<Element>(currentTaxonomyElements);
-                newTaxonomyElements.removeAll(parent.getElements());
-                newTaxonomyElements.add(parent);
-                newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
-                splitByElements(newTaxonomyElements);
-                double newEvaluation = evaluator.evaluate(category);
-                if (newEvaluation < evaluation) {
-                    nextTaxonomyElements = newTaxonomyElements;
-                    evaluation = newEvaluation;
-                }
+                List<Element> testSplitElements = new ArrayList<Element>(currentSplit.elements);
+                testSplitElements.removeAll(parent.getElements());
+                testSplitElements.add(parent);
+                CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                if (testSplit.evaluation < nextSplit.evaluation) nextSplit = testSplit;
             }
-        } while (nextTaxonomyElements != null);
-        splitByElements(currentTaxonomyElements);
+        } while (nextSplit != currentSplit);
+        return currentSplit;
     }
 
-    private void optimizeTopDown(Hierarchy taxonomy) {
-        List<Element> nextTaxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
-        splitByElements(nextTaxonomyElements);
-        double evaluation = evaluator.evaluate(category);
-        List<Element> currentTaxonomyElements;
-
+    private CategoryManipulator.Split optimizeTopDown(Hierarchy taxonomy) {
+        CategoryManipulator.Split nextSplit = manipulator.split(taxonomy.getRoot().getElements());
+        CategoryManipulator.Split currentSplit;
         do {
-            currentTaxonomyElements = nextTaxonomyElements;
-            nextTaxonomyElements = null;
-            for (Element element : currentTaxonomyElements) {
+            currentSplit = nextSplit;
+            for (Element element : currentSplit.elements) {
                 if (element instanceof Category) {
-                    List<Element> newTaxonomyElements = new ArrayList<Element>(currentTaxonomyElements);
-                    newTaxonomyElements.remove(element);
-                    newTaxonomyElements.addAll(((Category) element).getElements());
-                    newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
-                    splitByElements(newTaxonomyElements);
-                    double newEvaluation = evaluator.evaluate(category);
-                    if (newEvaluation < evaluation) {
-                        nextTaxonomyElements = newTaxonomyElements;
-                        evaluation = newEvaluation;
-                    }
+                    List<Element> testSplitElements = new ArrayList<Element>(currentSplit.elements);
+                    testSplitElements.remove(element);
+                    testSplitElements.addAll(((Category) element).getElements());
+                    CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                    if (testSplit.evaluation < nextSplit.evaluation) nextSplit = testSplit;
                 }
             }
-        } while (nextTaxonomyElements != null);
-        splitByElements(currentTaxonomyElements);
+        } while (nextSplit != currentSplit);
+        return currentSplit;
     }
 
-    private void optimizeTopDownSinglePath(Hierarchy taxonomy) {
-        List<Element> taxonomyElements = normalizeTaxonomyElements(taxonomy.getRoot().getElements());
-        splitByElements(taxonomyElements);
+    private CategoryManipulator.Split optimizeTopDownSinglePath(Hierarchy taxonomy) {
+        CategoryManipulator.Split split = manipulator.split(taxonomy.getRoot().getElements());
         int index = 0;
-        double evaluation = evaluator.evaluate(category);
-        while (index < taxonomyElements.size()) {
-            Element element = taxonomyElements.get(index);
+        while (index < split.elements.size()) {
+            Element element = split.elements.get(index);
             if (element instanceof Category) {
-                List<Element> newTaxonomyElements = new ArrayList<Element>(taxonomyElements);
-                newTaxonomyElements.remove(index);
-                newTaxonomyElements.addAll(((Category) element).getElements());
-                newTaxonomyElements = normalizeTaxonomyElements(newTaxonomyElements);
-                splitByElements(newTaxonomyElements);
-                double newEvaluation = evaluator.evaluate(category);
-                if (newEvaluation < evaluation) {
-                    taxonomyElements = newTaxonomyElements;
-                    evaluation = newEvaluation;
+                List<Element> testSplitElements = new ArrayList<Element>(split.elements);
+                testSplitElements.remove(index);
+                testSplitElements.addAll(((Category) element).getElements());
+                CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                if (testSplit.evaluation < split.evaluation) {
+                    split = testSplit;
                     index = 0;
                 } else {
                     index++;
@@ -110,78 +90,6 @@ public class LocalSearchCategoryOptimizer extends AbstractClassifier {
                 index++;
             }
         }
-        splitByElements(taxonomyElements);
-    }
-
-    private List<Element> normalizeTaxonomyElements(List<Element> elements) {
-        List<Element> normalized = new ArrayList<Element>();
-        for (Element element : elements) {
-            if (element instanceof Item) {
-                if (group.contains(element)) normalized.add(element);
-            } else if (element instanceof Category) {
-                List<Element> childElements = getChildElements(element);
-                if (!childElements.isEmpty()) {
-                    while (childElements.size() == 1) {
-                        element = childElements.get(0);
-                        childElements = getChildElements(element);
-                    }
-                    normalized.add(element);
-                }
-            }
-        }
-        Collections.sort(normalized, new Comparator<Element>() {
-            public int compare(Element element1, Element element2) {
-                return Double.compare(getPopularity(element2), getPopularity(element1));
-            }
-
-            private double getPopularity(Element element) {
-                if (element instanceof Item && group.contains(element)) {
-                    return element.getPopularity();
-                } else if (element instanceof Category) {
-                    List<Item> categoryGroup = ((Category) element).getGroup();
-                    categoryGroup.retainAll(group);
-                    double popularity = 0;
-                    for (Item item : categoryGroup) {
-                        popularity += item.getPopularity();
-                    }
-                    return popularity;
-                }
-                return 0;
-            }
-        });
-        return normalized;
-    }
-
-    private List<Element> getChildElements(Element element) {
-        List<Element> childElements = new ArrayList<Element>();
-        if (element instanceof Category) {
-            for (Element childElement : ((Category) element).getElements()) {
-                if (childElement instanceof Item) {
-                    if (group.contains(childElement)) childElements.add(childElement);
-                } else if (childElement instanceof Category) {
-                    List<Item> childGroup = ((Category) childElement).getGroup();
-                    childGroup.retainAll(group);
-                    if (!childGroup.isEmpty()) childElements.add(childElement);
-                }
-            }
-        }
-        return childElements;
-    }
-
-    protected void splitByElements(List<Element> elements) {
-        cleanupCategory();
-        List<Element> split = new ArrayList<Element>();
-        for (Element element : elements) {
-            if (element instanceof Item) {
-                split.add(element);
-            } else if (element instanceof Category) {
-                Category newCategory = targetHierarchy.newCategory(category, element.getName());
-                split.add(newCategory);
-                List<Item> categoryGroup = ((Category) element).getGroup();
-                categoryGroup.retainAll(group);
-                targetHierarchy.add(newCategory, categoryGroup.toArray(new Item[categoryGroup.size()]));
-            }
-        }
-        applySplitToCategory(split);
+        return split;
     }
 }

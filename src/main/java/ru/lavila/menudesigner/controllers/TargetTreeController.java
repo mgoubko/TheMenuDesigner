@@ -34,7 +34,8 @@ public class TargetTreeController
     {
 //        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
 //        new LocalSearchCategoryOptimizer(hierarchy, category, new CostCategoryEvaluator(calculator)).optimize(taxonomy);
-        new LocalSearchCategoryOptimizer(hierarchy, category, new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator)).optimize(taxonomy);
+        CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator));
+        manipulator.apply(new LocalSearchCategoryOptimizer(manipulator).optimize(taxonomy));
     }
 
     public void sortByPriority(Category category)
@@ -44,7 +45,7 @@ public class TargetTreeController
 
     public void optimize()
     {
-        new HierarchyOptimizer(hierarchy, calculator.getMenuModel(), new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator), itemsList).optimize();
+        new HierarchyOptimizer(hierarchy, new TopDownTreeEvaluator(calculator, hierarchy, hierarchyCalculator), itemsList).optimize();
     }
 
     public void save(String filename)
