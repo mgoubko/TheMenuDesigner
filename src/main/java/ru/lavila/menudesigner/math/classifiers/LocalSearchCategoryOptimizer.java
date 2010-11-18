@@ -3,29 +3,35 @@ package ru.lavila.menudesigner.math.classifiers;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import ru.lavila.menudesigner.utils.TheLogger;
 
 import java.util.*;
 
 public class LocalSearchCategoryOptimizer {
     private final CategoryManipulator manipulator;
+    private final MenuModel menuModel;
 
-    public LocalSearchCategoryOptimizer(CategoryManipulator manipulator) {
+    public LocalSearchCategoryOptimizer(CategoryManipulator manipulator, MenuModel menuModel) {
         this.manipulator = manipulator;
+        this.menuModel = menuModel;
     }
 
-    public CategoryManipulator.Split optimize(Hierarchy taxonomy) {
-        CategoryManipulator.Split topDownSplit = optimizeTopDown(taxonomy);
-        CategoryManipulator.Split bottomUpSplit = optimizeBottomUp(taxonomy);
+    public Split optimize(Hierarchy taxonomy) {
         TheLogger.log("Category '" + manipulator.category.getName() + "', Taxonomy '" + taxonomy.getName() + "':");
+
+        Split topDownSplit = optimizeTopDown(taxonomy);
         TheLogger.log("  Top-Down:  " + topDownSplit.evaluation);
+
+        Split bottomUpSplit = optimizeBottomUp(taxonomy);
         TheLogger.log("  Bottom-Up: " + bottomUpSplit.evaluation);
+
         return bottomUpSplit.evaluation < topDownSplit.evaluation ? bottomUpSplit : topDownSplit;
     }
 
-    private CategoryManipulator.Split optimizeBottomUp(Hierarchy taxonomy) {
-        CategoryManipulator.Split nextSplit = manipulator.groupSplit();
-        CategoryManipulator.Split currentSplit;
+    private Split optimizeBottomUp(Hierarchy taxonomy) {
+        Split nextSplit = manipulator.groupSplit();
+        Split currentSplit;
         do {
             currentSplit = nextSplit;
             Collection<Category> parents = new HashSet<Category>();
@@ -45,16 +51,16 @@ public class LocalSearchCategoryOptimizer {
                 List<Element> testSplitElements = new ArrayList<Element>(currentSplit.elements);
                 testSplitElements.removeAll(parent.getElements());
                 testSplitElements.add(parent);
-                CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                Split testSplit = manipulator.split(testSplitElements);
                 if (testSplit.evaluation < nextSplit.evaluation) nextSplit = testSplit;
             }
         } while (nextSplit != currentSplit);
         return currentSplit;
     }
 
-    private CategoryManipulator.Split optimizeTopDown(Hierarchy taxonomy) {
-        CategoryManipulator.Split nextSplit = manipulator.split(taxonomy.getRoot().getElements());
-        CategoryManipulator.Split currentSplit;
+    private Split optimizeTopDown(Hierarchy taxonomy) {
+        Split nextSplit = manipulator.split(taxonomy.getRoot().getElements());
+        Split currentSplit;
         do {
             currentSplit = nextSplit;
             for (Element element : currentSplit.elements) {
@@ -62,7 +68,7 @@ public class LocalSearchCategoryOptimizer {
                     List<Element> testSplitElements = new ArrayList<Element>(currentSplit.elements);
                     testSplitElements.remove(element);
                     testSplitElements.addAll(((Category) element).getElements());
-                    CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                    Split testSplit = manipulator.split(testSplitElements);
                     if (testSplit.evaluation < nextSplit.evaluation) nextSplit = testSplit;
                 }
             }
@@ -70,8 +76,8 @@ public class LocalSearchCategoryOptimizer {
         return currentSplit;
     }
 
-    private CategoryManipulator.Split optimizeTopDownSinglePath(Hierarchy taxonomy) {
-        CategoryManipulator.Split split = manipulator.split(taxonomy.getRoot().getElements());
+    private Split optimizeTopDownSinglePath(Hierarchy taxonomy) {
+        Split split = manipulator.split(taxonomy.getRoot().getElements());
         int index = 0;
         while (index < split.elements.size()) {
             Element element = split.elements.get(index);
@@ -79,7 +85,7 @@ public class LocalSearchCategoryOptimizer {
                 List<Element> testSplitElements = new ArrayList<Element>(split.elements);
                 testSplitElements.remove(index);
                 testSplitElements.addAll(((Category) element).getElements());
-                CategoryManipulator.Split testSplit = manipulator.split(testSplitElements);
+                Split testSplit = manipulator.split(testSplitElements);
                 if (testSplit.evaluation < split.evaluation) {
                     split = testSplit;
                     index = 0;

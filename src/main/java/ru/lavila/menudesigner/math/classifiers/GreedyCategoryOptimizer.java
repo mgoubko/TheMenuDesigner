@@ -11,15 +11,22 @@ import java.util.List;
 
 public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
 {
+    private final CategoryManipulator manipulator;
+    private final Category category;
+    private final Hierarchy hierarchy;
+    private final MenuModel menuModel;
     private List<TaxonomyElement> taxonomyElements;
     private List<Element> split;
 
-    public GreedyCategoryOptimizer(Hierarchy targetHierarchy, Category category)
+    public GreedyCategoryOptimizer(CategoryManipulator manipulator, MenuModel menuModel)
     {
-        super(targetHierarchy, category);
+        this.manipulator = manipulator;
+        this.category = manipulator.category;
+        this.hierarchy = manipulator.hierarchy;
+        this.menuModel = menuModel;
     }
 
-    public void optimize(Hierarchy taxonomy, MenuModel menuModel)
+    public Split optimize(Hierarchy taxonomy)
     {
         double[] proportion = menuModel.getOptimalProportion();
         double groupPopularity = 0;
@@ -31,7 +38,7 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
             groupPopularity += item.getPopularity();
         }
 
-        cleanupCategory();
+        manipulator.cleanup();
 
         // greedy algorithm to fill category close to optimal proportion
         for (int index = 0; index < proportion.length - 1; index++)
@@ -55,18 +62,19 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
             }
             else
             {
-                Category newCategory = targetHierarchy.newCategory(category, "...");
+                Category newCategory = hierarchy.newCategory(category, "...");
                 split.add(newCategory);
                 for (TaxonomyElement taxonomyElement : taxonomyElements)
                 {
                     if (taxonomyElement.element instanceof Item)
                     {
-                        targetHierarchy.add(newCategory, taxonomyElement.element);
+                        hierarchy.add(newCategory, taxonomyElement.element);
                     }
                 }
             }
         }
-        applySplitToCategory(split);
+
+        return new Split(split);
     }
 
     private void addElementToSplit(TaxonomyElement taxonomyElement)
@@ -76,7 +84,7 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
         taxonomyElements.removeAll(taxonomyElement.children);
         if (taxonomyElement.element instanceof Category)
         {
-            Category newCategory = targetHierarchy.newCategory(category, taxonomyElement.element.getName());
+            Category newCategory = hierarchy.newCategory(category, taxonomyElement.element.getName());
             split.add(newCategory);
             List<Item> items = new ArrayList<Item>();
             for (TaxonomyElement child : taxonomyElement.children)
@@ -86,11 +94,11 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
                     items.add((Item) child.element);
                 }
             }
-            targetHierarchy.add(newCategory, items.toArray(new Item[items.size()]));
+            hierarchy.add(newCategory, items.toArray(new Item[items.size()]));
         }
         else
         {
-            targetHierarchy.add(category, taxonomyElement.element);
+            hierarchy.add(category, taxonomyElement.element);
             split.add(taxonomyElement.element);
         }
     }

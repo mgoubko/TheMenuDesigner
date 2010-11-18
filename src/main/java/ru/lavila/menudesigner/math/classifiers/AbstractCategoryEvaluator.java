@@ -1,16 +1,16 @@
 package ru.lavila.menudesigner.math.classifiers;
 
-import ru.lavila.menudesigner.math.ItemsListCalculator;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 
 import java.util.List;
 
 public abstract class AbstractCategoryEvaluator implements CategoryEvaluator {
-    protected final ItemsListCalculator itemsCalculator;
+    protected final HierarchyCalculator calculator;
 
-    public AbstractCategoryEvaluator(ItemsListCalculator itemsCalculator) {
-        this.itemsCalculator = itemsCalculator;
+    public AbstractCategoryEvaluator(HierarchyCalculator calculator) {
+        this.calculator = calculator;
     }
 
     public double evaluate(Category category, CategoryEvaluator childEvaluator) {
@@ -20,7 +20,7 @@ public abstract class AbstractCategoryEvaluator implements CategoryEvaluator {
         for (int index = 0; index < totalElements; index++)
         {
             Element element = elements.get(index);
-            result += itemsCalculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
+            result += calculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
             if (element instanceof Category) result += childEvaluator.evaluate((Category) element);
         }
         return result;

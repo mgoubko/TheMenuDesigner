@@ -9,15 +9,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TopDownOptimizer extends AbstractClassifier {
-    public TopDownOptimizer(Hierarchy targetHierarchy, Category category) {
-        super(targetHierarchy, category);
+public class TopDownOptimizer {
+    private final CategoryManipulator manipulator;
+    private final Hierarchy hierarchy;
+    private final Category category;
+
+    public TopDownOptimizer(CategoryManipulator manipulator) {
+        this.manipulator = manipulator;
+        this.hierarchy = manipulator.hierarchy;
+        this.category = manipulator.category;
     }
 
     public void optimize(MenuModel menuModel) {
         List<Item> group = category.getGroup();
         Collections.sort(group, new ElementsPopularityComparator());
-        cleanupCategory();
+        manipulator.cleanup();
         double[] proportion = menuModel.getOptimalProportion();
         double groupPopularity = 0;
         for (Item item : group) groupPopularity += item.getPopularity();
@@ -39,11 +45,11 @@ public class TopDownOptimizer extends AbstractClassifier {
             group.removeAll(items);
             if (!items.isEmpty()) {
                 if (items.size() == 1) {
-                    targetHierarchy.add(category, items.get(0));
+                    hierarchy.add(category, items.get(0));
                 } else {
-                    Category newCategory = targetHierarchy.newCategory(category, "Category " + proportionIndex);
-                    targetHierarchy.add(newCategory, items.toArray(new Item[items.size()]));
-                    new TopDownOptimizer(targetHierarchy, newCategory).optimize(menuModel);
+                    Category newCategory = hierarchy.newCategory(category, "Category " + proportionIndex);
+                    hierarchy.add(newCategory, items.toArray(new Item[items.size()]));
+                    new TopDownOptimizer(new CategoryManipulator(hierarchy, newCategory)).optimize(menuModel);
                 }
             }
         }

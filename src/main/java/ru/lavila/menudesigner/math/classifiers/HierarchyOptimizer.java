@@ -1,31 +1,33 @@
 package ru.lavila.menudesigner.math.classifiers;
 
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.*;
 
 import java.util.List;
 
 public class HierarchyOptimizer {
-    private final Hierarchy targetHierarchy;
     private final List<Hierarchy> taxonomies;
-    private final CategoryEvaluator evaluator;
+    private final Hierarchy hierarchy;
+    private final HierarchyCalculator calculator;
 
-    public HierarchyOptimizer(Hierarchy targetHierarchy, CategoryEvaluator evaluator, ItemsList itemsList) {
-        this.targetHierarchy = targetHierarchy;
-        this.evaluator = evaluator;
+    public HierarchyOptimizer(ItemsList itemsList, Hierarchy hierarchy, HierarchyCalculator calculator) {
+        this.hierarchy = hierarchy;
         this.taxonomies = itemsList.getTaxonomies();
+        this.calculator = calculator;
     }
 
     public void optimize() {
-        Category category = targetHierarchy.getRoot();
+        Category category = hierarchy.getRoot();
         optimizeCategory(category);
     }
 
     private void optimizeCategory(Category category) {
-        CategoryManipulator manipulator = new CategoryManipulator(targetHierarchy, category, evaluator);
-        LocalSearchCategoryOptimizer optimizer = new LocalSearchCategoryOptimizer(manipulator);
-        CategoryManipulator.Split bestSplit = manipulator.groupSplit();
+        TopDownTreeEvaluator evaluator = new TopDownTreeEvaluator(hierarchy, calculator);
+        CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, evaluator);
+        LocalSearchCategoryOptimizer optimizer = new LocalSearchCategoryOptimizer(manipulator, calculator.getMenuModel());
+        Split bestSplit = manipulator.groupSplit();
         for (Hierarchy taxonomy : taxonomies) {
-            CategoryManipulator.Split testSplit = optimizer.optimize(taxonomy);
+            Split testSplit = optimizer.optimize(taxonomy);
             if (testSplit.evaluation < bestSplit.evaluation) bestSplit = testSplit;
         }
         manipulator.apply(bestSplit);

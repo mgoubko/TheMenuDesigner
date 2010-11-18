@@ -2,18 +2,13 @@ package ru.lavila.menudesigner.math.classifiers;
 
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
-import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AbstractTaxonomyElementsClassifier extends AbstractClassifier {
-    public AbstractTaxonomyElementsClassifier(Hierarchy targetHierarchy, Category category) {
-        super(targetHierarchy, category);
-    }
-
+public class AbstractTaxonomyElementsClassifier {
     protected List<TaxonomyElement> collectTaxonomyElements(Category taxonomyCategory, List<Item> targetItems, double ignoreLimit) {
         List<TaxonomyElement> taxonomyElements = new ArrayList<TaxonomyElement>();
         for (Element element : taxonomyCategory.getElements()) {

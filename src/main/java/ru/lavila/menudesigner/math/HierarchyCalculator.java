@@ -31,6 +31,11 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
         return itemsCalculator.getOptimalSearchTime();
     }
 
+    public double getOptimalSearchTime(List<Item> group)
+    {
+        return itemsCalculator.getOptimalSearchTime(group);
+    }
+
     public double getCategoryTimeLoss(Category category)
     {
         double result = getSubHierarchyTimeLoss(category);

@@ -1,7 +1,6 @@
 package ru.lavila.menudesigner.math.classifiers;
 
 import ru.lavila.menudesigner.math.HierarchyCalculator;
-import ru.lavila.menudesigner.math.ItemsListCalculator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Hierarchy;
 
@@ -9,8 +8,8 @@ public class TopDownTreeEvaluator extends AbstractCategoryEvaluator {
     private final Hierarchy targetHierarchy;
     private final HierarchyCalculator hierarchyCalculator;
 
-    public TopDownTreeEvaluator(ItemsListCalculator itemsCalculator, Hierarchy targetHierarchy, HierarchyCalculator hierarchyCalculator) {
-        super(itemsCalculator);
+    public TopDownTreeEvaluator(Hierarchy targetHierarchy, HierarchyCalculator hierarchyCalculator) {
+        super(hierarchyCalculator);
         this.targetHierarchy = targetHierarchy;
         this.hierarchyCalculator = hierarchyCalculator;
     }
@@ -21,7 +20,7 @@ public class TopDownTreeEvaluator extends AbstractCategoryEvaluator {
 
     private class ChildEvaluator implements CategoryEvaluator {
         public double evaluate(Category category) {
-            new TopDownOptimizer(targetHierarchy, category).optimize(itemsCalculator.getMenuModel());
+            new TopDownOptimizer(new CategoryManipulator(targetHierarchy, category)).optimize(calculator.getMenuModel());
             return hierarchyCalculator.getSearchTime(category);
         }
     }

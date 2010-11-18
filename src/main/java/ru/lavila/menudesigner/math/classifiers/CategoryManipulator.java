@@ -16,6 +16,10 @@ public class CategoryManipulator {
     public final List<Item> group;
     public final CategoryEvaluator evaluator;
 
+    public CategoryManipulator(Hierarchy hierarchy, Category category) {
+        this(hierarchy, category, null);
+    }
+
     public CategoryManipulator(Hierarchy hierarchy, Category category, CategoryEvaluator evaluator) {
         this.hierarchy = hierarchy;
         this.category = category;
@@ -28,10 +32,21 @@ public class CategoryManipulator {
         hierarchy.remove(children.toArray(new Element[children.size()]));
     }
 
+    public void sortByPopularity()
+    {
+        List<Element> elements = new ArrayList<Element>(category.getElements());
+        Collections.sort(elements, new ElementsPopularityComparator());
+        hierarchy.add(category, elements.toArray(new Element[elements.size()]));
+    }
+
     public void apply(Split split) {
+        apply(split.elements);
+    }
+
+    public void apply(List<Element> splitElements) {
         cleanup();
         List<Element> elements = new ArrayList<Element>();
-        for (Element element : split.elements) {
+        for (Element element : splitElements) {
             if (element instanceof Item) {
                 elements.add(element);
             } else if (element instanceof Category) {
@@ -101,25 +116,16 @@ public class CategoryManipulator {
     }
 
     public Split split(List<Element> elements) {
-        return new Split(elements);
+        double evaluation = -1;
+        List<Element> normalized = normalizeSplitElements(elements);
+        if (evaluator != null) {
+            apply(normalized);
+            evaluation = evaluator.evaluate(category);
+        }
+        return new Split(normalized, evaluation);
     }
 
     public Split groupSplit() {
-        return new Split(new ArrayList<Element>(group));
-    }
-
-    class Split {
-        public final List<Element> elements;
-        public final double evaluation;
-
-        public Split(List<Element> elements) {
-            this.elements = normalizeSplitElements(elements);
-            this.evaluation = evaluate();
-        }
-
-        private double evaluate() {
-            apply(this);
-            return evaluator.evaluate(category);
-        }
+        return split(new ArrayList<Element>(group));
     }
 }

@@ -1,11 +1,11 @@
 package ru.lavila.menudesigner.math.classifiers;
 
-import ru.lavila.menudesigner.math.ItemsListCalculator;
+import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Category;
 
 public class CostCategoryEvaluator extends AbstractCategoryEvaluator {
-    public CostCategoryEvaluator(ItemsListCalculator itemsCalculator) {
-        super(itemsCalculator);
+    public CostCategoryEvaluator(HierarchyCalculator calculator) {
+        super(calculator);
     }
 
     public double evaluate(Category category) {
@@ -14,7 +14,7 @@ public class CostCategoryEvaluator extends AbstractCategoryEvaluator {
 
     private class ChildEvaluator implements CategoryEvaluator {
         public double evaluate(Category category) {
-            return itemsCalculator.getOptimalSearchTime(category.getGroup());
+            return calculator.getOptimalSearchTime(category.getGroup());
         }
     }
 }
