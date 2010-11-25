@@ -48,7 +48,7 @@ public class TargetToolBar extends JToolBar
         {
             public void actionPerformed(ActionEvent e)
             {
-                controller.optimize();
+                controller.optimizeSubTree();
             }
         });
         add(optimize);

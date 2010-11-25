@@ -18,7 +18,6 @@ public class CategoryClassifier extends AbstractTaxonomyElementsClassifier
     public void classify(Hierarchy taxonomy)
     {
         List<TaxonomyElement> taxonomyElements = collectTaxonomyElements(taxonomy.getRoot(), manipulator.category.getGroup(), 0);
-        List<Element> split = new ArrayList<Element>();
 
         manipulator.cleanup();
 
@@ -35,15 +34,11 @@ public class CategoryClassifier extends AbstractTaxonomyElementsClassifier
             {
                 Category newCategory = manipulator.hierarchy.newCategory(parentCategory, element.getName());
                 categories.put((Category) element, newCategory);
-                if (parentCategory == manipulator.category) split.add(newCategory);
             }
             else
             {
                 manipulator.hierarchy.add(parentCategory, element);
-                if (parentCategory == manipulator.category) split.add(element);
             }
         }
-
-        manipulator.apply(split);
     }
 }
