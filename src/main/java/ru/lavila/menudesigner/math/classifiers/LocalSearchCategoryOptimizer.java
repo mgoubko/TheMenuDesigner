@@ -23,30 +23,34 @@ public class LocalSearchCategoryOptimizer {
         manipulator.cleanup();
         manipulator.hierarchy.freeze();
 
-        Split topDownSplit = optimizeTopDown(taxonomy);
-        Split best = topDownSplit;
+        Split topDownGreedySplit = optimizeTopDownGreedy(taxonomy);
+        Split best = topDownGreedySplit;
+
+//        Split topDownSplit = optimizeTopDown(taxonomy);
+//        if (topDownSplit.evaluation < best.evaluation) best = topDownSplit;
 
         Split bottomUpSplit = optimizeBottomUp(taxonomy);
         if (bottomUpSplit.evaluation < best.evaluation) best = bottomUpSplit;
 
-        Split fromTopSplit = optimizeFrom(taxonomy, topSplit(taxonomy));
-        if (fromTopSplit.evaluation < best.evaluation) best = fromTopSplit;
+//        Split fromTopSplit = optimizeFrom(taxonomy, topSplit(taxonomy));
+//        if (fromTopSplit.evaluation < best.evaluation) best = fromTopSplit;
 
-        Split fromBottomSplit = optimizeFrom(taxonomy, manipulator.groupSplit());
-        if (fromBottomSplit.evaluation < best.evaluation) best = fromBottomSplit;
+//        Split fromBottomSplit = optimizeFrom(taxonomy, manipulator.groupSplit());
+//        if (fromBottomSplit.evaluation < best.evaluation) best = fromBottomSplit;
 
-        Split greedyStart = new GreedyCategoryOptimizer(manipulator, menuModel).optimize(taxonomy);
-        Split fromGreedy = optimizeFrom(taxonomy, greedyStart);
-        if (fromGreedy.evaluation < best.evaluation) best = fromGreedy;
+//        Split greedyStart = new GreedyCategoryOptimizer(manipulator, menuModel).optimize(taxonomy);
+//        Split fromGreedy = optimizeFrom(taxonomy, greedyStart);
+//        if (fromGreedy.evaluation < best.evaluation) best = fromGreedy;
 
         manipulator.cleanup();
         manipulator.hierarchy.unfreeze();
         
-        TheLogger.log("  Top-Down:    " + topDownSplit.evaluation);
+//        TheLogger.log("  Top-Down:    " + topDownSplit.evaluation);
+        TheLogger.log("  Top-Down Gr: " + topDownGreedySplit.evaluation);
         TheLogger.log("  Bottom-Up:   " + bottomUpSplit.evaluation);
-        TheLogger.log("  From Top:    " + fromTopSplit.evaluation);
-        TheLogger.log("  From Bottom: " + fromBottomSplit.evaluation);
-        TheLogger.log("  From Greedy: " + fromGreedy.evaluation);
+//        TheLogger.log("  From Top:    " + fromTopSplit.evaluation);
+//        TheLogger.log("  From Bottom: " + fromBottomSplit.evaluation);
+//        TheLogger.log("  From Greedy: " + fromGreedy.evaluation);
 
         return best;
     }
@@ -138,8 +142,10 @@ public class LocalSearchCategoryOptimizer {
         return result;
     }
 
-    private Split optimizeTopDownSinglePath(Hierarchy taxonomy) {
-        Split split = manipulator.split(taxonomy.getRoot().getElements());
+    private Split optimizeTopDownGreedy(Hierarchy taxonomy) {
+        TheLogger.log("  Top-Down Greedy...");
+        Split split = topSplit(taxonomy);
+        TheLogger.log("    " + split.toString());
         int index = 0;
         while (index < split.elements.size()) {
             Element element = split.elements.get(index);
@@ -151,6 +157,7 @@ public class LocalSearchCategoryOptimizer {
                 if (testSplit.evaluation < split.evaluation) {
                     split = testSplit;
                     index = 0;
+                    TheLogger.log("    " + split.toString());
                 } else {
                     index++;
                 }
