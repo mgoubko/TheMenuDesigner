@@ -11,8 +11,18 @@ class Split {
     Split(List<Element> elements) {
         this(elements, -1);
     }
+
     Split(List<Element> elements, double evaluation) {
         this.elements = elements;
         this.evaluation = evaluation;
+    }
+
+    @Override
+    public String toString() {
+        String result = elements.size() + " / " + evaluation;
+//        for (Element element : elements) {
+//            result += " # " + element.getName();
+//        }
+        return result;
     }
 }

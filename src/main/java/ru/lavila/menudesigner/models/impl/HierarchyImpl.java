@@ -11,6 +11,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
     private final List<HierarchyListener> listeners;
     private final CategorizedElements hierarchyElements;
     private final boolean taxomony;
+    public int freeze = 0;
 
     public HierarchyImpl(String name, boolean taxomony)
     {
@@ -186,6 +187,14 @@ class HierarchyImpl implements Hierarchy, ElementListener
         return result.length() == 0 ? result : result.substring(3);
     }
 
+    public void freeze() {
+        freeze++;
+    }
+
+    public void unfreeze() {
+        if (freeze > 0) freeze--;
+    }
+
     public void addModelListener(HierarchyListener listener)
     {
         listeners.add(listener);
@@ -214,6 +223,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     private void fireModelChangeEvent(ElementChangeEvent event)
     {
+        if (freeze > 0) return;
         for (HierarchyListener listener : listeners)
         {
             listener.elementChanged(event);
@@ -222,6 +232,7 @@ class HierarchyImpl implements Hierarchy, ElementListener
 
     private void fireStructureChangeEvent(StructureChangeEvent event)
     {
+        if (freeze > 0) return;
         for (HierarchyListener listener : listeners)
         {
             listener.structureChanged(event);

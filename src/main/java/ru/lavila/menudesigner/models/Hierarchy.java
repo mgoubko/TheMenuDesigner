@@ -22,4 +22,6 @@ public interface Hierarchy
 
     public void addModelListener(HierarchyListener listener);
     public void removeModelListener(HierarchyListener listener);
+    public void freeze();
+    public void unfreeze();
 }

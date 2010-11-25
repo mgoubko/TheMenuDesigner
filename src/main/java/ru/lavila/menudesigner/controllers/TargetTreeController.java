@@ -29,9 +29,9 @@ public class TargetTreeController
 
     public void optimizeByTaxonomy(Hierarchy taxonomy, Category category)
     {
-//        new GreedyCategoryOptimizer(hierarchy, category).optimize(taxonomy, calculator.getMenuModel());
-//        new LocalSearchCategoryOptimizer(hierarchy, category, new CostCategoryEvaluator(calculator)).optimize(taxonomy);
-        CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, new TopDownTreeEvaluator(hierarchy, hierarchyCalculator));
+        CategoryEvaluator evaluator = new TopDownTreeEvaluator(hierarchy, hierarchyCalculator);
+//        CategoryEvaluator evaluator = new CostCategoryEvaluator(hierarchyCalculator);
+        CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, evaluator);
         manipulator.apply(new LocalSearchCategoryOptimizer(manipulator, hierarchyCalculator.getMenuModel()).optimize(taxonomy));
     }
 

@@ -48,33 +48,33 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
         }
 
         // increase branching factor to make '...' category the smallest one
-        while (!taxonomyElements.isEmpty() && taxonomyElementsPopularity() > split.get(split.size() - 1).getPopularity())
+        while (!taxonomyElements.isEmpty() /*&& taxonomyElementsPopularity() > split.get(split.size() - 1).getPopularity()*/)
         {
             addElementToSplit(taxonomyElements.get(0));
         }
 
-        if (!taxonomyElements.isEmpty())
-        {
-            // if taxonomyElements contains single element or single category
-            if (taxonomyElements.get(0).children.size() + 1 == taxonomyElements.size())
-            {
-                addElementToSplit(taxonomyElements.get(0));
-            }
-            else
-            {
-                Category newCategory = hierarchy.newCategory(category, "...");
-                split.add(newCategory);
-                for (TaxonomyElement taxonomyElement : taxonomyElements)
-                {
-                    if (taxonomyElement.element instanceof Item)
-                    {
-                        hierarchy.add(newCategory, taxonomyElement.element);
-                    }
-                }
-            }
-        }
+//        if (!taxonomyElements.isEmpty())
+//        {
+//            // if taxonomyElements contains single element or single category
+//            if (taxonomyElements.get(0).children.size() + 1 == taxonomyElements.size())
+//            {
+//                addElementToSplit(taxonomyElements.get(0));
+//            }
+//            else
+//            {
+//                Category newCategory = hierarchy.newCategory(category, "...");
+//                split.add(newCategory);
+//                for (TaxonomyElement taxonomyElement : taxonomyElements)
+//                {
+//                    if (taxonomyElement.element instanceof Item)
+//                    {
+//                        hierarchy.add(newCategory, taxonomyElement.element);
+//                    }
+//                }
+//            }
+//        }
 
-        return new Split(split);
+        return manipulator.split(split);
     }
 
     private void addElementToSplit(TaxonomyElement taxonomyElement)
@@ -82,25 +82,27 @@ public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
         taxonomyElements.remove(taxonomyElement);
         taxonomyElements.removeAll(taxonomyElement.parents);
         taxonomyElements.removeAll(taxonomyElement.children);
-        if (taxonomyElement.element instanceof Category)
-        {
-            Category newCategory = hierarchy.newCategory(category, taxonomyElement.element.getName());
-            split.add(newCategory);
-            List<Item> items = new ArrayList<Item>();
-            for (TaxonomyElement child : taxonomyElement.children)
-            {
-                if (child.element instanceof Item)
-                {
-                    items.add((Item) child.element);
-                }
-            }
-            hierarchy.add(newCategory, items.toArray(new Item[items.size()]));
-        }
-        else
-        {
-            hierarchy.add(category, taxonomyElement.element);
-            split.add(taxonomyElement.element);
-        }
+        split.add(taxonomyElement.element);
+
+//        if (taxonomyElement.element instanceof Category)
+//        {
+//            Category newCategory = hierarchy.newCategory(category, taxonomyElement.element.getName());
+//            split.add(newCategory);
+//            List<Item> items = new ArrayList<Item>();
+//            for (TaxonomyElement child : taxonomyElement.children)
+//            {
+//                if (child.element instanceof Item)
+//                {
+//                    items.add((Item) child.element);
+//                }
+//            }
+//            hierarchy.add(newCategory, items.toArray(new Item[items.size()]));
+//        }
+//        else
+//        {
+//            hierarchy.add(category, taxonomyElement.element);
+//            split.add(taxonomyElement.element);
+//        }
     }
 
     private TaxonomyElement findClosestTaxonomyElement(double value)

@@ -22,14 +22,19 @@ public class HierarchyOptimizer {
     }
 
     private void optimizeCategory(Category category) {
-        TopDownTreeEvaluator evaluator = new TopDownTreeEvaluator(hierarchy, calculator);
+        CategoryEvaluator evaluator = new TopDownTreeEvaluator(hierarchy, calculator);
+//        CategoryEvaluator evaluator = new CostCategoryEvaluator(calculator);
         CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, evaluator);
         LocalSearchCategoryOptimizer optimizer = new LocalSearchCategoryOptimizer(manipulator, calculator.getMenuModel());
+        manipulator.cleanup();
+        hierarchy.freeze();
         Split bestSplit = manipulator.groupSplit();
         for (Hierarchy taxonomy : taxonomies) {
             Split testSplit = optimizer.optimize(taxonomy);
             if (testSplit.evaluation < bestSplit.evaluation) bestSplit = testSplit;
         }
+        manipulator.cleanup();
+        hierarchy.unfreeze();
         manipulator.apply(bestSplit);
         for (Element element : category.getElements()) {
             if (element instanceof Category) {
