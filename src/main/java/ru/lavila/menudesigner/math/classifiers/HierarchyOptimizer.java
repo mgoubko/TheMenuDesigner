@@ -2,6 +2,7 @@ package ru.lavila.menudesigner.math.classifiers;
 
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.*;
+import ru.lavila.menudesigner.utils.TheLogger;
 
 import java.util.List;
 
@@ -15,10 +16,11 @@ public class HierarchyOptimizer {
         this.hierarchy = hierarchy;
         this.taxonomies = itemsList.getTaxonomies();
         this.calculator = calculator;
-        this.evaluator = new TopDownTreeEvaluator(hierarchy, calculator);
+        this.evaluator = new TopDownTreeEvaluator(calculator);
     }
 
     public void optimizeSubTree(Category category) {
+        long start = System.currentTimeMillis();
         CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, evaluator);
         LocalSearchCategoryOptimizer optimizer = new LocalSearchCategoryOptimizer(manipulator, calculator.getMenuModel());
         manipulator.cleanup();
@@ -36,10 +38,13 @@ public class HierarchyOptimizer {
                 optimizeSubTree((Category) element);
             }
         }
+        TheLogger.log("Time spent (optimize sub tree): " + (System.currentTimeMillis() - start) + " ms");
     }
 
     public void optimizeByTaxonomy(Category category, Hierarchy taxonomy) {
+        long start = System.currentTimeMillis();
         CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, evaluator);
         manipulator.apply(new LocalSearchCategoryOptimizer(manipulator, calculator.getMenuModel()).optimize(taxonomy));
+        TheLogger.log("Time spent (optimize by taxonomy): " + (System.currentTimeMillis() - start) + " ms");
     }
 }
