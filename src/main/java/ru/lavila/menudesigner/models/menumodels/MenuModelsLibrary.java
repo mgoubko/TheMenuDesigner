@@ -2,6 +2,7 @@ package ru.lavila.menudesigner.models.menumodels;
 
 import ru.lavila.menudesigner.math.menumodels.ReadUntilMenuModel;
 import ru.lavila.menudesigner.math.menumodels.ReadUntilWithErrorMenuModel;
+import ru.lavila.menudesigner.math.menumodels.SemanticAwareMenuModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,7 @@ public class MenuModelsLibrary
         //todo: remove hardcoded examples
         addMenuModel(new ReadUntilMenuModel(0.5, 0.1, 0.5, 0.5));
         addMenuModel(new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
+        addMenuModel(new SemanticAwareMenuModel(0.5, 0.1, 0.5));
     }
 
     public List<MenuModel> getMenuModels()

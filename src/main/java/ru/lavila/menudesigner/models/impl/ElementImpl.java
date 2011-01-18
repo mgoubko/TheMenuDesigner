@@ -29,6 +29,12 @@ abstract class ElementImpl implements Element
         fireNameChanged();
     }
 
+    public double getReadingTime() {
+        //TODO: evaluate reading speed from experiments
+        //TODO: read these values from source data
+        return getName().length() * 0.1;
+    }
+
     public void addModelListener(ElementListener listener)
     {
         listeners.add(listener);

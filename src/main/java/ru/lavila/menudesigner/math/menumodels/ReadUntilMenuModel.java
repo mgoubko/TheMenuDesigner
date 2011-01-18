@@ -4,16 +4,16 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolver;
 import org.apache.commons.math.analysis.solvers.UnivariateRealSolverFactory;
-import ru.lavila.menudesigner.models.menumodels.MenuModel;
+import ru.lavila.menudesigner.utils.TheLogger;
 
-public class ReadUntilMenuModel implements MenuModel
+public class ReadUntilMenuModel extends AnonymousMenuModel
 {
     private final int MAX_SIZE = 100;
 
-    protected final double tResp;
-    protected final double tLoad;
-    protected final double tRead;
-    protected final double tClick;
+    protected double tResp;
+    protected double tLoad;
+    protected double tRead;
+    protected double tClick;
     protected double[] optimalProportion = null;
 
     public ReadUntilMenuModel(double tResp, double tLoad, double tRead, double tClick)

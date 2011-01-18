@@ -7,6 +7,7 @@ public interface Element
     public String getName();
     public void setName(String name);
     public double getPopularity();
+    public double getReadingTime();
     public void addModelListener(ElementListener listener);
     public void removeModelListener(ElementListener listener);
 }

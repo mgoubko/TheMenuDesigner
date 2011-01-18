@@ -74,6 +74,7 @@ public class MenuModelsPanel extends JPanel implements MenuModelListener, MenuMo
         add(timeLabel);
         add(branchingLabel);
         add(proportionLabel);
+        menuModelChanged();
     }
 
     public void menuModelChanged()

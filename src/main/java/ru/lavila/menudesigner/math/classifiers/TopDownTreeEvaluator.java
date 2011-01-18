@@ -1,5 +1,6 @@
 package ru.lavila.menudesigner.math.classifiers;
 
+import ru.lavila.menudesigner.math.ElementsPopularityComparator;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Item;

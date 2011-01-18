@@ -16,7 +16,7 @@ public class ItemsListCalculator extends MenuModelClient
     public ItemsListCalculator(ItemsList itemsList, MenuModel menuModel)
     {
         this.itemsList = itemsList;
-        this.menuModel = menuModel;
+        setMenuModel(menuModel);
     }
 
     public MenuModel getMenuModel()
@@ -27,6 +27,7 @@ public class ItemsListCalculator extends MenuModelClient
     public void setMenuModel(MenuModel menuModel)
     {
         this.menuModel = menuModel;
+        menuModel.init(itemsList);
         fireModelChanged();
     }
 
@@ -44,7 +45,11 @@ public class ItemsListCalculator extends MenuModelClient
     {
         if (items.isEmpty()) return 0;
         double[] proportion = menuModel.getOptimalProportion();
-        double result = getSearchTime(proportion);
+        double result = 0;
+        for (int index = 0; index < proportion.length; index++)
+        {
+            result += menuModel.getTimeToSelect(index + 1, proportion.length) * proportion[index];
+        }
         double sum = 0;
         for (double popularity : proportion)
         {
@@ -60,15 +65,5 @@ public class ItemsListCalculator extends MenuModelClient
             sum += popularity * Math.log(popularity);
         }
         return result * (sum - totalPopularity * Math.log(totalPopularity));
-    }
-
-    double getSearchTime(double[] proportion)
-    {
-        double result = 0;
-        for (int index = 0; index < proportion.length; index++)
-        {
-            result += menuModel.getTimeToSelect(index + 1, proportion.length) * proportion[index];
-        }
-        return result;
     }
 }

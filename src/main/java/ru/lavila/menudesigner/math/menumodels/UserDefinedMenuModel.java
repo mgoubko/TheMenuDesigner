@@ -1,8 +1,6 @@
 package ru.lavila.menudesigner.math.menumodels;
 
-import ru.lavila.menudesigner.models.menumodels.MenuModel;
-
-public class UserDefinedMenuModel implements MenuModel
+public class UserDefinedMenuModel extends AnonymousMenuModel
 {
     private final String name;
     private final double[][] values;

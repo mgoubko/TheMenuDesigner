@@ -23,12 +23,12 @@ public class LocalSearchCategoryOptimizer {
         manipulator.cleanup();
         manipulator.hierarchy.freeze();
 
-        Split topDownGreedySplit = optimizeTopDownGreedy(taxonomy);
-        Split best = topDownGreedySplit;
+//        Split topDownGreedySplit = optimizeTopDownGreedy(taxonomy);
+//        Split best = topDownGreedySplit;
 
-//        Split topDownSplit = optimizeTopDown(taxonomy);
-//        if (topDownSplit.evaluation < best.evaluation) best = topDownSplit;
-
+        Split topDownSplit = optimizeTopDown(taxonomy);
+        Split best = topDownSplit;
+//
         Split bottomUpSplit = optimizeBottomUp(taxonomy);
         if (bottomUpSplit.evaluation < best.evaluation) best = bottomUpSplit;
 
@@ -45,8 +45,8 @@ public class LocalSearchCategoryOptimizer {
         manipulator.cleanup();
         manipulator.hierarchy.unfreeze();
         
-//        TheLogger.log("  Top-Down:    " + topDownSplit.evaluation);
-        TheLogger.log("  Top-Down Gr: " + topDownGreedySplit.evaluation);
+        TheLogger.log("  Top-Down:    " + topDownSplit.evaluation);
+//        TheLogger.log("  Top-Down Gr: " + topDownGreedySplit.evaluation);
         TheLogger.log("  Bottom-Up:   " + bottomUpSplit.evaluation);
 //        TheLogger.log("  From Top:    " + fromTopSplit.evaluation);
 //        TheLogger.log("  From Bottom: " + fromBottomSplit.evaluation);

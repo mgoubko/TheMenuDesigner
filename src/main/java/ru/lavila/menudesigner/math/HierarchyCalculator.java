@@ -70,12 +70,8 @@ public class HierarchyCalculator extends MenuModelClient implements MenuModelLis
     public double getSearchTime(Category category)
     {
         double result = 0;
-        List<Element> elements = category.getElements();
-        int totalElements = elements.size();
-        for (int index = 0; index < totalElements; index++)
-        {
-            Element element = elements.get(index);
-            result += itemsCalculator.getMenuModel().getTimeToSelect(index + 1, totalElements) * element.getPopularity();
+        for (Element element : category.getElements()) {
+            result += itemsCalculator.getMenuModel().getTimeToSelect(element, category) * element.getPopularity();
             if (element instanceof Category) result += getSearchTime((Category) element);
         }
         return result;

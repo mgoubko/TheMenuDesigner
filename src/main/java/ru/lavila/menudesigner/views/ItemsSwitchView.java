@@ -25,13 +25,12 @@ public class ItemsSwitchView extends JTabbedPane implements ItemsView
     private final ItemsController controller;
     private final List<JToolBar> toolBars;
 
-    public ItemsSwitchView(ItemsList itemsList, ItemsListCalculator calculator)
+    public ItemsSwitchView(ItemsList itemsList, ItemsListCalculator calculator, MenuModelsLibrary menuModelsLibrary)
     {
         super();
 
         controller = new ItemsController(itemsList);
 
-        MenuModelsLibrary menuModelsLibrary = new MenuModelsLibrary();
         TableView tableView = new TableView(
                 new TablePresenter(itemsList),
                 new MenuModelsPanel(new MenuModelsPresenter(calculator, menuModelsLibrary), new MenuModelsController(calculator, menuModelsLibrary))

@@ -1,9 +1,11 @@
 package ru.lavila.menudesigner.math.classifiers;
 
+import ru.lavila.menudesigner.math.ElementsPopularityComparator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.Item;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,16 +17,18 @@ public class CategoryManipulator {
     public final Category category;
     public final List<Item> group;
     public final CategoryEvaluator evaluator;
+    private final Comparator<Element> elementsComparator;
 
     public CategoryManipulator(Hierarchy hierarchy, Category category) {
-        this(hierarchy, category, null);
+        this(hierarchy, category, null, null);
     }
 
-    public CategoryManipulator(Hierarchy hierarchy, Category category, CategoryEvaluator evaluator) {
+    public CategoryManipulator(Hierarchy hierarchy, Category category, CategoryEvaluator evaluator, MenuModel menuModel) {
         this.hierarchy = hierarchy;
         this.category = category;
         this.evaluator = evaluator;
         this.group = category.getGroup();
+        elementsComparator = menuModel.getElementsComparator(new PopularityCalculator());
     }
 
     protected void cleanup() {
@@ -76,26 +80,7 @@ public class CategoryManipulator {
                 }
             }
         }
-        Collections.sort(normalized, new Comparator<Element>() {
-            public int compare(Element element1, Element element2) {
-                return Double.compare(getPopularity(element2), getPopularity(element1));
-            }
-
-            private double getPopularity(Element element) {
-                if (element instanceof Item && group.contains(element)) {
-                    return element.getPopularity();
-                } else if (element instanceof Category) {
-                    List<Item> categoryGroup = ((Category) element).getGroup();
-                    categoryGroup.retainAll(group);
-                    double popularity = 0;
-                    for (Item item : categoryGroup) {
-                        popularity += item.getPopularity();
-                    }
-                    return popularity;
-                }
-                return 0;
-            }
-        });
+        Collections.sort(normalized, elementsComparator);
         return normalized;
     }
 
@@ -127,5 +112,22 @@ public class CategoryManipulator {
 
     public Split groupSplit() {
         return split(new ArrayList<Element>(group));
+    }
+
+    private class PopularityCalculator implements MenuModel.PopularityCalculator {
+        public double getPopularity(Element element) {
+            if (element instanceof Item && group.contains(element)) {
+                return element.getPopularity();
+            } else if (element instanceof Category) {
+                List<Item> categoryGroup = ((Category) element).getGroup();
+                categoryGroup.retainAll(group);
+                double popularity = 0;
+                for (Item item : categoryGroup) {
+                    popularity += item.getPopularity();
+                }
+                return popularity;
+            }
+            return 0;
+        }
     }
 }

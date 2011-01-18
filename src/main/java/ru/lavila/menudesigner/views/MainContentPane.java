@@ -5,10 +5,10 @@ import ru.lavila.menudesigner.controllers.TreeController;
 import ru.lavila.menudesigner.io.ItemsListLoader;
 import ru.lavila.menudesigner.math.HierarchyCalculator;
 import ru.lavila.menudesigner.math.ItemsListCalculator;
-import ru.lavila.menudesigner.math.menumodels.ReadUntilWithErrorMenuModel;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.impl.ItemsListImpl;
+import ru.lavila.menudesigner.models.menumodels.MenuModelsLibrary;
 import ru.lavila.menudesigner.presenters.TreePopupMenuPresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
 import ru.lavila.menudesigner.views.toolbars.LoadToolBar;
@@ -38,10 +38,11 @@ public class MainContentPane extends JPanel
     public void setupView(ItemsList itemsList)
     {
         Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
-        //todo: remove hardcoded menu model
-        ItemsListCalculator calculator = new ItemsListCalculator(itemsList, new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
+        MenuModelsLibrary menuModelsLibrary = new MenuModelsLibrary();
 
-        ItemsSwitchView sourceView = new ItemsSwitchView(itemsList, calculator);
+        ItemsListCalculator calculator = new ItemsListCalculator(itemsList, menuModelsLibrary.getMenuModels().get(0));
+
+        ItemsSwitchView sourceView = new ItemsSwitchView(itemsList, calculator, menuModelsLibrary);
         sourceView.addToolBar(new LoadToolBar(this));
 
         HierarchyCalculator targetHierarchyCalculator = new HierarchyCalculator(calculator, targetHierarchy);
