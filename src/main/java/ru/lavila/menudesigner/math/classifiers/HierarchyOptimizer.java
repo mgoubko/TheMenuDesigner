@@ -50,12 +50,9 @@ public class HierarchyOptimizer {
                 double time = new HierarchyCalculator(calculator, tempHierarchy).getHierarchySearchTime();
                 itemsList.removeHierarchy(tempHierarchy);
                 TheLogger.log("Hierarchy search time: " + time);
-                if (time < bestTime) {
-                    bestTime = time;
-                    bestHierarchy = tempHierarchy;
-                } else {
-                    break;
-                }
+                if (time > bestTime) break;
+                bestTime = time;
+                bestHierarchy = tempHierarchy;
             }
         }
 

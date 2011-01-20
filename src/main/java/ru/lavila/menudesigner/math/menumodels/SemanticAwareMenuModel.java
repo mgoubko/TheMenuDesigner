@@ -10,22 +10,21 @@ import java.util.List;
 
 public class SemanticAwareMenuModel extends ReadUntilMenuModel {
     private final int VARIATIONS = 10;
-    private double minReadingTime;
-    private double maxReadingTime;
-    private final String name;
+    private final int variation;
 
     public SemanticAwareMenuModel(double tResp, double tLoad, double tClick) {
-        super(tResp, tLoad, -1, tClick);
-        this.name = "Semantic-aware self-terminating serial search";
+        this(tResp, tLoad, tClick, 0);
     }
 
-    private SemanticAwareMenuModel(double tResp, double tLoad, double tRead, double tClick) {
-        super(tResp, tLoad, tRead, tClick);
-        this.name = "Semantic-aware self-terminating serial search (tRead = " + tRead + ")";
+    private SemanticAwareMenuModel(double tResp, double tLoad, double tClick, int variation) {
+        super(tResp, tLoad, -1, tClick);
+        this.variation = variation;
     }
 
     @Override
     public String getName() {
+        String name = "Semantic-aware self-terminating serial search";
+        if (variation > 0) name += " (" + variation + "/" + VARIATIONS + ")";
         return name;
     }
 
@@ -33,8 +32,8 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
     public void init(ItemsList itemsList) {
         super.init(itemsList);
         optimalProportion = null;
-        minReadingTime = -1;
-        maxReadingTime = -1;
+        double minReadingTime = -1;
+        double maxReadingTime = -1;
         for (Item item : itemsList.toArray()) {
             double readingTime = item.getReadingTime();
             if (readingTime < minReadingTime || minReadingTime < 0) minReadingTime = readingTime;
@@ -47,7 +46,7 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
                 if (readingTime > maxReadingTime) maxReadingTime = readingTime;
             }
         }
-        tRead = minReadingTime;
+        tRead = minReadingTime + (maxReadingTime - minReadingTime) * variation / VARIATIONS;
     }
 
     @Override
@@ -77,10 +76,7 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
     public List<MenuModel> getVariations() {
         List<MenuModel> variations = new ArrayList<MenuModel>();
         for (int i = 1; i <= VARIATIONS; i++) {
-            variations.add(new SemanticAwareMenuModel(tResp, tLoad, minReadingTime + maxReadingTime * i / VARIATIONS, tClick) {
-                @Override
-                public void init(ItemsList itemsList) {}
-            });
+            variations.add(new SemanticAwareMenuModel(tResp, tLoad, tClick, i));
         }
         return variations;
     }
