@@ -149,6 +149,13 @@ public class ItemsListImpl implements ItemsList, ElementListener, HierarchyListe
         return hierarchy;
     }
 
+    public void removeHierarchy(Hierarchy hierarchy) {
+        if (hierarchies.contains(hierarchy)) {
+            hierarchy.removeModelListener(this);
+            hierarchies.remove(hierarchy);
+        }
+    }
+
     public void addModelListener(ItemsListListener listener)
     {
         listeners.add(listener);

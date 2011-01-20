@@ -17,6 +17,7 @@ public interface ItemsList
     public List<Hierarchy> getHierarchies();
     public List<Hierarchy> getTaxonomies();
     public Hierarchy newHierarchy(String name, boolean taxomony);
+    public void removeHierarchy(Hierarchy hierarchy);
 
     public void addModelListener(ItemsListListener listener);
     public void removeModelListener(ItemsListListener listener);

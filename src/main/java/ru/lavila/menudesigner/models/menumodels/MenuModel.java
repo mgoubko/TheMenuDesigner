@@ -5,6 +5,7 @@ import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.ItemsList;
 
 import java.util.Comparator;
+import java.util.List;
 
 public interface MenuModel
 {
@@ -41,6 +42,13 @@ public interface MenuModel
      * @return optimal proportion for popularities
      */
     public double[] getOptimalProportion();
+
+    /**
+     * Get alternative menu models based on the current one.
+     * Variations will be used when optimize hierarchy to choose the best one
+     * @return menu model variations excluding the model itself
+     */
+    public List<MenuModel> getVariations();
 
     /**
      * Comparator to sort elements in natural order defined by menu model

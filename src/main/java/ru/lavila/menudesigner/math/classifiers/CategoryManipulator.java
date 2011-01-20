@@ -28,7 +28,7 @@ public class CategoryManipulator {
         this.category = category;
         this.evaluator = evaluator;
         this.group = category.getGroup();
-        elementsComparator = menuModel.getElementsComparator(new PopularityCalculator());
+        elementsComparator = menuModel == null ? null : menuModel.getElementsComparator(new PopularityCalculator());
     }
 
     protected void cleanup() {

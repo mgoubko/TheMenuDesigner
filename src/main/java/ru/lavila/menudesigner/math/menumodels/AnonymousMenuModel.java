@@ -6,6 +6,7 @@ import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.menumodels.MenuModel;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,5 +25,9 @@ public abstract class AnonymousMenuModel implements MenuModel {
 
     public Comparator<Element> getElementsComparator(PopularityCalculator popularityCalculator) {
         return new ElementsPopularityComparator(popularityCalculator);
+    }
+
+    public List<MenuModel> getVariations() {
+        return Collections.emptyList();
     }
 }
