@@ -8,6 +8,7 @@ import ru.lavila.menudesigner.math.ItemsListCalculator;
 import ru.lavila.menudesigner.models.Hierarchy;
 import ru.lavila.menudesigner.models.ItemsList;
 import ru.lavila.menudesigner.models.impl.ItemsListImpl;
+import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import ru.lavila.menudesigner.models.menumodels.MenuModelsLibrary;
 import ru.lavila.menudesigner.presenters.TreePopupMenuPresenter;
 import ru.lavila.menudesigner.presenters.TreePresenter;
@@ -39,16 +40,17 @@ public class MainContentPane extends JPanel
     {
         Hierarchy targetHierarchy = itemsList.newHierarchy("Menu", false);
         MenuModelsLibrary menuModelsLibrary = new MenuModelsLibrary();
+        MenuModel menuModel = menuModelsLibrary.getMenuModels().get(0);
 
-        ItemsListCalculator calculator = new ItemsListCalculator(itemsList, menuModelsLibrary.getMenuModels().get(0));
+        ItemsListCalculator calculator = new ItemsListCalculator(itemsList, menuModel);
 
         ItemsSwitchView sourceView = new ItemsSwitchView(itemsList, calculator, menuModelsLibrary);
         sourceView.addToolBar(new LoadToolBar(this));
 
         HierarchyCalculator targetHierarchyCalculator = new HierarchyCalculator(calculator, targetHierarchy);
         TreeView targetView = new TreeView(new TreePresenter(targetHierarchy), new TreeController(targetHierarchy), targetHierarchyCalculator);
-        targetView.addToolBar(new TargetToolBar(this, new TargetTreeController(targetHierarchy, itemsList, targetHierarchyCalculator, calculator)));
-        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, itemsList, targetHierarchyCalculator, calculator), targetView));
+        targetView.addToolBar(new TargetToolBar(this, new TargetTreeController(targetHierarchy, itemsList, targetHierarchyCalculator, calculator, menuModel)));
+        targetView.setPopupMenu(new TreePopupMenu(new TreePopupMenuPresenter(itemsList), new TargetTreeController(targetHierarchy, itemsList, targetHierarchyCalculator, calculator, menuModel), targetView));
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Target Menu", targetView);

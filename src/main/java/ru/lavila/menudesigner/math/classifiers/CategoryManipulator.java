@@ -1,6 +1,5 @@
 package ru.lavila.menudesigner.math.classifiers;
 
-import ru.lavila.menudesigner.math.ElementsPopularityComparator;
 import ru.lavila.menudesigner.models.Category;
 import ru.lavila.menudesigner.models.Element;
 import ru.lavila.menudesigner.models.Hierarchy;
@@ -17,18 +16,20 @@ public class CategoryManipulator {
     public final Category category;
     public final List<Item> group;
     public final CategoryEvaluator evaluator;
+    private final MenuModel menuModel;
     private final Comparator<Element> elementsComparator;
 
-    public CategoryManipulator(Hierarchy hierarchy, Category category) {
-        this(hierarchy, category, null, null);
+    public CategoryManipulator(Hierarchy hierarchy, Category category, MenuModel menuModel) {
+        this(hierarchy, category, menuModel, null);
     }
 
-    public CategoryManipulator(Hierarchy hierarchy, Category category, CategoryEvaluator evaluator, MenuModel menuModel) {
+    public CategoryManipulator(Hierarchy hierarchy, Category category, MenuModel menuModel, CategoryEvaluator evaluator) {
         this.hierarchy = hierarchy;
         this.category = category;
         this.evaluator = evaluator;
         this.group = category.getGroup();
-        elementsComparator = menuModel == null ? null : menuModel.getElementsComparator(new PopularityCalculator());
+        this.menuModel = menuModel;
+        elementsComparator = menuModel.getElementsComparator(new PopularityCalculator());
     }
 
     protected void cleanup() {
@@ -36,10 +37,10 @@ public class CategoryManipulator {
         hierarchy.remove(children.toArray(new Element[children.size()]));
     }
 
-    public void sortByPopularity()
+    public void sort()
     {
         List<Element> elements = new ArrayList<Element>(category.getElements());
-        Collections.sort(elements, new ElementsPopularityComparator());
+        Collections.sort(elements, menuModel.getElementsComparator());
         hierarchy.add(category, elements.toArray(new Element[elements.size()]));
     }
 

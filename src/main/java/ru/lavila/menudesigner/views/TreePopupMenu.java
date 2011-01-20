@@ -32,10 +32,10 @@ public class TreePopupMenu extends JPopupMenu implements TreeSelectionListener {
     }
 
     private void fillMenu() {
-        sort = new JMenuItem("Sort by popularity");
+        sort = new JMenuItem("Sort category elements");
         sort.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controller.sortByPriority(getSelectedCategory());
+                controller.sortElements(getSelectedCategory());
             }
         });
         add(sort);
