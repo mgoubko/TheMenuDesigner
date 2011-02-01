@@ -30,9 +30,7 @@ abstract class ElementImpl implements Element
     }
 
     public double getReadingTime() {
-        //TODO: evaluate reading speed from experiments
-        //TODO: read these values from source data
-        return getName().length() * 0.1;
+        return getName().length() * 0.065 + 1.3;
     }
 
     public void addModelListener(ElementListener listener)
