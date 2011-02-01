@@ -41,6 +41,8 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
         }
         for (Hierarchy taxonomy : itemsList.getTaxonomies()) {
             for (Category category : taxonomy.getAllCategories()) {
+                // Skip root category as it's name should never be used in the target menu
+                if (taxonomy.getRoot() == category) continue;
                 double readingTime = category.getReadingTime();
                 if (readingTime < minReadingTime) minReadingTime = readingTime;
                 if (readingTime > maxReadingTime) maxReadingTime = readingTime;
