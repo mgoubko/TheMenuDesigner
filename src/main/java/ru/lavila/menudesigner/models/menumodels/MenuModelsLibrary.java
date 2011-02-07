@@ -20,8 +20,8 @@ public class MenuModelsLibrary
 
         //todo: remove hardcoded examples
         addMenuModel(new ReadUntilMenuModel(0.5, 0.1, 0.5, 0.5));
-        addMenuModel(new ReadUntilWithErrorMenuModel(1, 0, 1, 0.5, 0.05));
-        addMenuModel(new SemanticAwareMenuModel(0.5, 0.1, 0.5));
+        addMenuModel(new ReadUntilWithErrorMenuModel(1, 0, 3.35, 1, 0.05));
+        addMenuModel(new SemanticAwareMenuModel(1, 0, 1, 0.05));
     }
 
     public List<MenuModel> getMenuModels()

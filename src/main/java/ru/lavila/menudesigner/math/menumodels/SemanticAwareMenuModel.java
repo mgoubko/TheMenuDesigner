@@ -8,22 +8,22 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class SemanticAwareMenuModel extends ReadUntilMenuModel {
+public class SemanticAwareMenuModel extends ReadUntilWithErrorMenuModel {
     private final int VARIATIONS = 10;
     private final int variation;
 
-    public SemanticAwareMenuModel(double tResp, double tLoad, double tClick) {
-        this(tResp, tLoad, tClick, 0);
+    public SemanticAwareMenuModel(double tResp, double tLoad, double tClick, double errorProbability) {
+        this(tResp, tLoad, tClick, errorProbability, 0);
     }
 
-    private SemanticAwareMenuModel(double tResp, double tLoad, double tClick, int variation) {
-        super(tResp, tLoad, -1, tClick);
+    private SemanticAwareMenuModel(double tResp, double tLoad, double tClick, double errorProbability, int variation) {
+        super(tResp, tLoad, -1, tClick, errorProbability);
         this.variation = variation;
     }
 
     @Override
     public String getName() {
-        String name = "Semantic-aware self-terminating serial search";
+        String name = "Semantic-aware " + super.getName();
         if (variation > 0) name += " (" + variation + "/" + VARIATIONS + ")";
         return name;
     }
@@ -60,10 +60,11 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
     @Override
     public double getTimeToSelect(Element element, Category category) {
         List<Element> elements = category.getElements();
-        double result = tResp + tLoad * elements.size() + tClick;
+        double result = (1 + 2 * errorProbability) * (tResp + tLoad * elements.size() + tClick);
+        boolean willRead = true;
         for (Element categoryElement : elements) {
-            result += categoryElement.getReadingTime();
-            if (categoryElement == element) break;
+            result += categoryElement.getReadingTime() * (willRead ? 1 + 2 * errorProbability : errorProbability);
+            if (categoryElement == element) willRead = false;
         }
         return result;
     }
@@ -78,7 +79,7 @@ public class SemanticAwareMenuModel extends ReadUntilMenuModel {
     public List<MenuModel> getVariations() {
         List<MenuModel> variations = new ArrayList<MenuModel>();
         for (int i = 1; i <= VARIATIONS; i++) {
-            variations.add(new SemanticAwareMenuModel(tResp, tLoad, tClick, i));
+            variations.add(new SemanticAwareMenuModel(tResp, tLoad, tClick, errorProbability, i));
         }
         return variations;
     }
