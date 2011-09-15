@@ -14,7 +14,7 @@ public class HierarchyOptimizer {
     private final Hierarchy hierarchy;
     private final HierarchyCalculator hierarchyCalculator;
     private final ItemsListCalculator calculator;
-    private final CategoryEvaluator evaluator;
+    private CategoryEvaluator evaluator;
 
     public HierarchyOptimizer(ItemsList itemsList, Hierarchy hierarchy, HierarchyCalculator hierarchyCalculator, ItemsListCalculator calculator) {
         this.hierarchy = hierarchy;
@@ -22,7 +22,18 @@ public class HierarchyOptimizer {
         this.taxonomies = itemsList.getTaxonomies();
         this.hierarchyCalculator = hierarchyCalculator;
         this.calculator = calculator;
-        this.evaluator = new TopDownTreeEvaluator(hierarchyCalculator);
+        this.evaluator = new CostCategoryEvaluator(hierarchyCalculator);
+//        this.evaluator = new TopDownTreeEvaluator(hierarchyCalculator);
+    }
+
+    public void optimizeSubTreeWithFactor(Category category) {
+        double factor = 0.9;
+        int totalSize = category.getGroup().size();
+        for (int i = 0; i <= 30; i++) {
+            double beta = (0.0 + i) / 100;
+            this.evaluator = new CostCategoryEvaluator(hierarchyCalculator, factor, beta, totalSize);
+            optimizeSubTree(category);
+        }
     }
 
     public void optimizeSubTree(Category category) {
