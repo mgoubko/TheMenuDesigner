@@ -8,7 +8,7 @@ import ru.lavila.menudesigner.utils.TheLogger;
 
 import java.util.*;
 
-public class LocalSearchCategoryOptimizer {
+public class LocalSearchCategoryOptimizer implements CategoryOptimizer {
     private final CategoryManipulator manipulator;
     private final MenuModel menuModel;
 

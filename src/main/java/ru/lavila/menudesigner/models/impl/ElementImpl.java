@@ -30,7 +30,7 @@ abstract class ElementImpl implements Element
     }
 
     public double getReadingTime() {
-        return getName().length() * 0.065 + 1.3;
+        return getName().length() * 0.062 + 1.3;
     }
 
     public void addModelListener(ElementListener listener)

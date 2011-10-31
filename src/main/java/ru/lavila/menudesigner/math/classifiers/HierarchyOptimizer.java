@@ -76,7 +76,7 @@ public class HierarchyOptimizer {
 
     private void optimizeSubTree(Hierarchy hierarchy, Category category, MenuModel menuModel) {
         CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, menuModel, evaluator);
-        LocalSearchCategoryOptimizer optimizer = new LocalSearchCategoryOptimizer(manipulator, menuModel);
+        CategoryOptimizer optimizer = getCategoryOptimizer(manipulator, menuModel);
         Split bestSplit = manipulator.groupSplit();
         for (Hierarchy taxonomy : taxonomies) {
             Split split = optimizer.optimize(taxonomy);
@@ -104,7 +104,12 @@ public class HierarchyOptimizer {
     public void optimizeByTaxonomy(Category category, Hierarchy taxonomy) {
         long start = System.currentTimeMillis();
         CategoryManipulator manipulator = new CategoryManipulator(hierarchy, category, calculator.getMenuModel(), evaluator);
-        manipulator.apply(new LocalSearchCategoryOptimizer(manipulator, calculator.getMenuModel()).optimize(taxonomy));
+        manipulator.apply(getCategoryOptimizer(manipulator, calculator.getMenuModel()).optimize(taxonomy));
         TheLogger.log("Time spent (optimize by taxonomy): " + (System.currentTimeMillis() - start) + " ms");
+    }
+
+    private CategoryOptimizer getCategoryOptimizer(CategoryManipulator manipulator, MenuModel menuModel) {
+        return new LocalSearchCategoryOptimizer(manipulator, menuModel);
+//        return new GreedyCategoryOptimizer(manipulator, menuModel);
     }
 }

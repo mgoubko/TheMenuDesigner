@@ -9,7 +9,7 @@ import ru.lavila.menudesigner.models.menumodels.MenuModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier
+public class GreedyCategoryOptimizer extends AbstractTaxonomyElementsClassifier implements CategoryOptimizer
 {
     private final CategoryManipulator manipulator;
     private final Category category;
